@@ -1,0 +1,24 @@
+spring:
+  profiles:
+    active: dev
+
+---
+
+spring:
+  profiles: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/songrequest?useUnicode=yes&serverTimezone=UTC&characterEncoding=UTF-8
+    username: admin
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
+
+

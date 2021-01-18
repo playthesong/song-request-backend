@@ -1,0 +1,11 @@
+spring:
+  profiles: test
+  h2:
+    console:
+      enabled: true
+  datasource:
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
