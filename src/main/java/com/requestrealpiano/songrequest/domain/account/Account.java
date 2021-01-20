@@ -2,11 +2,14 @@ package com.requestrealpiano.songrequest.domain.account;
 
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +40,19 @@ public class Account {
     private Integer requestCount;
 
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    private LocalDate createdDate;
 
     @OneToMany(mappedBy = "account")
     private List<Letter> letters = new ArrayList<>();
 
+    @Builder
+    private Account(Long googleOauthId, String name, String email, Role role, String avatarUrl, Integer requestCount) {
+        this.googleOauthId = googleOauthId;
+        this.name = name;
+        this.email = email;
+        this.role = role;
+        this.avatarUrl = avatarUrl;
+        this.requestCount = requestCount;
+        this.createdDate = LocalDate.now(ZoneId.of("Asia/Seoul"));
+    }
 }

@@ -3,6 +3,7 @@ package com.requestrealpiano.songrequest.domain.song;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.youtubecontent.YoutubeContent;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -42,4 +43,15 @@ public class Song {
 
     @OneToMany(mappedBy = "song")
     private List<YoutubeContent> youtubeContent = new ArrayList<>();
+
+    @Builder
+    private Song(String songTitle, String albumTitle, String artist, String imageUrl,
+                 Integer requestCount, String hashId) {
+        this.songTitle = songTitle;
+        this.albumTitle = albumTitle;
+        this.artist = artist;
+        this.imageUrl = imageUrl;
+        this.requestCount = requestCount;
+        this.hashId = hashId;
+    }
 }
