@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.domain.songrequest;
+package com.requestrealpiano.songrequest.domain.letter;
 
 public enum RequestStatus {
     WAITING("대기"),

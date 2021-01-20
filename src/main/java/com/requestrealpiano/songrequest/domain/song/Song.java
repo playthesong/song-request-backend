@@ -1,6 +1,6 @@
 package com.requestrealpiano.songrequest.domain.song;
 
-import com.requestrealpiano.songrequest.domain.songrequest.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.youtubecontent.YoutubeContent;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -38,7 +38,7 @@ public class Song {
     private String hashId;
 
     @OneToMany(mappedBy ="song")
-    private List<SongRequest> songRequests = new ArrayList<>();
+    private List<Letter> letters = new ArrayList<>();
 
     @OneToMany(mappedBy = "song")
     private List<YoutubeContent> youtubeContent = new ArrayList<>();

@@ -1,6 +1,6 @@
 package com.requestrealpiano.songrequest.domain.account;
 
-import com.requestrealpiano.songrequest.domain.songrequest.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.Letter;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,6 +40,6 @@ public class Account {
     private LocalDateTime createdDate;
 
     @OneToMany(mappedBy = "account")
-    private List<SongRequest> songRequests = new ArrayList<>();
+    private List<Letter> letters = new ArrayList<>();
 
 }

@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.domain.songrequest.dto.response.inner;
+package com.requestrealpiano.songrequest.domain.letter.dto.response.inner;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import lombok.Builder;

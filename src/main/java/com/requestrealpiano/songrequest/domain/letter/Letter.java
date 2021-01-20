@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.domain.songrequest;
+package com.requestrealpiano.songrequest.domain.letter;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.song.Song;
@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class SongRequest {
+public class Letter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "song_request_id")
+    @Column(name = "letter_id")
     private Long id;
 
     @Column(name = "song_story")
