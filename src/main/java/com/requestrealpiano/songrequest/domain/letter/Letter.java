@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,11 +40,10 @@ public class Letter {
     private Song song;
 
     @Builder
-    private Letter(String songStory, RequestStatus requestStatus, LocalDateTime createdDateTime,
-                  Account account, Song song) {
+    private Letter(String songStory, RequestStatus requestStatus, Account account, Song song) {
         this.songStory = songStory;
         this.requestStatus = requestStatus;
-        this.createdDateTime = createdDateTime;
+        this.createdDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
         this.account = account;
         this.song = song;
     }
