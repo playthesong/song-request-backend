@@ -15,7 +15,7 @@ public class LetterService {
 
     private final LetterRepository letterRepository;
 
-    public List<LetterResponse> findAllSongRequests() {
+    public List<LetterResponse> findAllLetters() {
         List<Letter> letters = letterRepository.findAll();
         return letters.stream()
                       .map(LetterResponse::from)
