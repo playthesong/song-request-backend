@@ -35,8 +35,9 @@ public class LetterResponse {
 
         return LetterResponse.builder()
                                    .id(letter.getId())
-                                   .songSummary(SongSummary.from(song))
+                                   .songStory(letter.getSongStory())
                                    .requestStatus(requestStatus.getKey())
+                                   .songSummary(SongSummary.from(song))
                                    .accountSummary(AccountSummary.from(account))
                                    .build();
     }
