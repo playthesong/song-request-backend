@@ -35,7 +35,7 @@ class AccountTest {
                 () -> assertThat(account.getRole()).isEqualTo(role),
                 () -> assertThat(account.getAvatarUrl()).isEqualTo(avatarUrl),
                 () -> assertThat(account.getRequestCount()).isEqualTo(requestCount),
-                () -> assertThat(account.getCreatedDate()).isNotNull(),
+                () -> assertThat(account.getCreatedDateTime()).isNotNull(),
                 () -> assertThat(account.getLetters()).isNotNull()
         );
 

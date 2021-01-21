@@ -40,7 +40,7 @@ public class Account {
     private Integer requestCount;
 
     @Column(name = "created_date")
-    private LocalDate createdDate;
+    private LocalDateTime createdDateTime;
 
     @OneToMany(mappedBy = "account")
     private List<Letter> letters = new ArrayList<>();
@@ -53,6 +53,6 @@ public class Account {
         this.role = role;
         this.avatarUrl = avatarUrl;
         this.requestCount = requestCount;
-        this.createdDate = LocalDate.now(ZoneId.of("Asia/Seoul"));
+        this.createdDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 }
