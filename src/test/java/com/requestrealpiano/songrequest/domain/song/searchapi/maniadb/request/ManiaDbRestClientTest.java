@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.domain.song.searchapi.request;
+package com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.request;
 
 import com.requestrealpiano.songrequest.config.searchapi.ManiaDbProperties;
 import org.junit.jupiter.api.DisplayName;
