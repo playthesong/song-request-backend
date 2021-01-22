@@ -20,5 +20,9 @@ spring:
       hibernate:
         format_sql: true
 
-
-
+maniadb:
+  url: http://maniadb.com/api/search/
+  method: song
+  display: 10
+  apiKey: ${MANIADB_API_KEY}
+  version: 0.5
