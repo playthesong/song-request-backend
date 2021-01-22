@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @JacksonXmlRootElement(localName = "item")
-public class ManiaDbTrackData {
+public class ManiaDbTrack {
 
     @JacksonXmlProperty(localName = "title")
     private String title;
