@@ -6,14 +6,14 @@ import lombok.Getter;
 
 @Getter
 @JacksonXmlRootElement(localName = "item")
-public class ManiaDbTrack {
+public class ManiaDbTrackData {
 
     @JacksonXmlProperty(localName = "title")
     private String title;
 
     @JacksonXmlProperty(localName = "album")
-    private ManiaDbAlbum album;
+    private ManiaDbAlbumData album;
 
     @JacksonXmlProperty(localName = "artist")
-    private ManiaDbArtist artist;
+    private ManiaDbArtistData artist;
 }

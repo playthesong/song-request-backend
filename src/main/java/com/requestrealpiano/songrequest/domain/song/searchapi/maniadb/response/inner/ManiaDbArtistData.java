@@ -7,7 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @Getter
 @XmlRootElement(name = "manidb:artist")
-public class ManiaDbArtist {
+public class ManiaDbArtistData {
 
     @XmlElement(name = "name")
     private String name;
