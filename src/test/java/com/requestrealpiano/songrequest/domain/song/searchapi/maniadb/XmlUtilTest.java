@@ -5,6 +5,7 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.i
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbArtistData;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbData;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrackData;
+import com.requestrealpiano.songrequest.domain.song.searchapi.util.XmlUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -17,7 +18,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class ManiaDbXmlMapperTest {
+class XmlUtilTest {
 
     @ParameterizedTest
     @CsvSource({"10, 10"})
@@ -28,7 +29,7 @@ class ManiaDbXmlMapperTest {
         String testXml = Files.readString(testXmlFilePath);
 
         // when
-        ManiaDbClientResponse maniaDbClientResponse = ManiaDbXmlMapper.mapXmlToData(testXml);
+        ManiaDbClientResponse maniaDbClientResponse = XmlUtil.mapToManiaDbData(testXml);
         ManiaDbData maniaDbData = maniaDbClientResponse.getManiaDbData();
         List<ManiaDbTrackData> tracks = maniaDbData.getTracks();
 
