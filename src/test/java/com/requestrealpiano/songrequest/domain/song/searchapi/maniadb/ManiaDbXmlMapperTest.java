@@ -34,8 +34,8 @@ class ManiaDbXmlMapperTest {
 
         /* 0 - ManiaDbTrackData 중 첫 요소의 인덱스. */
         ManiaDbTrackData track = tracks.get(0);
-        ManiaDbAlbumData album = track.getAlbum();
-        ManiaDbArtistData artist = track.getArtist();
+        ManiaDbAlbumData album = track.getAlbumData();
+        ManiaDbArtistData artist = track.getArtistData();
 
         // then
         assertAll(
