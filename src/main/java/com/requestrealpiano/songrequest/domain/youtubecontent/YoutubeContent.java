@@ -2,10 +2,12 @@ package com.requestrealpiano.songrequest.domain.youtubecontent;
 
 import com.requestrealpiano.songrequest.domain.song.Song;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class YoutubeContent {

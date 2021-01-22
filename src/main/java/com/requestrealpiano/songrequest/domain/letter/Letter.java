@@ -1,20 +1,24 @@
-package com.requestrealpiano.songrequest.domain.songrequest;
+package com.requestrealpiano.songrequest.domain.letter;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class SongRequest {
+public class Letter {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "song_request_id")
+    @Column(name = "letter_id")
     private Long id;
 
     @Column(name = "song_story")
@@ -34,4 +38,13 @@ public class SongRequest {
     @ManyToOne
     @JoinColumn(name = "song_id")
     private Song song;
+
+    @Builder
+    private Letter(String songStory, RequestStatus requestStatus, Account account, Song song) {
+        this.songStory = songStory;
+        this.requestStatus = requestStatus;
+        this.createdDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        this.account = account;
+        this.song = song;
+    }
 }
