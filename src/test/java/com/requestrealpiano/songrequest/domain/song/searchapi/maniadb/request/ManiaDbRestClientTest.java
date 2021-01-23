@@ -17,14 +17,12 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+// 실제 API 요청 테스트를 하기 위해 @EnableConfigurationProperties(ManiaDbProperties.class) 설정 추가
 @SpringBootTest(classes = ManiaDbRestClientTest.TestConfiguration.class)
 class ManiaDbRestClientTest {
 
     @Autowired
     ManiaDbProperties maniaDbProperties;
-
-    @EnableConfigurationProperties(ManiaDbProperties.class)
-    public static class TestConfiguration { }
 
     @ParameterizedTest
     @MethodSource("createNewManiaDbRequestParameters")
@@ -79,6 +77,10 @@ class ManiaDbRestClientTest {
                 () -> assertThat(maniaDbRestClientWhenAllEmpty.getKeyword()).isEqualTo(empty)
         );
     }
+
+    /* 실제 API 요청 테스트를 하기 위해 다음의 설정 추가 */
+    @EnableConfigurationProperties(ManiaDbProperties.class)
+    public static class TestConfiguration { }
 
     @ParameterizedTest
     @CsvSource({"김동률, 감사"})
