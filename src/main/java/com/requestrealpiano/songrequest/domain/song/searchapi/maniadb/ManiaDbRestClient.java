@@ -30,7 +30,7 @@ public class ManiaDbRestClient {
         this.keyword = keyword;
     }
 
-    public String searchManiaDbXmlResponse() {
+    public String searchManiaDb() {
         RestTemplate restTemplate = new RestTemplate();
         URI requestURI = createManiaDbRequestURI();
         return restTemplate.getForObject(requestURI, String.class);

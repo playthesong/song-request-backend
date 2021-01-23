@@ -92,7 +92,7 @@ class ManiaDbRestClientTest {
         ManiaDbRestClient maniaDbRestClient = ManiaDbRestClient.of(maniaDbProperties, artist, title);
 
         // when
-        String xml = maniaDbRestClient.searchManiaDbXmlResponse();
+        String xml = maniaDbRestClient.searchManiaDb();
 
         // then
         assertThat(xml).isNotEmpty();
