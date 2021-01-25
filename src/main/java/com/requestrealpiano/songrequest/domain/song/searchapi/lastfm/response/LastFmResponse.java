@@ -9,8 +9,8 @@ import java.util.List;
 @Getter
 public class LastFmResponse {
 
-    private int totalCount;
-    private List<LastFmTrack> tracks;
+    private final int totalCount;
+    private final List<LastFmTrack> tracks;
 
     @Builder
     private LastFmResponse(int totalCount, List<LastFmTrack> tracks) {

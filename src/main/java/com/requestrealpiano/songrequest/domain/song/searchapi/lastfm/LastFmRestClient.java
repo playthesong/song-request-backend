@@ -13,13 +13,13 @@ import java.net.URI;
 @Getter
 public class LastFmRestClient {
 
-    private String baseUrl;
-    private String method;
-    private String limit;
-    private String apiKey;
-    private String format;
-    private String artist;
-    private String track;
+    private final String baseUrl;
+    private final String method;
+    private final String limit;
+    private final String apiKey;
+    private final String format;
+    private final String artist;
+    private final String track;
 
     @Builder
     private LastFmRestClient(String baseUrl, String method, String limit, String apiKey, String format,
