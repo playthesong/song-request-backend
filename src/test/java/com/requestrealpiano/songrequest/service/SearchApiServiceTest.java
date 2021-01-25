@@ -6,6 +6,7 @@ import com.requestrealpiano.songrequest.config.searchapi.ManiaDbProperties;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
+import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.JsonTranslator;
@@ -26,14 +27,14 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest(classes = {SearchApiService.class, JsonTranslator.class, XmlTranslator.class, SearchApiServiceTest.TestConfiguration.class})
+@SpringBootTest(classes = {SearchApiService.class, ManiaDbRestClient.class, JsonTranslator.class, XmlTranslator.class, SearchApiServiceTest.TestConfiguration.class})
 class SearchApiServiceTest {
 
     @Autowired
     SearchApiService searchApiService;
 
     @Autowired
-    ManiaDbProperties maniaDbProperties;
+    ManiaDbRestClient maniaDbRestClient;
 
     @Autowired
     LastFmProperties lastFmProperties;

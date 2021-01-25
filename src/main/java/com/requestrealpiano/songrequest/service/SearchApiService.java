@@ -17,15 +17,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class SearchApiService {
 
-    private final ManiaDbProperties maniaDbProperties;
+    private final ManiaDbRestClient maniaDbRestClient;
     private final LastFmProperties lastFmProperties;
     private final JsonTranslator jsonTranslator;
     private final XmlTranslator xmlTranslator;
 
     // TODO: JsonProcessingException 처리
     public ManiaDbResponse searchManiaDbResponse(String artist, String title) throws JsonProcessingException {
-        ManiaDbRestClient maniaDbRestClient = ManiaDbRestClient.of(maniaDbProperties, artist, title);
-        String rawXml = maniaDbRestClient.searchManiaDb();
+        String rawXml = maniaDbRestClient.searchManiaDb(artist, title);
         ManiaDbClientResponse maniaDbData = xmlTranslator.mapToManiaDbData(rawXml);
         return ManiaDbResponse.from(maniaDbData);
     }
