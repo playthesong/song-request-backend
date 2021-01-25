@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 public class SearchApiService {
 
     private final ManiaDbRestClient maniaDbRestClient;
-    private final LastFmProperties lastFmProperties;
+    private final LastFmRestClient lastFmRestClient;
     private final JsonTranslator jsonTranslator;
     private final XmlTranslator xmlTranslator;
 
@@ -31,8 +31,7 @@ public class SearchApiService {
 
     // TODO: JsonProcessingException 처리
     public LastFmResponse searchLastFmResponse(String artist, String title) throws JsonProcessingException {
-        LastFmRestClient lastFmRestClient = LastFmRestClient.of(lastFmProperties, artist, title);
-        String rawJson = lastFmRestClient.searchLastFm();
+        String rawJson = lastFmRestClient.searchLastFm(artist, title);
         LastFmResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(rawJson);
         return lastFmResponse;
     }

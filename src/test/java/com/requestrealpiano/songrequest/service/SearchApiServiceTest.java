@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest(classes = {SearchApiService.class, ManiaDbRestClient.class, JsonTranslator.class, XmlTranslator.class, SearchApiServiceTest.TestConfiguration.class})
+@SpringBootTest(classes = {SearchApiService.class, ManiaDbRestClient.class, LastFmRestClient.class, JsonTranslator.class, XmlTranslator.class, SearchApiServiceTest.TestConfiguration.class})
 class SearchApiServiceTest {
 
     @Autowired
@@ -37,7 +37,7 @@ class SearchApiServiceTest {
     ManiaDbRestClient maniaDbRestClient;
 
     @Autowired
-    LastFmProperties lastFmProperties;
+    LastFmRestClient lastFmRestClient;
 
     @Autowired
     JsonTranslator jsonTranslator;
@@ -99,11 +99,8 @@ class SearchApiServiceTest {
     @MethodSource("searchLastFmResponseParameters")
     @DisplayName("LastFM 검색 결과 반환 테스트")
     void search_lastfm_response(String artist, String title, int totalCount) throws JsonProcessingException {
-        // given
-        LastFmRestClient lastFmRestClient = LastFmRestClient.of(lastFmProperties, artist, title);
-
         // when
-        String rawJson = lastFmRestClient.searchLastFm();
+        String rawJson = lastFmRestClient.searchLastFm(artist, title);
         LastFmResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(rawJson);
         List<LastFmTrack> tracks = lastFmResponse.getTracks();
 
