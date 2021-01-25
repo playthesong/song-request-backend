@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -39,7 +40,8 @@ public class LastFmTrack {
         this.imageUrl = url;
     }
 
-    LastFmTrack(String title, String artist, String imageUrl) {
+    @Builder
+    private LastFmTrack(String title, String artist, String imageUrl) {
         this.title = title;
         this.artist = artist;
         this.imageUrl = imageUrl;

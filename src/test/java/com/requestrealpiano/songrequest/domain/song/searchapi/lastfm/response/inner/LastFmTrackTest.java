@@ -14,9 +14,13 @@ class LastFmTrackTest {
     @ParameterizedTest
     @CsvSource({"Title, Artist, http://imageUrl"})
     @DisplayName("LastFm Track 데이터 직렬화 테스트")
-    void serialize_lastfm_track(String title, String artist, String url) throws JsonProcessingException {
+    void serialize_lastfm_track(String title, String artist, String imageUrl) throws JsonProcessingException {
         // given
-        LastFmTrack track = new LastFmTrack(title, artist, url);
+        LastFmTrack track = LastFmTrack.builder()
+                                       .title(title)
+                                       .artist(artist)
+                                       .imageUrl(imageUrl)
+                                       .build();
         String testJson = "{\"title\":\"Title\",\"artist\":\"Artist\",\"imageUrl\":\"http://imageUrl\"}";
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -32,7 +36,11 @@ class LastFmTrackTest {
     @DisplayName("LastFm Track 데이터 역직렬화 테스트")
     void deserialize_lastfm_track(String title, String artist, String imageUrl) throws JsonProcessingException {
         // given
-        LastFmTrack track = new LastFmTrack(title, artist, imageUrl);
+        LastFmTrack track = LastFmTrack.builder()
+                                       .title(title)
+                                       .artist(artist)
+                                       .imageUrl(imageUrl)
+                                       .build();
         String testJson = "{\"name\":\"Title\",\"artist\":\"Artist\",\"url\":\"http://imageUrl\"}";
         ObjectMapper objectMapper = new ObjectMapper();
 
