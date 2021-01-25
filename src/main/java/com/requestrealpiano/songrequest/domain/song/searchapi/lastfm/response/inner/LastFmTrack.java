@@ -11,18 +11,18 @@ import lombok.NoArgsConstructor;
 @JsonPropertyOrder({"title", "artist", "imageUrl"})
 public class LastFmTrack {
 
-    private String name;
+    private String title;
     private String artist;
-    private String url;
+    private String imageUrl;
 
     @JsonProperty("title")
     public String getTitle() {
-        return name;
+        return title;
     }
 
     @JsonProperty(value = "name", access = JsonProperty.Access.WRITE_ONLY)
     public void setName(String name) {
-        this.name = name;
+        this.title = name;
     }
 
     public String getArtist() {
@@ -31,17 +31,17 @@ public class LastFmTrack {
 
     @JsonProperty("imageUrl")
     public String getImageUrl() {
-        return url;
+        return imageUrl;
     }
 
     @JsonProperty(value = "url", access = JsonProperty.Access.WRITE_ONLY)
     public void setUrl(String url) {
-        this.url = url;
+        this.imageUrl = url;
     }
 
-    LastFmTrack(String name, String artist, String url) {
-        this.name = name;
+    LastFmTrack(String title, String artist, String imageUrl) {
+        this.title = title;
         this.artist = artist;
-        this.url = url;
+        this.imageUrl = imageUrl;
     }
 }

@@ -30,9 +30,9 @@ class LastFmTrackTest {
     @ParameterizedTest
     @CsvSource({"Title, Artist, http://imageUrl"})
     @DisplayName("LastFm Track 데이터 역직렬화 테스트")
-    void deserialize_lastfm_track(String title, String artist, String url) throws JsonProcessingException {
+    void deserialize_lastfm_track(String title, String artist, String imageUrl) throws JsonProcessingException {
         // given
-        LastFmTrack track = new LastFmTrack(title, artist, url);
+        LastFmTrack track = new LastFmTrack(title, artist, imageUrl);
         String testJson = "{\"name\":\"Title\",\"artist\":\"Artist\",\"url\":\"http://imageUrl\"}";
         ObjectMapper objectMapper = new ObjectMapper();
 
