@@ -9,6 +9,7 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.in
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.JsonTranslator;
+import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTranslator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -25,7 +26,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest(classes = {SearchApiService.class, JsonTranslator.class, SearchApiServiceTest.TestConfiguration.class})
+@SpringBootTest(classes = {SearchApiService.class, JsonTranslator.class, XmlTranslator.class, SearchApiServiceTest.TestConfiguration.class})
 class SearchApiServiceTest {
 
     @Autowired
@@ -39,6 +40,9 @@ class SearchApiServiceTest {
 
     @Autowired
     JsonTranslator jsonTranslator;
+
+    @Autowired
+    XmlTranslator xmlTranslator;
 
     @EnableConfigurationProperties({ManiaDbProperties.class, LastFmProperties.class})
     public static class TestConfiguration { }

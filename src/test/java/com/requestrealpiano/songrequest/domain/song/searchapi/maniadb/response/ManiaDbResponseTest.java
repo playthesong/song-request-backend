@@ -1,11 +1,19 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTranslator;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbData;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrackData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.context.annotation.Import;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,7 +24,11 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+@ExtendWith(MockitoExtension.class)
 class ManiaDbResponseTest {
+
+    @InjectMocks
+    XmlTranslator xmlTranslator;
 
     @Test
     @DisplayName("ManiaDB의 응답 데이터를 바탕으로 최종 검색 결과 DTO를 생성하는 테스트")
@@ -24,7 +36,8 @@ class ManiaDbResponseTest {
         // given
         Path testXmlFilePath = Path.of("src/test/resources/expectedresponse/maniadb_response.xml");
         String testXml = Files.readString(testXmlFilePath);
-        ManiaDbClientResponse maniaDbClientResponse = XmlTranslator.mapToManiaDbData(testXml);
+
+        ManiaDbClientResponse maniaDbClientResponse = xmlTranslator.mapToManiaDbData(testXml);
 
         ManiaDbData data = maniaDbClientResponse.getManiaDbData();
         List<ManiaDbTrackData> trackDataList = data.getTracks();
