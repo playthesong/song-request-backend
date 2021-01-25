@@ -1,8 +1,8 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.lastfm;
 
 import com.requestrealpiano.songrequest.config.searchapi.LastFmProperties;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -10,36 +10,28 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
+@RequiredArgsConstructor
 @Getter
+@Component
 public class LastFmRestClient {
 
-    private final String baseUrl;
-    private final String method;
-    private final String limit;
-    private final String apiKey;
-    private final String format;
-    private final String artist;
-    private final String track;
+    private final LastFmProperties lastFmProperties;
 
-    @Builder
-    private LastFmRestClient(String baseUrl, String method, String limit, String apiKey, String format,
-                             String artist, String track) {
-        this.baseUrl = baseUrl;
-        this.method = method;
-        this.limit = limit;
-        this.apiKey = apiKey;
-        this.format = format;
-        this.artist = artist;
-        this.track = track;
-    }
-
-    public String searchLastFm() {
+    public String searchLastFm(String artist, String track) {
         RestTemplate restTemplate = new RestTemplate();
-        URI requestURI = createLastFmRequestURI();
+        String checkedArtist = createValidWord(artist);
+        String checkedTrack = createValidWord(track);
+        URI requestURI = createLastFmRequestURI(checkedArtist, checkedTrack);
         return restTemplate.getForObject(requestURI, String.class);
     }
 
-    private URI createLastFmRequestURI() {
+    private URI createLastFmRequestURI(String artist, String track) {
+        String baseUrl = lastFmProperties.getUrl();
+        String method = lastFmProperties.getMethod();
+        String limit = lastFmProperties.getLimit();
+        String apiKey = lastFmProperties.getApiKey();
+        String format = lastFmProperties.getFormat();
+
         return UriComponentsBuilder.fromHttpUrl(baseUrl)
                                    .queryParam("method", method)
                                    .queryParam("limit", limit)
@@ -51,18 +43,10 @@ public class LastFmRestClient {
                                    .toUri();
     }
 
-    public static LastFmRestClient of(LastFmProperties lastFmProperties, String artist, String track) {
-        String checkedArtist = StringUtils.defaultString(artist);
-        String checkedTrack = StringUtils.defaultString(track);
-
-        return LastFmRestClient.builder()
-                               .baseUrl(lastFmProperties.getUrl())
-                               .method(lastFmProperties.getMethod())
-                               .limit(lastFmProperties.getLimit())
-                               .apiKey(lastFmProperties.getApiKey())
-                               .format(lastFmProperties.getFormat())
-                               .artist(checkedArtist)
-                               .track(checkedTrack)
-                               .build();
+    private String createValidWord(String word) {
+        if (StringUtils.isEmpty(word)) {
+            return "default";
+        }
+        return word;
     }
 }
