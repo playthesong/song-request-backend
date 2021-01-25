@@ -1,9 +1,14 @@
 package com.requestrealpiano.songrequest.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
+import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
+import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
+import com.requestrealpiano.songrequest.domain.song.searchapi.util.JsonTranslator;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -11,11 +16,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,5 +77,25 @@ class SongServiceTest {
                                               .imageUrl("http://imageUrl_3")
                                               .build();
         return Arrays.asList(firstTrack, secondTrack, thirdTrack);
+    }
+
+    @Test
+    @DisplayName("SearchApiService로부터 받아온 LastFM 검색 결과 데이터를 반환하는 테스트")
+    void return_lastfm_response() throws JsonProcessingException {
+        // given
+        String notExistArtist = "Not Exist Artist";
+        String notExistTitle = "Not Exist Title";
+
+        List<LastFmTrack> tracks = new ArrayList<>();
+        int totalCount = tracks.size();
+        LastFmResponse mockLastFmResponse = LastFmResponse.of(totalCount, tracks);
+
+        // when
+        when(searchApiService.searchLastFmResponse(notExistArtist, notExistTitle)).thenReturn(mockLastFmResponse);
+        LastFmResponse lastFmResponse = songService.searchLastFm(notExistArtist, notExistTitle);
+
+        // then
+        assertThat(lastFmResponse.getTotalCount()).isEqualTo(totalCount);
+        assertThat(lastFmResponse.getTracks()).isEqualTo(tracks);
     }
 }
