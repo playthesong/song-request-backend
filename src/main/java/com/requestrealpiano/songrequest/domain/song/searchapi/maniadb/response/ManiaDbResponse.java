@@ -6,6 +6,7 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.i
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,12 +25,18 @@ public class ManiaDbResponse {
     public static ManiaDbResponse from(ManiaDbClientResponse maniaDbClientResponse) {
         ManiaDbData maniaDbData = maniaDbClientResponse.getManiaDbData();
         List<ManiaDbTrackData> tracks = maniaDbData.getTracks();
+        int totalCount = maniaDbData.getTotalCount();
 
-        return ManiaDbResponse.builder()
-                              .totalCount(maniaDbData.getTotalCount())
-                              .tracks(tracks.stream()
-                                            .map(ManiaDbTrack::from)
-                                            .collect(Collectors.toList()))
-                              .build();
+        ManiaDbResponseBuilder builder = ManiaDbResponse.builder();
+        builder.totalCount(totalCount)
+               .build();
+
+        // 0 - 검색 결과 개수
+        if (totalCount == 0) {
+            return builder.tracks(Collections.emptyList())
+                          .build();
+        }
+           return builder.tracks(tracks.stream().map(ManiaDbTrack::from).collect(Collectors.toList()))
+                         .build();
     }
 }
