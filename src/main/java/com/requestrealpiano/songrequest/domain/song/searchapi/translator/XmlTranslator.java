@@ -1,11 +1,11 @@
-package com.requestrealpiano.songrequest.domain.song.searchapi.util;
+package com.requestrealpiano.songrequest.domain.song.searchapi.translator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbClientResponse;
 
-public class XmlUtil {
+public class XmlTranslator {
 
     // TODO: JsonProcessingException 처리
     public static ManiaDbClientResponse mapToManiaDbData(String xml) throws JsonProcessingException {

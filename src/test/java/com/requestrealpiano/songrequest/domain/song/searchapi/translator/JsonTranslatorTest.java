@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.domain.song.searchapi.util;
+package com.requestrealpiano.songrequest.domain.song.searchapi.translator;
 
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;

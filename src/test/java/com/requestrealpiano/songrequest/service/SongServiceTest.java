@@ -1,12 +1,10 @@
 package com.requestrealpiano.songrequest.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
-import com.requestrealpiano.songrequest.domain.song.searchapi.util.JsonTranslator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +20,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

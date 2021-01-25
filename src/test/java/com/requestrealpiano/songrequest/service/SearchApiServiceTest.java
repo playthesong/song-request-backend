@@ -8,9 +8,8 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.La
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
-import com.requestrealpiano.songrequest.domain.song.searchapi.util.JsonTranslator;
+import com.requestrealpiano.songrequest.domain.song.searchapi.translator.JsonTranslator;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;

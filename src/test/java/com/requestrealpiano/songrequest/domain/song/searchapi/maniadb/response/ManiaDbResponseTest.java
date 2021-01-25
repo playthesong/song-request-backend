@@ -1,6 +1,6 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response;
 
-import com.requestrealpiano.songrequest.domain.song.searchapi.util.XmlUtil;
+import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTranslator;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbData;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrackData;
@@ -24,7 +24,7 @@ class ManiaDbResponseTest {
         // given
         Path testXmlFilePath = Path.of("src/test/resources/expectedresponse/maniadb_response.xml");
         String testXml = Files.readString(testXmlFilePath);
-        ManiaDbClientResponse maniaDbClientResponse = XmlUtil.mapToManiaDbData(testXml);
+        ManiaDbClientResponse maniaDbClientResponse = XmlTranslator.mapToManiaDbData(testXml);
 
         ManiaDbData data = maniaDbClientResponse.getManiaDbData();
         List<ManiaDbTrackData> trackDataList = data.getTracks();
