@@ -26,10 +26,10 @@ public class ManiaDbResponse {
         List<ManiaDbTrackData> tracks = maniaDbData.getTracks();
 
         return ManiaDbResponse.builder()
-                .totalCount(maniaDbData.getTotalCount())
-                .tracks(tracks.stream()
-                              .map(ManiaDbTrack::from)
-                              .collect(Collectors.toList()))
-                .build();
+                              .totalCount(maniaDbData.getTotalCount())
+                              .tracks(tracks.stream()
+                                            .map(ManiaDbTrack::from)
+                                            .collect(Collectors.toList()))
+                              .build();
     }
 }
