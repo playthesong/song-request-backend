@@ -21,5 +21,4 @@ public class LetterController {
     public ApiResponse<List<LetterResponse>> findAll() {
         return ApiResponse.OK(letterService.findAllLetters());
     }
-
 }

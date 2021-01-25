@@ -20,5 +20,16 @@ spring:
       hibernate:
         format_sql: true
 
+lastfm:
+  url: http://ws.audioscrobbler.com/2.0
+  method: track.search
+  limit: 10
+  apiKey: ${LASTFM_API_KEY}
+  format: json
 
-
+maniadb:
+  url: http://maniadb.com/api/search/
+  method: song
+  display: 10
+  apiKey: ${MANIADB_API_KEY}
+  version: 0.5
