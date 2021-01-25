@@ -1,22 +1,32 @@
 package com.requestrealpiano.songrequest.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.requestrealpiano.songrequest.config.searchapi.LastFmProperties;
 import com.requestrealpiano.songrequest.config.searchapi.ManiaDbProperties;
+import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
+import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
+import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
+import com.requestrealpiano.songrequest.domain.song.searchapi.util.JsonTranslator;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest(classes = {SearchApiService.class, SearchApiServiceTest.TestConfiguration.class})
+@SpringBootTest(classes = {SearchApiService.class, JsonTranslator.class, SearchApiServiceTest.TestConfiguration.class})
 class SearchApiServiceTest {
 
     @Autowired
@@ -25,7 +35,13 @@ class SearchApiServiceTest {
     @Autowired
     ManiaDbProperties maniaDbProperties;
 
-    @EnableConfigurationProperties(ManiaDbProperties.class)
+    @Autowired
+    LastFmProperties lastFmProperties;
+
+    @Autowired
+    JsonTranslator jsonTranslator;
+
+    @EnableConfigurationProperties({ManiaDbProperties.class, LastFmProperties.class})
     public static class TestConfiguration { }
 
     @ParameterizedTest
@@ -72,6 +88,36 @@ class SearchApiServiceTest {
                 () -> assertThat(track.getTitle()).isEqualTo(testTrack.getTitle()),
                 () -> assertThat(track.getArtist()).isEqualTo(testTrack.getArtist()),
                 () -> assertThat(track.getImageUrl()).isEqualTo(testTrack.getImageUrl())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("searchLastFmResponseParameters")
+    @DisplayName("LastFM 검색 결과 반환 테스트")
+    void search_lastfm_response(String artist, String title, int totalCount) throws JsonProcessingException {
+        // given
+        LastFmRestClient lastFmRestClient = LastFmRestClient.of(lastFmProperties, artist, title);
+
+        // when
+        String rawJson = lastFmRestClient.searchLastFm();
+        LastFmResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(rawJson);
+        List<LastFmTrack> tracks = lastFmResponse.getTracks();
+
+        // then
+        assertAll(
+                () -> assertThat(lastFmResponse.getTotalCount()).isEqualTo(totalCount),
+                () -> assertThat(tracks.stream()
+                                       .filter(track -> track.getArtist().contains(artist))
+                                       .count()).isEqualTo(totalCount),
+                () -> assertThat(tracks.stream()
+                                       .filter(track -> track.getTitle().contains(title))
+                                       .count()).isEqualTo(totalCount)
+        );
+    }
+
+    private static Stream<Arguments> searchLastFmResponseParameters() {
+        return Stream.of(
+                Arguments.of("김동률", "감사", 10)
         );
     }
 }
