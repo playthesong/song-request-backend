@@ -36,7 +36,7 @@ class SongControllerTest {
     SongService songService;
 
     @Test
-    @DisplayName("ManiaDB 검색 결과 반환 테스트")
+    @DisplayName("ManiaDB 검색 결과 반환 API 테스트")
     void search_maniadb() throws Exception {
         // given
         String artist = "Artist";
@@ -95,7 +95,7 @@ class SongControllerTest {
 
     @ParameterizedTest
     @CsvSource("Artist Name, Song Title, http://imageUrl")
-    @DisplayName("LastFM 검색 결과 반환 테스트")
+    @DisplayName("LastFM 검색 결과 반환 API 테스트")
     void search_lastfm_api(String artist, String title, String imageUrl) throws Exception {
         // given
         LastFmTrack track = LastFmTrack.builder()
