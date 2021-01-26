@@ -33,7 +33,7 @@ class LetterControllerTest {
     LetterService letterService;
 
     @Test
-    @DisplayName("전체 신청곡 목록을 조회 API 테스트")
+    @DisplayName("전체 신청곡 목록 조회 API 테스트")
     void find_all_letters() throws Exception {
         // given
         List<LetterResponse> letterResponses = createMockLetterResponses();
