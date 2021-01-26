@@ -33,7 +33,7 @@ class XmlTranslatorTest {
     @DisplayName("ManiaDB API 응답 XML을 DTO에 매핑하는 테스트")
     void map_xml_response_to_dto(int totalCount, int trackCount) throws IOException {
         // given
-        Path testXmlFilePath = Path.of("src/test/resources/expectedresponse/maniadb_response.xml");
+        Path testXmlFilePath = Path.of("src/test/resources/expectedresponse/maniadb/maniadb_response.xml");
         String testXml = Files.readString(testXmlFilePath);
 
         // when
