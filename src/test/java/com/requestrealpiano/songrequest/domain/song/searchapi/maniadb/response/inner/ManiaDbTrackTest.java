@@ -14,7 +14,7 @@ class ManiaDbTrackTest {
 
     @ParameterizedTest
     @MethodSource("createNewManiaDbTrackParameters")
-    @DisplayName("ManiaDB의 Track 데이터를 이용하여 응답 Track 데이터를 생성하는 테스트")
+    @DisplayName("ManiaDB 검색 결과에서 추출한 Track 데이터로부터 DTO(ManiaDBTrack) 를 생성하는 테스트")
     void create_new_maniadb_track(String albumTitle, String imageUrl, String artistName, String songTitle) {
         // given
         ManiaDbAlbumData albumData = new ManiaDbAlbumData(albumTitle, imageUrl);
