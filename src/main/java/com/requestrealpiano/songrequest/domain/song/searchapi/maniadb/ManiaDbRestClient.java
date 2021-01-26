@@ -3,40 +3,35 @@ package com.requestrealpiano.songrequest.domain.song.searchapi.maniadb;
 import com.requestrealpiano.songrequest.config.searchapi.ManiaDbProperties;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
+@RequiredArgsConstructor
 @Getter
+@Component
 public class ManiaDbRestClient {
 
-    private String baseUrl;
-    private String display;
-    private String method;
-    private String apiKey;
-    private String version;
-    private String keyword;
+    private final ManiaDbProperties maniaDbProperties;
 
-    @Builder
-    private ManiaDbRestClient(String baseUrl, String display, String method, String apiKey, String version,
-                              String keyword) {
-        this.baseUrl = baseUrl;
-        this.display = display;
-        this.method = method;
-        this.apiKey = apiKey;
-        this.version = version;
-        this.keyword = keyword;
-    }
-
-    public String searchManiaDb() {
+    public String searchManiaDb(String artist, String title) {
         RestTemplate restTemplate = new RestTemplate();
-        URI requestURI = createManiaDbRequestURI();
+        String keyword = createValidKeyword(artist, title);
+        URI requestURI = createManiaDbRequestURI(keyword);
         return restTemplate.getForObject(requestURI, String.class);
     }
 
-    private URI createManiaDbRequestURI() {
+    private URI createManiaDbRequestURI(String keyword) {
+        String baseUrl = maniaDbProperties.getUrl();
+        String method = maniaDbProperties.getMethod();
+        String display = maniaDbProperties.getDisplay();
+        String apiKey = maniaDbProperties.getApiKey();
+        String version = maniaDbProperties.getVersion();
+
         return UriComponentsBuilder.fromHttpUrl(baseUrl + keyword)
                                    .queryParam("sr", method)
                                    .queryParam("display", display)
@@ -46,17 +41,16 @@ public class ManiaDbRestClient {
                                    .toUri();
     }
 
-    public static ManiaDbRestClient of(ManiaDbProperties maniaDbProperties, String artist, String title) {
-        String checkedArtist = StringUtils.defaultString(artist);
-        String checkedTitle = StringUtils.defaultString(title);
+    private String createValidKeyword(String artist, String title) {
+        String checkedArtist = artist;
+        String checkedTitle = title;
+        if (StringUtils.isEmpty(artist)) {
+            checkedArtist = "Artist";
+        }
 
-        return ManiaDbRestClient.builder()
-                                .baseUrl(maniaDbProperties.getUrl())
-                                .display(maniaDbProperties.getDisplay())
-                                .method(maniaDbProperties.getMethod())
-                                .apiKey(maniaDbProperties.getApiKey())
-                                .version(maniaDbProperties.getVersion())
-                                .keyword(checkedArtist + checkedTitle)
-                                .build();
+        if (StringUtils.isEmpty(title)) {
+            checkedTitle = "Title";
+        }
+        return checkedArtist + checkedTitle;
     }
 }

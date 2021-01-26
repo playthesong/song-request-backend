@@ -8,8 +8,8 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.La
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbClientResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
-import com.requestrealpiano.songrequest.domain.song.searchapi.util.JsonTranslator;
-import com.requestrealpiano.songrequest.domain.song.searchapi.util.XmlUtil;
+import com.requestrealpiano.songrequest.domain.song.searchapi.translator.JsonTranslator;
+import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTranslator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,22 +17,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class SearchApiService {
 
-    private final ManiaDbProperties maniaDbProperties;
-    private final LastFmProperties lastFmProperties;
+    private final ManiaDbRestClient maniaDbRestClient;
+    private final LastFmRestClient lastFmRestClient;
     private final JsonTranslator jsonTranslator;
+    private final XmlTranslator xmlTranslator;
 
     // TODO: JsonProcessingException 처리
     public ManiaDbResponse searchManiaDbResponse(String artist, String title) throws JsonProcessingException {
-        ManiaDbRestClient maniaDbRestClient = ManiaDbRestClient.of(maniaDbProperties, artist, title);
-        String rawXml = maniaDbRestClient.searchManiaDb();
-        ManiaDbClientResponse maniaDbData = XmlUtil.mapToManiaDbData(rawXml);
+        String rawXml = maniaDbRestClient.searchManiaDb(artist, title);
+        ManiaDbClientResponse maniaDbData = xmlTranslator.mapToManiaDbData(rawXml);
         return ManiaDbResponse.from(maniaDbData);
     }
 
     // TODO: JsonProcessingException 처리
     public LastFmResponse searchLastFmResponse(String artist, String title) throws JsonProcessingException {
-        LastFmRestClient lastFmRestClient = LastFmRestClient.of(lastFmProperties, artist, title);
-        String rawJson = lastFmRestClient.searchLastFm();
+        String rawJson = lastFmRestClient.searchLastFm(artist, title);
         LastFmResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(rawJson);
         return lastFmResponse;
     }
