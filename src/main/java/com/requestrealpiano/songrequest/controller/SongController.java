@@ -1,8 +1,7 @@
 package com.requestrealpiano.songrequest.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
-import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.global.response.ApiResponse;
 import com.requestrealpiano.songrequest.service.SongService;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +18,9 @@ public class SongController {
     private final SongService songService;
 
     @GetMapping
-    public ApiResponse<ManiaDbResponse> search(@RequestParam String artist,
-                                                         @RequestParam String title) throws JsonProcessingException {
-        ManiaDbResponse maniaDbResponse = songService.searchSong(artist, title);
-        return ApiResponse.OK(maniaDbResponse);
+    public ApiResponse<SearchApiResponse> search(@RequestParam String artist,
+                                                 @RequestParam String title) throws JsonProcessingException {
+        SearchApiResponse searchApiResponse = songService.searchSong(artist, title);
+        return ApiResponse.OK(searchApiResponse);
     }
 }
