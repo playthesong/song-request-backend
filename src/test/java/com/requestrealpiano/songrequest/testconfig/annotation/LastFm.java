@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.global.annotation;
+package com.requestrealpiano.songrequest.testconfig.annotation;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -8,6 +8,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Documented
-@Qualifier("maniaDbApiService")
-public @interface ManiaDb {
+@Qualifier("lastFmApiService")
+public @interface LastFm {
 }
