@@ -17,7 +17,7 @@ public class LetterController {
 
     private final LetterService letterService;
 
-    @GetMapping("")
+    @GetMapping
     public ApiResponse<List<LetterResponse>> findAll() {
         return ApiResponse.OK(letterService.findAllLetters());
     }
