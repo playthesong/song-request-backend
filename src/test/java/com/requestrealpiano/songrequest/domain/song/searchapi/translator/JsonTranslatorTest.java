@@ -1,7 +1,7 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.translator;
 
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,11 +34,11 @@ class JsonTranslatorTest {
         String testJson = Files.readString(jsonFilePath);
 
         // when
-        LastFmResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(testJson);
-        List<LastFmTrack> tracks = lastFmResponse.getTracks();
+        SearchApiResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(testJson);
+        List<Track> tracks = lastFmResponse.getTracks();
 
         /* 0 - 첫 LastFm Track 데이터의 인덱스 */
-        LastFmTrack track = tracks.get(0);
+        Track track = tracks.get(0);
 
         // then
         assertAll(
