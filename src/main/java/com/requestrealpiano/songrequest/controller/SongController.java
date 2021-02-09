@@ -18,17 +18,10 @@ public class SongController {
 
     private final SongService songService;
 
-    @GetMapping("/search-api/k-pop")
-    public ApiResponse<ManiaDbResponse> searchManiaDbApi(@RequestParam String artist,
+    @GetMapping
+    public ApiResponse<ManiaDbResponse> search(@RequestParam String artist,
                                                          @RequestParam String title) throws JsonProcessingException {
-        ManiaDbResponse maniaDbResponse = songService.searchManiaDb(artist, title);
+        ManiaDbResponse maniaDbResponse = songService.searchSong(artist, title);
         return ApiResponse.OK(maniaDbResponse);
-    }
-
-    @GetMapping("/search-api/pop")
-    public ApiResponse<LastFmResponse> searchLastFmApi(@RequestParam String artist,
-                                                       @RequestParam String title) throws JsonProcessingException {
-        LastFmResponse lastFmResponse = songService.searchLastFm(artist, title);
-        return ApiResponse.OK(lastFmResponse);
     }
 }
