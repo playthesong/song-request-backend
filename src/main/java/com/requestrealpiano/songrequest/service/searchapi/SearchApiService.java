@@ -1,8 +1,9 @@
 package com.requestrealpiano.songrequest.service.searchapi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 
-public interface SearchApiService<T> {
+public interface SearchApiService {
 
-    T requestSearchApiResponse(String artist, String title) throws JsonProcessingException;
+    SearchApiResponse requestSearchApiResponse(String artist, String title) throws JsonProcessingException;
 }
