@@ -1,10 +1,10 @@
 package com.requestrealpiano.songrequest.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
-import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
-import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
+import com.requestrealpiano.songrequest.service.searchapi.SearchApiService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,15 +36,15 @@ class SongServiceTest {
     @DisplayName("SearchApiService를 통해 받아온 ManiaDB 데이터 검색 결과를 반환 하는 테스트")
     void search_mania_db(String artist, String title, int totalCount) throws JsonProcessingException {
         // given
-        List<ManiaDbTrack> mockTracks = createMockManiaDbTracks();
-        ManiaDbResponse testResponse = ManiaDbResponse.builder()
-                                                      .totalCount(totalCount)
-                                                      .tracks(mockTracks)
-                                                      .build();
+        List<Track> mockTracks = createMockManiaDbTracks();
+        SearchApiResponse testResponse = SearchApiResponse.builder()
+                                                          .totalCount(totalCount)
+                                                          .tracks(mockTracks)
+                                                          .build();
 
         // when
-        when(searchApiService.searchManiaDbResponse(artist, title)).thenReturn(testResponse);
-        ManiaDbResponse maniaDbResponse = songService.searchManiaDb(artist, title);
+        when(searchApiService.requestSearchApiResponse(artist, title)).thenReturn(testResponse);
+        SearchApiResponse maniaDbResponse = songService.searchSong(artist, title);
 
         // then
         assertAll(
@@ -57,22 +57,22 @@ class SongServiceTest {
 
     }
 
-    private List<ManiaDbTrack> createMockManiaDbTracks() {
-        ManiaDbTrack firstTrack = ManiaDbTrack.builder()
-                                              .artist("Artist 1")
-                                              .title("Title 1")
-                                              .imageUrl("http://imageUrl_1")
-                                              .build();
-        ManiaDbTrack secondTrack = ManiaDbTrack.builder()
-                                               .artist("Artist 2")
-                                               .title("Title 2")
-                                               .imageUrl("http://imageUrl_2")
-                                               .build();
-        ManiaDbTrack thirdTrack = ManiaDbTrack.builder()
-                                              .artist("Artist 3")
-                                              .title("Title 3")
-                                              .imageUrl("http://imageUrl_3")
-                                              .build();
+    private List<Track> createMockManiaDbTracks() {
+        Track firstTrack = Track.builder()
+                                .artist("Artist 1")
+                                .title("Title 1")
+                                .imageUrl("http://imageUrl_1")
+                                .build();
+        Track secondTrack = Track.builder()
+                                 .artist("Artist 2")
+                                 .title("Title 2")
+                                 .imageUrl("http://imageUrl_2")
+                                 .build();
+        Track thirdTrack = Track.builder()
+                                .artist("Artist 3")
+                                .title("Title 3")
+                                .imageUrl("http://imageUrl_3")
+                                .build();
         return Arrays.asList(firstTrack, secondTrack, thirdTrack);
     }
 
@@ -83,16 +83,15 @@ class SongServiceTest {
         String notExistArtist = "Not Exist Artist";
         String notExistTitle = "Not Exist Title";
 
-        List<LastFmTrack> tracks = new ArrayList<>();
+        List<LastFmTrack> tracks = Collections.emptyList();
         int totalCount = tracks.size();
-        LastFmResponse mockLastFmResponse = LastFmResponse.of(totalCount, tracks);
+        SearchApiResponse mockLastFmResponse = SearchApiResponse.from(tracks);
 
         // when
-        when(searchApiService.searchLastFmResponse(notExistArtist, notExistTitle)).thenReturn(mockLastFmResponse);
-        LastFmResponse lastFmResponse = songService.searchLastFm(notExistArtist, notExistTitle);
+        when(searchApiService.requestSearchApiResponse(notExistArtist, notExistTitle)).thenReturn(mockLastFmResponse);
+        SearchApiResponse lastFmResponse = songService.searchSong(notExistArtist, notExistTitle);
 
         // then
         assertThat(lastFmResponse.getTotalCount()).isEqualTo(totalCount);
-        assertThat(lastFmResponse.getTracks()).isEqualTo(tracks);
     }
 }
