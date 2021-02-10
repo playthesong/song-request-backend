@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import static com.requestrealpiano.songrequest.global.response.ApiResponse.OK;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/letters")
@@ -19,6 +21,7 @@ public class LetterController {
 
     @GetMapping
     public ApiResponse<List<LetterResponse>> findAll() {
-        return ApiResponse.OK(letterService.findAllLetters());
+        List<LetterResponse> letters = letterService.findAllLetters();
+        return OK(letters);
     }
 }

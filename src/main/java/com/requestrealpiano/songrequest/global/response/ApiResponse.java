@@ -18,16 +18,4 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> OK(T data) {
         return new ApiResponse<>(true, "OK", data);
     }
-
-    public static <T> ApiResponse<T> CREATED() {
-        return new ApiResponse<>(true, "CREATED", null);
-    }
-
-    public static <T> ApiResponse<T> UPDATED() {
-        return new ApiResponse<>(true, "UPDATED", null);
-    }
-
-    public static <T> ApiResponse<T> DELETED() {
-        return new ApiResponse<>(true, "DELETED", null);
-    }
 }

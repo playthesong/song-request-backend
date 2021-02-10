@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.requestrealpiano.songrequest.global.response.ApiResponse.OK;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/songs")
@@ -21,6 +23,6 @@ public class SongController {
     public ApiResponse<SearchApiResponse> search(@RequestParam String artist,
                                                  @RequestParam String title) throws JsonProcessingException {
         SearchApiResponse searchApiResponse = songService.searchSong(artist, title);
-        return ApiResponse.OK(searchApiResponse);
+        return OK(searchApiResponse);
     }
 }
