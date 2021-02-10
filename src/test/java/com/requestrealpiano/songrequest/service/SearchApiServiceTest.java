@@ -58,15 +58,14 @@ class SearchApiServiceTest {
     public static class TestConfiguration { }
 
     @ParameterizedTest
-    @MethodSource("searchResponseParameters")
+    @MethodSource("searchManiaDbResponseParameters")
     @DisplayName("ManiaDB 검색 결과 반환 테스트")
-    void search_maniaDb_response(String artist, String title, int totalCount) throws IOException {
+    void search_maniaDb_response(String artist, String title, int first, int totalCount) throws IOException {
         // when
         SearchApiResponse maniaDbResponse = maniaDbApiService.requestSearchApiResponse(artist, title);
         List<Track> tracks = maniaDbResponse.getTracks();
 
-        /* 0 - 첫 번째 검색 결과 인덱스 */
-        Track track = tracks.get(0);
+        Track track = tracks.get(first);
 
         // then
         assertAll(
@@ -76,8 +75,14 @@ class SearchApiServiceTest {
         );
     }
 
+    private static Stream<Arguments> searchManiaDbResponseParameters() {
+        return Stream.of(
+                Arguments.of("김동률", "감사", 0, 10)
+        );
+    }
+
     @ParameterizedTest
-    @MethodSource("searchResponseParameters")
+    @MethodSource("searchLastFmResponseParameters")
     @DisplayName("LastFM 검색 결과 반환 테스트")
     void search_lastfm_response(String artist, String title, int totalCount) throws JsonProcessingException {
         // when
@@ -96,9 +101,9 @@ class SearchApiServiceTest {
         );
     }
 
-    private static Stream<Arguments> searchResponseParameters() {
+    private static Stream<Arguments> searchLastFmResponseParameters() {
         return Stream.of(
-                Arguments.of("김동률", "감사", 10)
+                Arguments.of("아이유", "밤편지", 10)
         );
     }
 }
