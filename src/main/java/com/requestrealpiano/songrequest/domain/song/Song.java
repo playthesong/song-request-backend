@@ -33,7 +33,7 @@ public class Song {
     private String imageUrl;
 
     @Column(name = "request_count")
-    private Integer requestCount;
+    private int requestCount;
 
     @Column(name = "hash_id")
     private String hashId;
