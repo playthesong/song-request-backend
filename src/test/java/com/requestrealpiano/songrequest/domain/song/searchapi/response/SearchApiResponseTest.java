@@ -32,7 +32,8 @@ class SearchApiResponseTest {
     @DisplayName("ManiaDB의 응답 데이터를 바탕으로 최종 검색 결과 DTO를 생성하는 테스트")
     void create_final_result_maniadb_response() throws IOException {
         // given
-        Path testXmlFilePath = Path.of("src/test/resources/expectedresponse/maniadb/maniadb_response.xml");
+        String xmlPath = "src/test/resources/expectedresponse/maniadb/maniadb_response.xml";
+        Path testXmlFilePath = Path.of(xmlPath);
         String testXml = Files.readString(testXmlFilePath);
 
         ManiaDbClientResponse maniaDbClientResponse = xmlTranslator.mapToManiaDbData(testXml);

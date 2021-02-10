@@ -9,7 +9,9 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTran
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -29,11 +32,11 @@ class XmlTranslatorTest {
     XmlTranslator xmlTranslator;
 
     @ParameterizedTest
-    @CsvSource({"10, 10"})
+    @MethodSource("mapXmlResponseToDtoParameters")
     @DisplayName("ManiaDB API 응답 XML을 DTO에 매핑하는 테스트")
-    void map_xml_response_to_dto(int totalCount, int trackCount) throws IOException {
+    void map_xml_response_to_dto(String xmlPath, int first, int totalCount, int trackCount) throws IOException {
         // given
-        Path testXmlFilePath = Path.of("src/test/resources/expectedresponse/maniadb/maniadb_response.xml");
+        Path testXmlFilePath = Path.of(xmlPath);
         String testXml = Files.readString(testXmlFilePath);
 
         // when
@@ -41,8 +44,7 @@ class XmlTranslatorTest {
         ManiaDbData maniaDbData = maniaDbClientResponse.getManiaDbData();
         List<ManiaDbTrackData> tracks = maniaDbData.getTracks();
 
-        /* 0 - ManiaDbTrackData 중 첫 요소의 인덱스. */
-        ManiaDbTrackData track = tracks.get(0);
+        ManiaDbTrackData track = tracks.get(first);
         ManiaDbAlbumData album = track.getAlbumData();
         ManiaDbArtistData artist = track.getArtistData();
 
@@ -56,6 +58,12 @@ class XmlTranslatorTest {
                 () -> assertThat(album.getImageUrl()).isNotEmpty(),
                 () -> assertThat(artist).isNotNull(),
                 () -> assertThat(artist.getName()).isNotEmpty()
+        );
+    }
+
+    private static Stream<Arguments> mapXmlResponseToDtoParameters() {
+        return Stream.of(
+                Arguments.of("src/test/resources/expectedresponse/maniadb/maniadb_response.xml", 0, 10, 10)
         );
     }
 }
