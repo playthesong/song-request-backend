@@ -40,19 +40,16 @@ class SongControllerTest {
     @MockBean
     SongService songService;
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("searchManiaDbParameters")
     @DisplayName("ManiaDB 검색 결과 반환 API 테스트")
-    void search_maniadb() throws Exception {
+    void search_mania_db(String artist, String title, int first) throws Exception {
         // given
-        String artist = "Artist";
-        String title = "title";
-
         SearchApiResponse maniaDbResponse = createMockManiaDbResponse();
         int totalCount = maniaDbResponse.getTotalCount();
         List<Track> tracks = maniaDbResponse.getTracks();
 
-        /* 0 - Tracks의 첫 번째 트랙 인덱스 */
-        Track track = tracks.get(0);
+        Track track = tracks.get(first);
 
         // when
         when(songService.searchSong(artist, title)).thenReturn(maniaDbResponse);
@@ -73,6 +70,12 @@ class SongControllerTest {
               .andExpect(jsonPath("data.tracks[0].artist").value(track.getArtist()))
               .andExpect(jsonPath("data.tracks[0].imageUrl").value(track.getImageUrl()))
         ;
+    }
+
+    private static Stream<Arguments> searchManiaDbParameters() {
+        return Stream.of(
+                Arguments.of("Artist", "title", 0)
+        );
     }
 
     private SearchApiResponse createMockManiaDbResponse() {
