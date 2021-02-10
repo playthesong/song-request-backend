@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-// 실제 API 요청 테스트를 하기 위해 @EnableConfigurationProperties(LastFmProperties.class) 설정 추가
 @SpringBootTest(classes = {LastFmRestClient.class, LastFmRestClientTest.TestConfiguration.class})
 class LastFmRestClientTest {
 
