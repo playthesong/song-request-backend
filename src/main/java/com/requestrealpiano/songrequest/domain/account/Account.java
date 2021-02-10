@@ -36,10 +36,10 @@ public class Account {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(name = "reqeust_count")
+    @Column(name = "request_count")
     private Integer requestCount;
 
-    @Column(name = "created_date")
+    @Column(name = "created_date_time")
     private LocalDateTime createdDateTime;
 
     @OneToMany(mappedBy = "account")
