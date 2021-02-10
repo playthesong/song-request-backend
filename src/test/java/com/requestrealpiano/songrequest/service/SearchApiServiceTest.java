@@ -58,7 +58,7 @@ class SearchApiServiceTest {
     public static class TestConfiguration { }
 
     @ParameterizedTest
-    @CsvSource("김동률, 감사, 10")
+    @MethodSource("searchResponseParameters")
     @DisplayName("ManiaDB 검색 결과 반환 테스트")
     void search_maniaDb_response(String artist, String title, int totalCount) throws IOException {
         // when
@@ -77,7 +77,7 @@ class SearchApiServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("searchLastFmResponseParameters")
+    @MethodSource("searchResponseParameters")
     @DisplayName("LastFM 검색 결과 반환 테스트")
     void search_lastfm_response(String artist, String title, int totalCount) throws JsonProcessingException {
         // when
@@ -96,7 +96,7 @@ class SearchApiServiceTest {
         );
     }
 
-    private static Stream<Arguments> searchLastFmResponseParameters() {
+    private static Stream<Arguments> searchResponseParameters() {
         return Stream.of(
                 Arguments.of("김동률", "감사", 10)
         );

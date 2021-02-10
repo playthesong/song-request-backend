@@ -12,17 +12,17 @@ class ApiResponseTest {
     @DisplayName("표준 응답 객체 생성 테스트 - OK")
     void create_new_api_response_OK() {
         // given
-        String testMessage = "Test Message";
+        String testData = "Test Message";
         String OK_MESSAGE = "OK";
 
         // when
-        ApiResponse<String> ApiResponseOK = ApiResponse.OK(testMessage);
+        ApiResponse<String> ApiResponseOK = ApiResponse.OK(testData);
 
         // then
         assertAll(
                 () -> assertThat(ApiResponseOK.isSuccess()).isTrue(),
                 () -> assertThat(ApiResponseOK.getStatusMessage()).isEqualTo(OK_MESSAGE),
-                () -> assertThat(ApiResponseOK.getData()).isEqualTo(testMessage)
+                () -> assertThat(ApiResponseOK.getData()).isEqualTo(testData)
         );
     }
 }

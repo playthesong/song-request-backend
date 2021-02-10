@@ -9,7 +9,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -32,7 +35,7 @@ class SongServiceTest {
     SearchApiService searchApiService;
 
     @ParameterizedTest
-    @CsvSource({"Artist, Title, 3"})
+    @MethodSource("searchManiaDbParameters")
     @DisplayName("SearchApiService를 통해 받아온 ManiaDB 데이터 검색 결과를 반환 하는 테스트")
     void search_mania_db(String artist, String title, int totalCount) throws JsonProcessingException {
         // given
@@ -54,7 +57,12 @@ class SongServiceTest {
                                                 .filter(maniaDbTrack -> maniaDbTrack.getArtist().contains(artist))
                                                 .count()).isEqualTo(totalCount)
         );
+    }
 
+    private static Stream<Arguments> searchManiaDbParameters() {
+        return Stream.of(
+                Arguments.of("Artist", "Title", 3)
+        );
     }
 
     private List<Track> createMockManiaDbTracks() {
@@ -76,13 +84,11 @@ class SongServiceTest {
         return Arrays.asList(firstTrack, secondTrack, thirdTrack);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("searchLastFmParameters")
     @DisplayName("SearchApiService로부터 받아온 LastFM 검색 결과 데이터를 반환하는 테스트")
-    void return_lastfm_response() throws JsonProcessingException {
+    void search_last_fm(String notExistArtist, String notExistTitle) throws JsonProcessingException {
         // given
-        String notExistArtist = "Not Exist Artist";
-        String notExistTitle = "Not Exist Title";
-
         List<LastFmTrack> tracks = Collections.emptyList();
         int totalCount = tracks.size();
         SearchApiResponse mockLastFmResponse = SearchApiResponse.from(tracks);
@@ -93,5 +99,11 @@ class SongServiceTest {
 
         // then
         assertThat(lastFmResponse.getTotalCount()).isEqualTo(totalCount);
+    }
+
+    private static Stream<Arguments> searchLastFmParameters() {
+        return Stream.of(
+                Arguments.of("This artist does not exist ", "This title does not exist")
+        );
     }
 }

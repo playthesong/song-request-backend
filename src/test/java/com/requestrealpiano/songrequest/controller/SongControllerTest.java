@@ -10,7 +10,9 @@ import com.requestrealpiano.songrequest.testconfig.annotation.ManiaDb;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,6 +24,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -96,7 +99,7 @@ class SongControllerTest {
     }
 
     @ParameterizedTest
-    @CsvSource("Artist Name, Song Title, http://imageUrl")
+    @MethodSource("searchLastFmApiParameters")
     @DisplayName("LastFM 검색 결과 반환 API 테스트")
     void search_lastfm_api(String artist, String title, String imageUrl) throws Exception {
         // given
@@ -131,4 +134,9 @@ class SongControllerTest {
         ;
     }
 
+    private static Stream<Arguments> searchLastFmApiParameters() {
+        return Stream.of(
+                Arguments.of("Artist Name", "Song Title", "http://imageUrl")
+        );
+    }
 }
