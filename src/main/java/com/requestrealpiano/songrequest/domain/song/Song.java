@@ -46,7 +46,7 @@ public class Song {
 
     @Builder
     private Song(String songTitle, String albumTitle, String artist, String imageUrl,
-                 Integer requestCount, String hashId) {
+                 int requestCount, String hashId) {
         this.songTitle = songTitle;
         this.albumTitle = albumTitle;
         this.artist = artist;
