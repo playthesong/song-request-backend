@@ -22,12 +22,6 @@ public class JsonTranslator {
         return SearchApiResponse.from(tracks);
     }
 
-    // 프론트 구현 이후 사용 여부 결정
-    private int extractTotalCount(JsonNode dataNode) {
-        JsonNode totalCountNode = dataNode.get("opensearch:totalResults");
-        return totalCountNode.asInt();
-    }
-
     private List<LastFmTrack> extractTracks(JsonNode dataNode, ObjectMapper objectMapper) {
         JsonNode trackDataNode = dataNode.get("trackmatches");
         JsonNode tracksNode = trackDataNode.get("track");

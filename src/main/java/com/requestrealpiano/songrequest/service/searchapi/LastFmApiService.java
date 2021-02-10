@@ -18,7 +18,6 @@ public class LastFmApiService implements SearchApiService {
     @Override
     public SearchApiResponse requestSearchApiResponse(String artist, String title) throws JsonProcessingException {
         String rawJson = lastFmRestClient.searchLastFm(artist, title);
-        SearchApiResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(rawJson);
-        return lastFmResponse;
+        return jsonTranslator.mapToLastFmResponse(rawJson);
     }
 }
