@@ -5,7 +5,9 @@ import com.requestrealpiano.songrequest.config.searchapi.ManiaDbProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+@EnableJpaAuditing
 @EnableConfigurationProperties(value = {ManiaDbProperties.class, LastFmProperties.class})
 @SpringBootApplication
 public class SongRequestApplication {

@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.domain.account;
 
+import com.requestrealpiano.songrequest.domain.base.BaseTimeEntity;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,7 +17,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class Account {
+public class Account extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,9 +40,6 @@ public class Account {
     @Column(name = "request_count")
     private Integer requestCount;
 
-    @Column(name = "created_date_time")
-    private LocalDateTime createdDateTime;
-
     @OneToMany(mappedBy = "account")
     private List<Letter> letters = new ArrayList<>();
 
@@ -53,6 +51,5 @@ public class Account {
         this.role = role;
         this.avatarUrl = avatarUrl;
         this.requestCount = requestCount;
-        this.createdDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 }

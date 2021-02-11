@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -51,19 +52,43 @@ class LetterRepositoryTest extends BaseRepositoryTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("createdDateTimeOfLetterParameters")
+    @DisplayName("JPA Auditing 적용 Letter 생성 시간 테스트")
+    void created_date_time_of_letter(int year, int month, int dayOfMonth, int hour, int minute, int second, int first) {
+        // given
+        List<Letter> letters = createMockLetters();
+        LocalDateTime testDateTime = LocalDateTime.of(year, month, dayOfMonth, hour, minute, second, first);
+
+        // when
+        letterRepository.saveAll(letters);
+        List<Letter> savedLetters = letterRepository.findAll();
+        Letter letter = savedLetters.get(first);
+
+        // then
+        assertThat(letter.getCreatedDateTime()).isNotNull();
+        assertThat(letter.getCreatedDateTime()).isAfter(testDateTime);
+    }
+
+    private static Stream<Arguments> createdDateTimeOfLetterParameters() {
+        return Stream.of(
+                Arguments.of(2021, 2, 10, 11, 11, 11, 0)
+        );
+    }
+
     private List<Letter> createMockLetters() {
         Letter firstLetter = Letter.builder()
-                                   .songStory("Song Story 1")
-                                   .requestStatus(RequestStatus.WAITING)
-                                   .build();
+                .songStory("Song Story 1")
+                .requestStatus(RequestStatus.WAITING)
+                .build();
         Letter secondLetter = Letter.builder()
-                                    .songStory("Song Story 2")
-                                    .requestStatus(RequestStatus.WAITING)
-                                    .build();
+                .songStory("Song Story 2")
+                .requestStatus(RequestStatus.WAITING)
+                .build();
         Letter thirdLetter = Letter.builder()
-                                   .songStory("Song Story 3")
-                                   .requestStatus(RequestStatus.WAITING)
-                                   .build();
+                .songStory("Song Story 3")
+                .requestStatus(RequestStatus.WAITING)
+                .build();
         return Arrays.asList(firstLetter, secondLetter, thirdLetter);
     }
 }

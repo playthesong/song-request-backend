@@ -31,7 +31,6 @@ class LetterTest {
                 () -> assertThat(letter).isNotNull(),
                 () -> assertThat(letter.getSongStory()).isEqualTo(songStory),
                 () -> assertThat(letter.getRequestStatus()).isEqualTo(requestStatus),
-                () -> assertThat(letter.getCreatedDateTime()).isNotNull(),
                 () -> assertThat(letter.getAccount()).isEqualTo(account),
                 () -> assertThat(letter.getSong()).isEqualTo(song)
         );
