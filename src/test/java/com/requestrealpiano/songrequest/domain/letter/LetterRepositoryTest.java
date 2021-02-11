@@ -55,10 +55,9 @@ class LetterRepositoryTest extends BaseRepositoryTest {
     @ParameterizedTest
     @MethodSource("createdDateTimeOfLetterParameters")
     @DisplayName("JPA Auditing 적용 Letter 생성 시간 테스트")
-    void created_date_time_of_letter(int year, int month, int dayOfMonth, int hour, int minute, int second, int first) {
+    void created_date_time_of_letter(LocalDateTime testDateTime, int first) {
         // given
         List<Letter> letters = createMockLetters();
-        LocalDateTime testDateTime = LocalDateTime.of(year, month, dayOfMonth, hour, minute, second, first);
 
         // when
         letterRepository.saveAll(letters);
@@ -72,7 +71,7 @@ class LetterRepositoryTest extends BaseRepositoryTest {
 
     private static Stream<Arguments> createdDateTimeOfLetterParameters() {
         return Stream.of(
-                Arguments.of(2021, 2, 10, 11, 11, 11, 0)
+                Arguments.of(LocalDateTime.now(), 0)
         );
     }
 
