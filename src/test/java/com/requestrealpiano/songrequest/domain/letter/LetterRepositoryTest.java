@@ -2,10 +2,13 @@ package com.requestrealpiano.songrequest.domain.letter;
 
 import com.requestrealpiano.songrequest.testconfig.BaseRepositoryTest;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -24,7 +27,7 @@ class LetterRepositoryTest extends BaseRepositoryTest {
     @MethodSource("findAllLettersParameters")
     @DisplayName("Letter 데이터를 DB에서 조회한다.")
     void find_all_letters(int first, int second, int third,
-                          Long firstLetterId, Long secondLetterId, Long thirdLetterId) {
+                          String firstSongStory, String secondSongStory, String thirdSongStory) {
         // given
         List<Letter> letters = createMockLetters();
 
@@ -41,14 +44,14 @@ class LetterRepositoryTest extends BaseRepositoryTest {
         assertThat(savedLetters.stream().filter(letter -> Optional.ofNullable(letter.getId()).isPresent())
                                .count()).isEqualTo(letters.size());
 
-        assertThat(firstLetter.getId()).isEqualTo(firstLetterId);
-        assertThat(secondLetter.getId()).isEqualTo(secondLetterId);
-        assertThat(thirdLetter.getId()).isEqualTo(thirdLetterId);
+        assertThat(firstLetter.getSongStory()).isEqualTo(firstSongStory);
+        assertThat(secondLetter.getSongStory()).isEqualTo(secondSongStory);
+        assertThat(thirdLetter.getSongStory()).isEqualTo(thirdSongStory);
     }
 
     private static Stream<Arguments> findAllLettersParameters() {
         return Stream.of(
-                Arguments.of(0, 1, 2, 1L, 2L, 3L)
+                Arguments.of(0, 1, 2, "Song Story 1", "Song Story 2", "Song Story 3")
         );
     }
 
@@ -58,15 +61,14 @@ class LetterRepositoryTest extends BaseRepositoryTest {
     void created_date_time_of_letter(LocalDateTime testDateTime, int first) {
         // given
         List<Letter> letters = createMockLetters();
+        Letter letter = letters.get(first);
 
         // when
-        letterRepository.saveAll(letters);
-        List<Letter> savedLetters = letterRepository.findAll();
-        Letter letter = savedLetters.get(first);
+        Letter savedLetter = letterRepository.save(letter);
 
         // then
-        assertThat(letter.getCreatedDateTime()).isNotNull();
-        assertThat(letter.getCreatedDateTime()).isAfter(testDateTime);
+        assertThat(savedLetter.getCreatedDateTime()).isNotNull();
+        assertThat(savedLetter.getCreatedDateTime()).isAfter(testDateTime);
     }
 
     private static Stream<Arguments> createdDateTimeOfLetterParameters() {
