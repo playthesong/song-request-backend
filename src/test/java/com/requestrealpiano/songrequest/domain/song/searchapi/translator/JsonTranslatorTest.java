@@ -1,7 +1,7 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.translator;
 
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,17 +28,17 @@ class JsonTranslatorTest {
     @ParameterizedTest
     @MethodSource("mapJsonToLastFmResponseParameters")
     @DisplayName("LastFM JSON 응답으로부터 DTO를 생성하는 테스트")
-    void map_json_to_lastfm_response(int totalCount, String artist, String title, String imageUrl) throws IOException {
+    void map_json_to_lastfm_response(int first, int totalCount, String artist,
+                                     String title, String imageUrl) throws IOException {
         // given
         Path jsonFilePath = Path.of("src/test/resources/expectedresponse/lastfm/lastfm_response.json");
         String testJson = Files.readString(jsonFilePath);
 
         // when
-        LastFmResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(testJson);
-        List<LastFmTrack> tracks = lastFmResponse.getTracks();
+        SearchApiResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(testJson);
+        List<Track> tracks = lastFmResponse.getTracks();
 
-        /* 0 - 첫 LastFm Track 데이터의 인덱스 */
-        LastFmTrack track = tracks.get(0);
+        Track track = tracks.get(first);
 
         // then
         assertAll(
@@ -51,7 +51,7 @@ class JsonTranslatorTest {
 
     private static Stream<Arguments> mapJsonToLastFmResponseParameters() {
         return Stream.of(
-                Arguments.of(10, "김동률", "감사",
+                Arguments.of(0, 10, "김동률", "감사",
                              "https://www.last.fm/music/%EA%B9%80%EB%8F%99%EB%A5%A0/_/%EA%B0%90%EC%82%AC")
         );
     }

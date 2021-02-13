@@ -1,17 +1,15 @@
 package com.requestrealpiano.songrequest.domain.account;
 
 public enum Role {
-    ADMIN("ROLE_ADMIN", "관리자"),
-    MEMBER("ROLE_MEMBER", "회원"),
-    GUEST("ROLE_GUEST", "권한 승인 대기자")
+    ADMIN("ROLE_ADMIN"),
+    MEMBER("ROLE_MEMBER"),
+    GUEST("ROLE_GUEST")
     ;
 
     private final String value;
-    private final String description;
 
-    Role(String value, String description) {
+    Role(String value) {
         this.value = value;
-        this.description = description;
     }
 
     public String getKey() {
@@ -20,9 +18,5 @@ public enum Role {
 
     public String getValue() {
         return value;
-    }
-
-    public String getDescription() {
-        return description;
     }
 }

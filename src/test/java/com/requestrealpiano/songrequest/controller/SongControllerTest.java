@@ -1,14 +1,18 @@
 package com.requestrealpiano.songrequest.controller;
 
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
-import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
-import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.service.SongService;
+import com.requestrealpiano.songrequest.service.searchapi.SearchApiService;
+import com.requestrealpiano.songrequest.testconfig.annotation.LastFm;
+import com.requestrealpiano.songrequest.testconfig.annotation.ManiaDb;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,6 +24,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -35,23 +40,20 @@ class SongControllerTest {
     @MockBean
     SongService songService;
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("searchManiaDbParameters")
     @DisplayName("ManiaDB 검색 결과 반환 API 테스트")
-    void search_maniadb() throws Exception {
+    void search_mania_db(String artist, String title, int first) throws Exception {
         // given
-        String artist = "Artist";
-        String title = "title";
-
-        ManiaDbResponse maniaDbResponse = createMockManiaDbResponse();
+        SearchApiResponse maniaDbResponse = createMockManiaDbResponse();
         int totalCount = maniaDbResponse.getTotalCount();
-        List<ManiaDbTrack> tracks = maniaDbResponse.getTracks();
+        List<Track> tracks = maniaDbResponse.getTracks();
 
-        /* 0 - Tracks의 첫 번째 트랙 인덱스 */
-        ManiaDbTrack track = tracks.get(0);
+        Track track = tracks.get(first);
 
         // when
-        when(songService.searchManiaDb(artist, title)).thenReturn(maniaDbResponse);
-        ResultActions result = mockMvc.perform(get("/songs/search-api/k-pop")
+        when(songService.searchSong(artist, title)).thenReturn(maniaDbResponse);
+        ResultActions result = mockMvc.perform(get("/songs")
                                                 .param("artist", artist)
                                                 .param("title", title)
                                                 .accept(MediaType.APPLICATION_JSON));
@@ -70,31 +72,37 @@ class SongControllerTest {
         ;
     }
 
-    private ManiaDbResponse createMockManiaDbResponse() {
-        ManiaDbTrack firstTrack = ManiaDbTrack.builder()
-                                              .artist("Artist 1")
-                                              .title("Title 1")
-                                              .imageUrl("http://imageUrl_1")
-                                              .build();
-        ManiaDbTrack secondTrack = ManiaDbTrack.builder()
-                                              .artist("Artist 2")
-                                              .title("Title 2")
-                                              .imageUrl("http://imageUrl_2")
-                                              .build();
-        ManiaDbTrack thirdTrack = ManiaDbTrack.builder()
-                                              .artist("Artist 3")
-                                              .title("Title 3")
-                                              .imageUrl("http://imageUrl_3")
-                                              .build();
-        List<ManiaDbTrack> tracks = Arrays.asList(firstTrack, secondTrack, thirdTrack);
-        return ManiaDbResponse.builder()
+    private static Stream<Arguments> searchManiaDbParameters() {
+        return Stream.of(
+                Arguments.of("Artist", "title", 0)
+        );
+    }
+
+    private SearchApiResponse createMockManiaDbResponse() {
+        Track firstTrack = Track.builder()
+                                 .artist("Artist 1")
+                                 .title("Title 1")
+                                 .imageUrl("http://imageUrl_1")
+                                 .build();
+        Track secondTrack = Track.builder()
+                                 .artist("Artist 2")
+                                 .title("Title 2")
+                                 .imageUrl("http://imageUrl_2")
+                                 .build();
+        Track thirdTrack = Track.builder()
+                                 .artist("Artist 3")
+                                 .title("Title 3")
+                                 .imageUrl("http://imageUrl_3")
+                                 .build();
+        List<Track> tracks = Arrays.asList(firstTrack, secondTrack, thirdTrack);
+        return SearchApiResponse.builder()
                               .totalCount(tracks.size())
                               .tracks(tracks)
                               .build();
     }
 
     @ParameterizedTest
-    @CsvSource("Artist Name, Song Title, http://imageUrl")
+    @MethodSource("searchLastFmApiParameters")
     @DisplayName("LastFM 검색 결과 반환 API 테스트")
     void search_lastfm_api(String artist, String title, String imageUrl) throws Exception {
         // given
@@ -105,12 +113,12 @@ class SongControllerTest {
                                        .build();
         List<LastFmTrack> tracks = Collections.singletonList(track);
         int totalCount = tracks.size();
-        LastFmResponse lastFmResponse = LastFmResponse.of(totalCount, tracks);
+        SearchApiResponse response = SearchApiResponse.from(tracks);
 
         // when
-        when(songService.searchLastFm(artist, title)).thenReturn(lastFmResponse);
+        when(songService.searchSong(artist, title)).thenReturn(response);
 
-        ResultActions result = mockMvc.perform(get("/songs/search-api/pop")
+        ResultActions result = mockMvc.perform(get("/songs")
                                         .param("artist", artist)
                                         .param("title", title)
                                         .accept(MediaType.APPLICATION_JSON));
@@ -129,4 +137,9 @@ class SongControllerTest {
         ;
     }
 
+    private static Stream<Arguments> searchLastFmApiParameters() {
+        return Stream.of(
+                Arguments.of("Artist Name", "Song Title", "http://imageUrl")
+        );
+    }
 }

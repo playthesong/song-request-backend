@@ -4,13 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.requestrealpiano.songrequest.config.searchapi.LastFmProperties;
 import com.requestrealpiano.songrequest.config.searchapi.ManiaDbProperties;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.LastFmResponse;
-import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
-import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbResponse;
-import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrack;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.JsonTranslator;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTranslator;
+import com.requestrealpiano.songrequest.service.searchapi.LastFmApiService;
+import com.requestrealpiano.songrequest.service.searchapi.ManiaDbApiService;
+import com.requestrealpiano.songrequest.service.searchapi.SearchApiService;
+import com.requestrealpiano.songrequest.testconfig.annotation.LastFm;
+import com.requestrealpiano.songrequest.testconfig.annotation.ManiaDb;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -27,12 +30,17 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest(classes = {SearchApiService.class, ManiaDbRestClient.class, LastFmRestClient.class,
+@SpringBootTest(classes = {ManiaDbApiService.class, ManiaDbRestClient.class, LastFmApiService.class, LastFmRestClient.class,
                            JsonTranslator.class, XmlTranslator.class, SearchApiServiceTest.TestConfiguration.class})
 class SearchApiServiceTest {
 
     @Autowired
-    SearchApiService searchApiService;
+    @ManiaDb
+    SearchApiService maniaDbApiService;
+
+    @Autowired
+    @LastFm
+    SearchApiService lastFmApiService;
 
     @Autowired
     ManiaDbRestClient maniaDbRestClient;
@@ -50,15 +58,14 @@ class SearchApiServiceTest {
     public static class TestConfiguration { }
 
     @ParameterizedTest
-    @CsvSource("김동률, 감사, 10")
+    @MethodSource("searchManiaDbResponseParameters")
     @DisplayName("ManiaDB 검색 결과 반환 테스트")
-    void search_maniaDb_response(String artist, String title, int totalCount) throws IOException {
+    void search_maniaDb_response(String artist, String title, int first, int totalCount) throws IOException {
         // when
-        ManiaDbResponse maniaDbResponse = searchApiService.searchManiaDbResponse(artist, title);
-        List<ManiaDbTrack> tracks = maniaDbResponse.getTracks();
+        SearchApiResponse maniaDbResponse = maniaDbApiService.requestSearchApiResponse(artist, title);
+        List<Track> tracks = maniaDbResponse.getTracks();
 
-        /* 0 - 첫 번째 검색 결과 인덱스 */
-        ManiaDbTrack track = tracks.get(0);
+        Track track = tracks.get(first);
 
         // then
         assertAll(
@@ -68,14 +75,19 @@ class SearchApiServiceTest {
         );
     }
 
+    private static Stream<Arguments> searchManiaDbResponseParameters() {
+        return Stream.of(
+                Arguments.of("김동률", "감사", 0, 10)
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("searchLastFmResponseParameters")
     @DisplayName("LastFM 검색 결과 반환 테스트")
     void search_lastfm_response(String artist, String title, int totalCount) throws JsonProcessingException {
         // when
-        String rawJson = lastFmRestClient.searchLastFm(artist, title);
-        LastFmResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(rawJson);
-        List<LastFmTrack> tracks = lastFmResponse.getTracks();
+        SearchApiResponse lastFmResponse = lastFmApiService.requestSearchApiResponse(artist, title);
+        List<Track> tracks = lastFmResponse.getTracks();
 
         // then
         assertAll(
@@ -91,7 +103,7 @@ class SearchApiServiceTest {
 
     private static Stream<Arguments> searchLastFmResponseParameters() {
         return Stream.of(
-                Arguments.of("김동률", "감사", 10)
+                Arguments.of("아이유", "밤편지", 10)
         );
     }
 }
