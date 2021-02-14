@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class SongRepositoryTest extends BaseRepositoryTest {
@@ -20,15 +21,15 @@ class SongRepositoryTest extends BaseRepositoryTest {
     SongRepository songRepository;
 
     @ParameterizedTest
-    @MethodSource("findBySongTitleAndArtistContainingAllParameters")
+    @MethodSource("findExistSongByTitleAndArtistWhenExistParameters")
     @DisplayName("OK - Song title, Artist 로 Song 을 찾는 테스트")
-    void find_by_song_title_and_artist_containing_all(String songTitle, String artist) {
+    void find_by_title_and_artist_when_exist(String songTitle, String artist) {
         // given
         List<Song> songs = createMockSongs();
 
         // when
         songRepository.saveAll(songs);
-        Song song  = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songTitle, artist)
+        Song song = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songTitle, artist)
                                    .orElseThrow(SongNotFoundException::new);
 
         // then
@@ -38,7 +39,7 @@ class SongRepositoryTest extends BaseRepositoryTest {
         );
     }
 
-    private static Stream<Arguments> findBySongTitleAndArtistContainingAllParameters() {
+    private static Stream<Arguments> findExistSongByTitleAndArtistWhenExistParameters() {
         return Stream.of(
                 Arguments.of("Something Just Like This", "Coldplay"),
                 Arguments.of("Something just like", "coldplay"),
@@ -46,10 +47,33 @@ class SongRepositoryTest extends BaseRepositoryTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("findByTitleAndArtistWhenNotExistParameters")
+    @DisplayName("Not found - 존재하지 않는 Song을 찾는 경우")
+    void find_by_title_and_artist_when_not_exist(String title, String artist) {
+        // given
+        List<Song> songs = createMockSongs();
+
+        // when
+        songRepository.saveAll(songs);
+
+        // then
+        assertThatThrownBy(() -> songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(title, artist)
+                                               .orElseThrow(SongNotFoundException::new))
+        .isInstanceOf(SongNotFoundException.class);
+    }
+
+    private static Stream<Arguments> findByTitleAndArtistWhenNotExistParameters() {
+        return Stream.of(
+                Arguments.of("Not exist title", "Not exist artist"),
+                Arguments.of("Something not exist title", "Something not exist artist")
+        );
+    }
+
     private List<Song> createMockSongs() {
-        Song firstSong = Song.builder().songTitle("Not exist title")
-                                       .artist("Not exist artist")
-                                       .imageUrl("Not exist image URL")
+        Song firstSong = Song.builder().songTitle("exist title")
+                                       .artist("exist artist")
+                                       .imageUrl("exist image URL")
                                        .build();
         Song secondSong = Song.builder().songTitle("Hey Jude")
                                         .artist("The Beatles")
