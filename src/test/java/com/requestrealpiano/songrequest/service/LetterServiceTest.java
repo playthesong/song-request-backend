@@ -35,8 +35,8 @@ class LetterServiceTest {
     @Mock
     LetterRepository letterRepository;
 
-    @DisplayName("저장 되어 있는 모든 Letters 로부터 LetterResponses 를 생성하는 테스트")
     @Test
+    @DisplayName("저장 되어 있는 모든 Letters 로부터 LetterResponses 를 생성하는 테스트")
     void find_all_letters() {
         // given
         List<Letter> letters = createMockLetters();
@@ -74,9 +74,9 @@ class LetterServiceTest {
         return Arrays.asList(firstLetter, secondLetter, thirdLetter);
     }
 
-    @DisplayName("정상적인 ID로부터 Letter를 조회하는 테스트")
     @ParameterizedTest
     @MethodSource("findLetterByValidIdParameters")
+    @DisplayName("정상적인 ID로부터 Letter를 조회하는 테스트")
     void find_letter_by_valid_id(Long validId, String songStory, RequestStatus requestStatus) {
         // given
         Letter letter = Letter.builder()
