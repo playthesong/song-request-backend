@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.domain.song;
 
 import com.requestrealpiano.songrequest.domain.letter.Letter;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.youtubecontent.YoutubeContent;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -35,9 +36,6 @@ public class Song {
     @Column(name = "request_count")
     private int requestCount;
 
-    @Column(name = "hash_id")
-    private String hashId;
-
     @OneToMany(mappedBy ="song")
     private List<Letter> letters = new ArrayList<>();
 
@@ -45,13 +43,22 @@ public class Song {
     private List<YoutubeContent> youtubeContent = new ArrayList<>();
 
     @Builder
-    private Song(String songTitle, String albumTitle, String artist, String imageUrl,
-                 int requestCount, String hashId) {
+    private Song(String songTitle, String albumTitle, String artist, String imageUrl, int requestCount) {
         this.songTitle = songTitle;
         this.albumTitle = albumTitle;
         this.artist = artist;
         this.imageUrl = imageUrl;
         this.requestCount = requestCount;
-        this.hashId = hashId;
+    }
+
+    public static Song from(SongRequest songRequest) {
+        int initialCount = 1;
+
+        return Song.builder()
+                   .songTitle(songRequest.getTitle())
+                   .artist(songRequest.getArtist())
+                   .imageUrl(songRequest.getImageUrl())
+                   .requestCount(initialCount)
+                   .build();
     }
 }
