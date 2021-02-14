@@ -41,6 +41,7 @@ class LetterControllerTest {
         LetterResponse firstLetterResponse = letterResponses.get(0);
         SongSummary song = firstLetterResponse.getSong();
         AccountSummary account = firstLetterResponse.getAccount();
+        LocalDateTime createdDateTime = firstLetterResponse.getCreatedDateTime();
 
         // when
         when(letterService.findAllLetters()).thenReturn(letterResponses);
@@ -59,7 +60,7 @@ class LetterControllerTest {
                      .andExpect(jsonPath("data[0].id").value(firstLetterResponse.getId()))
                      .andExpect(jsonPath("data[0].songStory").value(firstLetterResponse.getSongStory()))
                      .andExpect(jsonPath("data[0].requestStatus").value(firstLetterResponse.getRequestStatus()))
-                     .andExpect(jsonPath("data[0].createdDateTime").value(firstLetterResponse.getCreatedDateTime()))
+                     .andExpect(jsonPath("data[0].createdDateTime").value(createdDateTime.toString()))
                      .andExpect(jsonPath("data[0].song.id").value(song.getId()))
                      .andExpect(jsonPath("data[0].song.title").value(song.getTitle()))
                      .andExpect(jsonPath("data[0].song.artist").value(song.getArtist()))
@@ -70,12 +71,50 @@ class LetterControllerTest {
         ;
     }
 
+    @Test
+    @DisplayName("OK - 유효한 ID 로부터 Letter 상세정보를 조회하는 API 테스트")
+    void find_letter_by_valid_id() throws Exception {
+        // given
+        List<LetterResponse> letterResponses = createMockLetterResponses();
+        LetterResponse letterResponse = letterResponses.get(0);
+        SongSummary song = letterResponse.getSong();
+        AccountSummary account = letterResponse.getAccount();
+        Long letterId = letterResponse.getId();
+        LocalDateTime createdDateTime = letterResponse.getCreatedDateTime();
+
+        // when
+        when(letterService.findLetter(letterId)).thenReturn(letterResponse);
+
+        ResultActions resultActions = mockMvc.perform(get("/letters/{id}", letterId)
+                                                      .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andDo(print())
+                     .andExpect(status().isOk())
+                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                     .andExpect(jsonPath("success").value(true))
+                     .andExpect(jsonPath("statusMessage").value("OK"))
+                     .andExpect(jsonPath("data.id").value(letterResponse.getId()))
+                     .andExpect(jsonPath("data.songStory").value(letterResponse.getSongStory()))
+                     .andExpect(jsonPath("data.requestStatus").value(letterResponse.getRequestStatus()))
+                     .andExpect(jsonPath("data.createdDateTime").value(createdDateTime.toString()))
+                     .andExpect(jsonPath("data.song.id").value(song.getId()))
+                     .andExpect(jsonPath("data.song.title").value(song.getTitle()))
+                     .andExpect(jsonPath("data.song.artist").value(song.getArtist()))
+                     .andExpect(jsonPath("data.song.imageUrl").value(song.getImageUrl()))
+                     .andExpect(jsonPath("data.account.id").value(account.getId()))
+                     .andExpect(jsonPath("data.account.name").value(account.getName()))
+                     .andExpect(jsonPath("data.account.avatarUrl").value(account.getAvatarUrl()))
+        ;
+    }
+
+
     private List<LetterResponse> createMockLetterResponses() {
         LetterResponse firstLetterResponse = LetterResponse.builder()
                                                            .id(1L)
                                                            .songStory("Song Story 1")
                                                            .requestStatus(RequestStatus.WAITING.getKey())
-                                                           .createdDateTime(LocalDateTime.of(2021, 2, 14, 8, 43))
+                                                           .createdDateTime(LocalDateTime.of(2021, 2, 14, 8, 43, 1))
                                                            .accountSummary(AccountSummary.builder()
                                                                                          .id(1L)
                                                                                          .name("Name 1")
@@ -92,7 +131,7 @@ class LetterControllerTest {
                                                             .id(2L)
                                                             .songStory("Song Story 2")
                                                             .requestStatus(RequestStatus.WAITING.getKey())
-                                                            .createdDateTime(LocalDateTime.of(2021, 2, 14, 8, 43))
+                                                            .createdDateTime(LocalDateTime.of(2021, 2, 14, 8, 43, 1))
                                                             .accountSummary(AccountSummary.builder()
                                                                     .id(2L)
                                                                     .name("Name 2")
@@ -109,7 +148,7 @@ class LetterControllerTest {
                                                            .id(3L)
                                                            .songStory("Song Story 3")
                                                            .requestStatus(RequestStatus.WAITING.getKey())
-                                                           .createdDateTime(LocalDateTime.of(2021, 2, 14, 8, 43))
+                                                           .createdDateTime(LocalDateTime.of(2021, 2, 14, 8, 43, 1))
                                                            .accountSummary(AccountSummary.builder()
                                                                    .id(3L)
                                                                    .name("Name 3")
