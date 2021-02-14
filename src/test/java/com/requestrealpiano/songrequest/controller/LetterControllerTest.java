@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -58,6 +59,7 @@ class LetterControllerTest {
                      .andExpect(jsonPath("data[0].id").value(firstLetterResponse.getId()))
                      .andExpect(jsonPath("data[0].songStory").value(firstLetterResponse.getSongStory()))
                      .andExpect(jsonPath("data[0].requestStatus").value(firstLetterResponse.getRequestStatus()))
+                     .andExpect(jsonPath("data[0].createdDateTime").value(firstLetterResponse.getCreatedDateTime()))
                      .andExpect(jsonPath("data[0].song.id").value(song.getId()))
                      .andExpect(jsonPath("data[0].song.title").value(song.getTitle()))
                      .andExpect(jsonPath("data[0].song.artist").value(song.getArtist()))
@@ -65,7 +67,7 @@ class LetterControllerTest {
                      .andExpect(jsonPath("data[0].account.id").value(account.getId()))
                      .andExpect(jsonPath("data[0].account.name").value(account.getName()))
                      .andExpect(jsonPath("data[0].account.avatarUrl").value(account.getAvatarUrl()))
-                ;
+        ;
     }
 
     private List<LetterResponse> createMockLetterResponses() {
@@ -73,6 +75,7 @@ class LetterControllerTest {
                                                            .id(1L)
                                                            .songStory("Song Story 1")
                                                            .requestStatus(RequestStatus.WAITING.getKey())
+                                                           .createdDateTime(LocalDateTime.of(2021, 2, 14, 8, 43))
                                                            .accountSummary(AccountSummary.builder()
                                                                                          .id(1L)
                                                                                          .name("Name 1")
@@ -89,6 +92,7 @@ class LetterControllerTest {
                                                             .id(2L)
                                                             .songStory("Song Story 2")
                                                             .requestStatus(RequestStatus.WAITING.getKey())
+                                                            .createdDateTime(LocalDateTime.of(2021, 2, 14, 8, 43))
                                                             .accountSummary(AccountSummary.builder()
                                                                     .id(2L)
                                                                     .name("Name 2")
@@ -105,6 +109,7 @@ class LetterControllerTest {
                                                            .id(3L)
                                                            .songStory("Song Story 3")
                                                            .requestStatus(RequestStatus.WAITING.getKey())
+                                                           .createdDateTime(LocalDateTime.of(2021, 2, 14, 8, 43))
                                                            .accountSummary(AccountSummary.builder()
                                                                    .id(3L)
                                                                    .name("Name 3")
