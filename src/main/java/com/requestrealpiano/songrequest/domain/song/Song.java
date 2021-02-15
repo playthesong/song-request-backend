@@ -51,6 +51,12 @@ public class Song {
         this.requestCount = requestCount;
     }
 
+    public Song increaseRequestCount() {
+        int increase = 1;
+        this.requestCount += increase;
+        return this;
+    }
+
     public static Song from(SongRequest songRequest) {
         int initialCount = 1;
 

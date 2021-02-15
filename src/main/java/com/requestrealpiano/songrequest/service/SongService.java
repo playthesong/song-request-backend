@@ -18,6 +18,7 @@ public class SongService {
 
     public Song findSongByRequest(SongRequest songRequest) {
         return songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist())
+                             .map(Song::increaseRequestCount)
                              .orElseGet(() -> {
                                  Song song = Song.from(songRequest);
                                  return songRepository.save(song);

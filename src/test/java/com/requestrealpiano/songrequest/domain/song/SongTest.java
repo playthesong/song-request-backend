@@ -75,4 +75,29 @@ class SongTest {
                 Arguments.of("New Title", "New Artist", "New Image URL", 1)
         );
     }
+
+    @ParameterizedTest
+    @MethodSource("increaseRequestCountParameters")
+    @DisplayName("requestCount 증가 메서드 테스트")
+    void increase_request_count(String title, String artist, String imageUrl, int initialCount, int increasedCount) {
+        // given
+        Song song = Song.builder()
+                        .songTitle(title)
+                        .artist(artist)
+                        .imageUrl(imageUrl)
+                        .requestCount(initialCount)
+                        .build();
+
+        // when
+        Song updatedSong = song.increaseRequestCount();
+
+        // then
+        assertThat(updatedSong.getRequestCount()).isEqualTo(increasedCount);
+    }
+
+    private static Stream<Arguments> increaseRequestCountParameters() {
+        return Stream.of(
+                Arguments.of("Song title", "Artist", "http://ImageUrl", 1, 2)
+        );
+    }
 }

@@ -45,8 +45,8 @@ class SongServiceTest {
 
     @ParameterizedTest
     @MethodSource("whenFindExistSongByRequestParameters")
-    @DisplayName("요청 받은 Song이 DB에 존재할 경우 찾아서 반환하는 테스트")
-    void when_find_exist_song_by_request(String songTitle, String artist, String imageUrl) {
+    @DisplayName("요청 받은 Song이 DB에 존재할 경우 RequestCount를 증가 시킨 뒤 반환하는 테스트")
+    void when_find_exist_song_by_request(String songTitle, String artist, String imageUrl, int beforeCount, int afterCount) {
         // given
         SongRequest songRequest = SongRequestBuilder.newBuilder()
                                                     .title(songTitle)
@@ -57,6 +57,7 @@ class SongServiceTest {
         Song existSong = Song.builder()
                              .songTitle(songTitle)
                              .artist(artist)
+                             .requestCount(beforeCount)
                              .imageUrl(imageUrl)
                              .build();
 
@@ -69,13 +70,14 @@ class SongServiceTest {
         assertAll(
                 () -> assertThat(song.getSongTitle()).isEqualTo(existSong.getSongTitle()),
                 () -> assertThat(song.getArtist()).isEqualTo(existSong.getArtist()),
-                () -> assertThat(song.getImageUrl()).isEqualTo(existSong.getImageUrl())
+                () -> assertThat(song.getImageUrl()).isEqualTo(existSong.getImageUrl()),
+                () -> assertThat(song.getRequestCount()).isEqualTo(afterCount)
         );
     }
 
     private static Stream<Arguments> whenFindExistSongByRequestParameters() {
         return Stream.of(
-                Arguments.of("Exist song title", "Exist artist", "Exist image URL")
+                Arguments.of("Exist song title", "Exist artist", "Exist image URL", 1, 2)
         );
     }
 
