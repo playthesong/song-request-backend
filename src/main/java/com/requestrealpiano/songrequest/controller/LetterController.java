@@ -1,13 +1,11 @@
 package com.requestrealpiano.songrequest.controller;
 
+import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
 import com.requestrealpiano.songrequest.global.response.ApiResponse;
 import com.requestrealpiano.songrequest.service.LetterService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,5 +28,11 @@ public class LetterController {
     public ApiResponse<LetterResponse> findById(@PathVariable Long id) {
         LetterResponse letter = letterService.findLetter(id);
         return OK(letter);
+    }
+
+    @PostMapping
+    public ApiResponse<LetterResponse> createNew(@RequestBody NewLetterRequest newLetterRequest) {
+        LetterResponse newLetter = letterService.createNewLetter(newLetterRequest);
+        return OK(newLetter);
     }
 }

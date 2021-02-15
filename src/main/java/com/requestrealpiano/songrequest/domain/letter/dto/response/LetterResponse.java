@@ -38,12 +38,12 @@ public class LetterResponse {
         RequestStatus requestStatus = letter.getRequestStatus();
 
         return LetterResponse.builder()
-                                   .id(letter.getId())
-                                   .songStory(letter.getSongStory())
-                                   .requestStatus(requestStatus.getKey())
-                                   .createdDateTime(letter.getCreatedDateTime())
-                                   .songSummary(SongSummary.from(song))
-                                   .accountSummary(AccountSummary.from(account))
-                                   .build();
+                             .id(letter.getId())
+                             .songStory(letter.getSongStory())
+                             .requestStatus(requestStatus.getKey())
+                             .createdDateTime(letter.getCreatedDateTime())
+                             .songSummary(SongSummary.from(song))
+                             .accountSummary(AccountSummary.from(account))
+                             .build();
     }
 }
