@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -43,5 +41,14 @@ public class Letter extends BaseTimeEntity {
         this.requestStatus = requestStatus;
         this.account = account;
         this.song = song;
+    }
+
+    public static Letter of(String songStory, Account account, Song song) {
+        return Letter.builder()
+                     .songStory(songStory)
+                     .requestStatus(RequestStatus.WAITING)
+                     .account(account)
+                     .song(song)
+                     .build();
     }
 }

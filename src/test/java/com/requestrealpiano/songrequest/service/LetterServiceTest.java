@@ -1,9 +1,15 @@
 package com.requestrealpiano.songrequest.service;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
+import com.requestrealpiano.songrequest.domain.account.AccountRepository;
+import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequestBuilder;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.LetterNotFoundException;
@@ -24,6 +30,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +43,12 @@ class LetterServiceTest {
 
     @Mock
     LetterRepository letterRepository;
+
+    @Mock
+    AccountRepository accountRepository;
+
+    @Mock
+    SongService songService;
 
     @Test
     @DisplayName("저장 되어 있는 모든 Letters 로부터 LetterResponses 를 생성하는 테스트")
@@ -102,8 +117,8 @@ class LetterServiceTest {
         );
     }
 
-    @DisplayName("LetterNotFoundException - 존재하지 않는 ID 값으로 Letter 를 조회할 때 예외가 발생하는 테스트")
     @Test
+    @DisplayName("LetterNotFoundException - 존재하지 않는 ID 값으로 Letter 를 조회할 때 예외가 발생하는 테스트")
     void find_letter_by_invalid_id() {
         // given
         Long invalidId = 1234567L;
@@ -115,4 +130,57 @@ class LetterServiceTest {
         assertThatThrownBy(() -> letterService.findLetter(invalidId)).isInstanceOf(LetterNotFoundException.class);
     }
 
+    @ParameterizedTest
+    @MethodSource("createNewLetterParameters")
+    @DisplayName("새로운 Letter를 생성하는 테스트")
+    void create_new_letter(String title, String artist, String imageUrl, String songStory, Long accountId,
+                           Long googleOauthId, String name, String email, Role role, String avatarUrl, Integer requestCount) {
+        // given
+        SongRequest songRequest = SongRequestBuilder.newBuilder()
+                                                    .title(title)
+                                                    .artist(artist)
+                                                    .imageUrl(imageUrl)
+                                                    .build();
+        NewLetterRequest newLetterRequest = NewLetterRequestBuilder.newBuilder()
+                                                                   .songStory(songStory)
+                                                                   .songRequest(songRequest)
+                                                                   .accountId(accountId)
+                                                                   .build();
+        Song song = Song.builder()
+                        .songTitle(title)
+                        .artist(artist)
+                        .imageUrl(imageUrl)
+                        .build();
+        Account account = Account.builder()
+                                 .googleOauthId(googleOauthId)
+                                 .name(name)
+                                 .email(email)
+                                 .role(role)
+                                 .avatarUrl(avatarUrl)
+                                 .requestCount(requestCount)
+                                 .build();
+        Letter letter = Letter.of(songStory, account, song);
+
+
+        // when
+        when(accountRepository.findById(eq(newLetterRequest.getAccountId()))).thenReturn(Optional.of(account));
+        when(letterRepository.save(any(Letter.class))).thenReturn(letter);
+        LetterResponse letterResponse = letterService.createNewLetter(newLetterRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(letterResponse.getSongStory()).isEqualTo(songStory),
+                () -> assertThat(letterResponse.getRequestStatus()).isEqualTo(RequestStatus.WAITING.getKey()),
+                () -> assertThat(letterResponse.getSong().getTitle()).isEqualTo(title),
+                () -> assertThat(letterResponse.getAccount().getName()).isEqualTo(name),
+                () -> assertThat(letterResponse.getAccount().getAvatarUrl()).isEqualTo(avatarUrl)
+        );
+    }
+
+    private static Stream<Arguments> createNewLetterParameters() {
+        return Stream.of(
+                Arguments.of("Song title", "Artist", "imageUrl", "Song Story", 1L, 1234567L, "Username", "User email",
+                             Role.MEMBER, "http://avatarUrl", 1)
+        );
+    }
 }

@@ -1,12 +1,20 @@
 package com.requestrealpiano.songrequest.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequestBuilder;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.AccountSummary;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.SongSummary;
 import com.requestrealpiano.songrequest.service.LetterService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,9 +26,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -106,6 +117,62 @@ class LetterControllerTest {
                      .andExpect(jsonPath("data.account.name").value(account.getName()))
                      .andExpect(jsonPath("data.account.avatarUrl").value(account.getAvatarUrl()))
         ;
+    }
+
+    @ParameterizedTest
+    @MethodSource("createNewLetterParameters")
+    @DisplayName("새로운 Letter 생성 API 테스트")
+    void create_new_Letter(String songStory, SongRequest songRequest, Long accountId) throws Exception {
+        // given
+        NewLetterRequest newLetterRequest = NewLetterRequestBuilder.newBuilder()
+                                                                   .songStory(songStory)
+                                                                   .songRequest(songRequest)
+                                                                   .accountId(accountId)
+                                                                   .build();
+        List<LetterResponse> responses = createMockLetterResponses();
+        LetterResponse response = responses.get(0);
+        SongSummary song = response.getSong();
+        LocalDateTime createdDateTime = response.getCreatedDateTime();
+        AccountSummary account = response.getAccount();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // when
+        when(letterService.createNewLetter(any(NewLetterRequest.class))).thenReturn(response);
+        ResultActions resultActions = mockMvc.perform(post("/letters")
+                                                      .accept(MediaType.APPLICATION_JSON)
+                                                      .contentType(MediaType.APPLICATION_JSON)
+                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
+
+        // then
+        resultActions.andDo(print())
+                     .andExpect(status().isOk())
+                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                     .andExpect(jsonPath("success").value(true))
+                     .andExpect(jsonPath("statusMessage").value("OK"))
+                     .andExpect(jsonPath("data.id").value(response.getId()))
+                     .andExpect(jsonPath("data.songStory").value(response.getSongStory()))
+                     .andExpect(jsonPath("data.requestStatus").value(response.getRequestStatus()))
+                     .andExpect(jsonPath("data.createdDateTime").value(createdDateTime.toString()))
+                     .andExpect(jsonPath("data.song.id").value(song.getId()))
+                     .andExpect(jsonPath("data.song.title").value(song.getTitle()))
+                     .andExpect(jsonPath("data.song.artist").value(song.getArtist()))
+                     .andExpect(jsonPath("data.song.imageUrl").value(song.getImageUrl()))
+                     .andExpect(jsonPath("data.account.id").value(account.getId()))
+                     .andExpect(jsonPath("data.account.name").value(account.getName()))
+                     .andExpect(jsonPath("data.account.avatarUrl").value(account.getAvatarUrl()))
+        ;
+    }
+
+    private static Stream<Arguments> createNewLetterParameters() {
+        return Stream.of(
+                Arguments.of("Song story",
+                             SongRequestBuilder.newBuilder()
+                                               .title("Song title")
+                                               .artist("Artist")
+                                               .imageUrl("http://imageUrl")
+                                               .build(),
+                             1L)
+        );
     }
 
 

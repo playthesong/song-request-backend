@@ -1,6 +1,10 @@
 package com.requestrealpiano.songrequest.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequestBuilder;
+import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.domain.song.SongRepository;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
@@ -19,10 +23,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,7 +38,86 @@ class SongServiceTest {
     SongService songService;
 
     @Mock
+    SongRepository songRepository;
+
+    @Mock
     SearchApiService searchApiService;
+
+    @ParameterizedTest
+    @MethodSource("whenFindExistSongByRequestParameters")
+    @DisplayName("요청 받은 Song이 DB에 존재할 경우 RequestCount를 증가 시킨 뒤 반환하는 테스트")
+    void when_find_exist_song_by_request(String songTitle, String artist, String imageUrl, int beforeCount, int afterCount) {
+        // given
+        SongRequest songRequest = SongRequestBuilder.newBuilder()
+                                                    .title(songTitle)
+                                                    .artist(artist)
+                                                    .imageUrl(imageUrl)
+                                                    .build();
+
+        Song existSong = Song.builder()
+                             .songTitle(songTitle)
+                             .artist(artist)
+                             .requestCount(beforeCount)
+                             .imageUrl(imageUrl)
+                             .build();
+
+        // when
+        when(songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist()))
+                .thenReturn(Optional.of(existSong));
+        Song song = songService.findSongByRequest(songRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(song.getSongTitle()).isEqualTo(existSong.getSongTitle()),
+                () -> assertThat(song.getArtist()).isEqualTo(existSong.getArtist()),
+                () -> assertThat(song.getImageUrl()).isEqualTo(existSong.getImageUrl()),
+                () -> assertThat(song.getRequestCount()).isEqualTo(afterCount)
+        );
+    }
+
+    private static Stream<Arguments> whenFindExistSongByRequestParameters() {
+        return Stream.of(
+                Arguments.of("Exist song title", "Exist artist", "Exist image URL", 1, 2)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("whenFindNotExistSongParameters")
+    @DisplayName("요청 받은 Song이 DB에 존재하지 않을 경우 새로 저장한 뒤 반환하는 테스트")
+    void when_find_not_exist_song(String songTitle, String artist, String imageUrl) {
+        // given
+        SongRequest songRequest = SongRequestBuilder.newBuilder()
+                                                    .title(songTitle)
+                                                    .artist(artist)
+                                                    .imageUrl(imageUrl)
+                                                    .build();
+
+        Song newSong = Song.builder()
+                           .songTitle(songTitle)
+                           .artist(artist)
+                           .imageUrl(imageUrl)
+                           .build();
+
+        // when
+        when(songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist()))
+                .thenReturn(Optional.empty());
+        when(songRepository.save(any(Song.class))).thenReturn(newSong);
+
+        Song song = songService.findSongByRequest(songRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(song.getSongTitle()).isEqualTo(newSong.getSongTitle()),
+                () -> assertThat(song.getArtist()).isEqualTo(newSong.getArtist()),
+                () -> assertThat(song.getImageUrl()).isEqualTo(newSong.getImageUrl())
+        );
+    }
+
+    private static Stream<Arguments> whenFindNotExistSongParameters() {
+        return Stream.of(
+                Arguments.of("Not exist song title", "Not exist artist", "Not exist")
+        );
+    }
 
     @ParameterizedTest
     @MethodSource("searchManiaDbParameters")

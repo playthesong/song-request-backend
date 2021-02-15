@@ -39,14 +39,42 @@ class LetterTest {
     private static Stream<Arguments> createNewLetterParameters() {
         return Stream.of(
                 Arguments.of("사연 1 입니다.", RequestStatus.WAITING,
-                             Account.builder().name("Name1").build(),
-                             Song.builder().songTitle("노래 제목1").build()),
+                        Account.builder().name("Name1").build(),
+                        Song.builder().songTitle("노래 제목1").build()),
                 Arguments.of("사연 2 입니다.", RequestStatus.PENDING,
-                             Account.builder().name("Name2").build(),
-                             Song.builder().songTitle("노래 제목2").build()),
+                        Account.builder().name("Name2").build(),
+                        Song.builder().songTitle("노래 제목2").build()),
                 Arguments.of("사연 1 입니다.", RequestStatus.WAITING,
-                             Account.builder().name("Name3").build(),
-                             Song.builder().songTitle("노래 제목3").build())
+                        Account.builder().name("Name3").build(),
+                        Song.builder().songTitle("노래 제목3").build())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("createNewLetterByOfParameters")
+    @DisplayName("정적 메서드 of()로부터 새로운 Letter를 생성하는 테스트")
+    void create_new_letter_by_of(String songStory, Account testAccount, Song testSong) {
+        // when
+        Letter letter = Letter.of(songStory, testAccount, testSong);
+        Account account = letter.getAccount();
+        Song song = letter.getSong();
+
+
+        // then
+        assertAll(
+                () -> assertThat(letter.getSongStory()).isEqualTo(songStory),
+                () -> assertThat(letter.getRequestStatus()).isEqualTo(RequestStatus.WAITING),
+                () -> assertThat(account.getName()).isEqualTo(testAccount.getName()),
+                () -> assertThat(song.getSongTitle()).isEqualTo(testSong.getSongTitle())
+        );
+    }
+
+
+    private static Stream<Arguments> createNewLetterByOfParameters() {
+        return Stream.of(
+                Arguments.of("Song story",
+                             Account.builder().name("Username").build(),
+                             Song.builder().songTitle("Song title").build())
         );
     }
 }
