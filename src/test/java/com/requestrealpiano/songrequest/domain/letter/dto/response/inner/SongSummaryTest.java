@@ -25,6 +25,5 @@ class SongSummaryTest {
                 () -> assertThat(songSummary.getArtist()).isEqualTo(song.getArtist()),
                 () -> assertThat(songSummary.getImageUrl()).isEqualTo(song.getImageUrl())
         );
-
     }
 }

@@ -19,7 +19,7 @@ class LetterTest {
     @ParameterizedTest
     @MethodSource("createNewLetterByOfParameters")
     @DisplayName("정적 메서드 of()로부터 새로운 Letter를 생성하는 테스트")
-    void create_new_letter_by_of(String songStory) {
+    void create_new_letter_by_of(String songStory, RequestStatus defaultStatus) {
         // given
         Account account = AccountFactory.createMember();
         Song song = SongFactory.createOne();
@@ -30,7 +30,7 @@ class LetterTest {
         // then
         assertAll(
                 () -> assertThat(letter.getSongStory()).isEqualTo(songStory),
-                () -> assertThat(letter.getRequestStatus()).isEqualTo(RequestStatus.WAITING),
+                () -> assertThat(letter.getRequestStatus()).isEqualTo(defaultStatus),
                 () -> assertThat(letter.getAccount()).isEqualTo(account),
                 () -> assertThat(letter.getSong()).isEqualTo(song)
         );
@@ -38,7 +38,7 @@ class LetterTest {
 
     private static Stream<Arguments> createNewLetterByOfParameters() {
         return Stream.of(
-                Arguments.of("Song story")
+                Arguments.of("Song story", RequestStatus.WAITING)
         );
     }
 }

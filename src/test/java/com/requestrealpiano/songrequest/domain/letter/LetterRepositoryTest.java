@@ -37,13 +37,12 @@ class LetterRepositoryTest extends BaseRepositoryTest {
                                .count()).isEqualTo(letters.size());
     }
 
-    @ParameterizedTest
-    @MethodSource("createdDateTimeOfLetterParameters")
+    @Test
     @DisplayName("JPA Auditing 적용 Letter 생성 시간 테스트")
-    void created_date_time_of_letter(LocalDateTime testDateTime, int first) {
+    void created_date_time_of_letter() {
         // given
-        List<Letter> letters = LetterFactory.createList();
-        Letter letter = letters.get(first);
+        Letter letter = LetterFactory.createOne();
+        LocalDateTime testDateTime = LocalDateTime.now();
 
         // when
         Letter savedLetter = letterRepository.save(letter);
@@ -51,11 +50,5 @@ class LetterRepositoryTest extends BaseRepositoryTest {
         // then
         assertThat(savedLetter.getCreatedDateTime()).isNotNull();
         assertThat(savedLetter.getCreatedDateTime()).isAfter(testDateTime);
-    }
-
-    private static Stream<Arguments> createdDateTimeOfLetterParameters() {
-        return Stream.of(
-                Arguments.of(LocalDateTime.now(), 0)
-        );
     }
 }
