@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.domain.song.searchapi.maniadb;
+package com.requestrealpiano.songrequest.domain.song.searchapi.translator;
 
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbClientResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbAlbumData;
