@@ -20,9 +20,9 @@ class LetterResponseTest {
     @DisplayName("Letter를 통해 Letter DTO를 생성하는 테스트")
     void create_new_letter_response() {
         // given
-        Song song = SongFactory.createOne();
-        Account account = AccountFactory.createMember();
-        Letter letter = LetterFactory.createOne(song, account);
+        Letter letter = LetterFactory.createOne();
+        Song song = letter.getSong();
+        Account account = letter.getAccount();
 
         // when
         LetterResponse letterResponse = LetterResponse.from(letter);

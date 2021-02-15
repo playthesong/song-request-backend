@@ -10,12 +10,12 @@ import java.util.List;
 
 public class LetterFactory {
 
-    public static Letter createOne(Song song, Account account) {
+    public static Letter createOne() {
         return Letter.builder()
                      .songStory("Song story")
                      .requestStatus(RequestStatus.WAITING)
-                     .song(song)
-                     .account(account)
+                     .song(SongFactory.createOne())
+                     .account(AccountFactory.createMember())
                      .build();
     }
 
