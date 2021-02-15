@@ -47,6 +47,9 @@ class LetterServiceTest {
     @Mock
     AccountRepository accountRepository;
 
+    @Mock
+    SongService songService;
+
     @Test
     @DisplayName("저장 되어 있는 모든 Letters 로부터 LetterResponses 를 생성하는 테스트")
     void find_all_letters() {
