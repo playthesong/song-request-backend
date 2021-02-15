@@ -12,11 +12,13 @@ import com.requestrealpiano.songrequest.global.error.AccountNotFoundException;
 import com.requestrealpiano.songrequest.global.error.LetterNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class LetterService {
 
@@ -36,6 +38,7 @@ public class LetterService {
         return LetterResponse.from(letter);
     }
 
+    @Transactional
     public LetterResponse createNewLetter(NewLetterRequest newLetterRequest) {
         SongRequest songRequest = newLetterRequest.getSongRequest();
         String songStory = newLetterRequest.getSongStory();

@@ -8,14 +8,17 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApi
 import com.requestrealpiano.songrequest.service.searchapi.SearchApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class SongService {
 
     private final SongRepository songRepository;
     private final SearchApiService searchApiService;
 
+    @Transactional
     public Song findSongByRequest(SongRequest songRequest) {
         return songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist())
                              .map(Song::increaseRequestCount)
