@@ -3,6 +3,9 @@ package com.requestrealpiano.songrequest.testobject;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequestBuilder;
+import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.song.Song;
 
 import java.util.Arrays;
@@ -55,5 +58,13 @@ public class LetterFactory {
                                    .song(song)
                                    .build();
         return Arrays.asList(firstLetter, secondLetter, thirdLetter);
+    }
+
+    public static NewLetterRequest createNewLetterRequest() {
+        return NewLetterRequestBuilder.newBuilder()
+                                      .songStory("Song Story")
+                                      .songRequest(SongFactory.createSongRequest())
+                                      .accountId(1L)
+                                      .build();
     }
 }

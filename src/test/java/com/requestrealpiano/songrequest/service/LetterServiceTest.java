@@ -29,6 +29,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
+import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequest;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,52 +58,24 @@ class LetterServiceTest {
     @DisplayName("저장 되어 있는 모든 Letters 로부터 LetterResponses 를 생성하는 테스트")
     void find_all_letters() {
         // given
-        List<Letter> letters = createMockLetters();
-        List<LetterResponse> testResponses = letters.stream()
-                                                    .map(LetterResponse::from)
-                                                    .collect(Collectors.toList());
+        Account account = createMember();
+        Song song = createSong();
+        List<Letter> letters = createLettersOf(account, song);
 
         // when
         when(letterRepository.findAll()).thenReturn(letters);
         List<LetterResponse> letterResponses = letterService.findAllLetters();
 
         // then
-        assertThat(letterResponses.size()).isEqualTo(testResponses.size());
+        assertThat(letterResponses.size()).isEqualTo(letters.size());
     }
 
-    private List<Letter> createMockLetters() {
-        Letter firstLetter = Letter.builder()
-                .songStory("Song Story 1")
-                .requestStatus(RequestStatus.WAITING)
-                .song(Song.builder().build())
-                .account(Account.builder().build())
-                .build();
-        Letter secondLetter = Letter.builder()
-                .songStory("Song Story 2")
-                .requestStatus(RequestStatus.WAITING)
-                .song(Song.builder().build())
-                .account(Account.builder().build())
-                .build();
-        Letter thirdLetter = Letter.builder()
-                .songStory("Song Story 3")
-                .requestStatus(RequestStatus.WAITING)
-                .song(Song.builder().build())
-                .account(Account.builder().build())
-                .build();
-        return Arrays.asList(firstLetter, secondLetter, thirdLetter);
-    }
-
-    @ParameterizedTest
-    @MethodSource("findLetterByValidIdParameters")
+    @Test
     @DisplayName("정상적인 ID로부터 Letter를 조회하는 테스트")
-    void find_letter_by_valid_id(Long validId, String songStory, RequestStatus requestStatus) {
+    void find_letter_by_valid_id() {
         // given
-        Letter letter = Letter.builder()
-                              .songStory(songStory)
-                              .requestStatus(requestStatus)
-                              .account(Account.builder().build())
-                              .song(Song.builder().build())
-                              .build();
+        Long validId = 1L;
+        Letter letter = createLetter();
         LetterResponse testResponse = LetterResponse.from(letter);
 
         // when
@@ -109,12 +85,6 @@ class LetterServiceTest {
         // then
         assertThat(letterResponse.getSongStory()).isEqualTo(testResponse.getSongStory());
         assertThatCode(() -> letterService.findLetter(validId)).doesNotThrowAnyException();
-    }
-
-    private static Stream<Arguments> findLetterByValidIdParameters() {
-        return Stream.of(
-                Arguments.of(1L, "Song Story", RequestStatus.WAITING)
-        );
     }
 
     @Test
@@ -130,57 +100,29 @@ class LetterServiceTest {
         assertThatThrownBy(() -> letterService.findLetter(invalidId)).isInstanceOf(LetterNotFoundException.class);
     }
 
-    @ParameterizedTest
-    @MethodSource("createNewLetterParameters")
+    @Test
     @DisplayName("새로운 Letter를 생성하는 테스트")
-    void create_new_letter(String title, String artist, String imageUrl, String songStory, Long accountId,
-                           Long googleOauthId, String name, String email, Role role, String avatarUrl, Integer requestCount) {
+    void create_new_letter() {
         // given
-        SongRequest songRequest = SongRequestBuilder.newBuilder()
-                                                    .title(title)
-                                                    .artist(artist)
-                                                    .imageUrl(imageUrl)
-                                                    .build();
-        NewLetterRequest newLetterRequest = NewLetterRequestBuilder.newBuilder()
-                                                                   .songStory(songStory)
-                                                                   .songRequest(songRequest)
-                                                                   .accountId(accountId)
-                                                                   .build();
-        Song song = Song.builder()
-                        .songTitle(title)
-                        .artist(artist)
-                        .imageUrl(imageUrl)
-                        .build();
-        Account account = Account.builder()
-                                 .googleOauthId(googleOauthId)
-                                 .name(name)
-                                 .email(email)
-                                 .role(role)
-                                 .avatarUrl(avatarUrl)
-                                 .requestCount(requestCount)
-                                 .build();
-        Letter letter = Letter.of(songStory, account, song);
+        NewLetterRequest newLetterRequest = createNewLetterRequest();
 
+        String songStory = newLetterRequest.getSongStory();
+        Account account = createMember();
+        Song song = createSong();
+        Letter newLetter = Letter.of(songStory, account, song);
 
         // when
         when(accountRepository.findById(eq(newLetterRequest.getAccountId()))).thenReturn(Optional.of(account));
-        when(letterRepository.save(any(Letter.class))).thenReturn(letter);
+        when(letterRepository.save(any(Letter.class))).thenReturn(newLetter);
         LetterResponse letterResponse = letterService.createNewLetter(newLetterRequest);
 
         // then
         assertAll(
-                () -> assertThat(letterResponse.getSongStory()).isEqualTo(songStory),
-                () -> assertThat(letterResponse.getRequestStatus()).isEqualTo(RequestStatus.WAITING.getKey()),
-                () -> assertThat(letterResponse.getSong().getTitle()).isEqualTo(title),
-                () -> assertThat(letterResponse.getAccount().getName()).isEqualTo(name),
-                () -> assertThat(letterResponse.getAccount().getAvatarUrl()).isEqualTo(avatarUrl)
-        );
-    }
-
-    private static Stream<Arguments> createNewLetterParameters() {
-        return Stream.of(
-                Arguments.of("Song title", "Artist", "imageUrl", "Song Story", 1L, 1234567L, "Username", "User email",
-                             Role.MEMBER, "http://avatarUrl", 1)
+                () -> assertThat(letterResponse.getSongStory()).isEqualTo(newLetter.getSongStory()),
+                () -> assertThat(letterResponse.getRequestStatus()).isEqualTo(newLetter.getRequestStatus().getKey()),
+                () -> assertThat(letterResponse.getSong().getTitle()).isEqualTo(newLetter.getSong().getSongTitle()),
+                () -> assertThat(letterResponse.getAccount().getName()).isEqualTo(newLetter.getAccount().getName()),
+                () -> assertThat(letterResponse.getAccount().getAvatarUrl()).isEqualTo(newLetter.getAccount().getAvatarUrl())
         );
     }
 }
