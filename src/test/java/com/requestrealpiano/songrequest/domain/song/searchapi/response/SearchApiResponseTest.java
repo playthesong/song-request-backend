@@ -9,6 +9,9 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTran
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -18,6 +21,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,13 +32,12 @@ class SearchApiResponseTest {
     @InjectMocks
     XmlTranslator xmlTranslator;
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("createFinalManiaDbResultParameters")
     @DisplayName("ManiaDB의 응답 데이터를 바탕으로 최종 검색 결과 DTO를 생성하는 테스트")
-    void create_final_result_maniadb_response() throws IOException {
+    void create_final_maniadb_result(Path testXmlPath) throws IOException {
         // given
-        String xmlPath = "src/test/resources/expectedresponse/maniadb/maniadb_response.xml";
-        Path testXmlFilePath = Path.of(xmlPath);
-        String testXml = Files.readString(testXmlFilePath);
+        String testXml = Files.readString(testXmlPath);
 
         ManiaDbClientResponse maniaDbClientResponse = xmlTranslator.mapToManiaDbData(testXml);
 
@@ -52,6 +55,12 @@ class SearchApiResponseTest {
         assertAll(
                 () -> assertThat(maniaDbResponse.getTotalCount()).isEqualTo(data.getTotalCount()),
                 () -> assertThat(maniaDbTracks.size()).isEqualTo(tracks.size())
+        );
+    }
+
+    private static Stream<Arguments> createFinalManiaDbResultParameters() {
+        return Stream.of(
+                Arguments.of(Path.of("src/test/resources/expectedresponse/maniadb/maniadb_response.xml"))
         );
     }
 

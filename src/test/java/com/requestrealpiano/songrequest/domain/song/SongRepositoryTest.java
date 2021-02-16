@@ -2,7 +2,9 @@ package com.requestrealpiano.songrequest.domain.song;
 
 import com.requestrealpiano.songrequest.global.error.SongNotFoundException;
 import com.requestrealpiano.songrequest.testconfig.BaseRepositoryTest;
+import com.requestrealpiano.songrequest.testobject.SongFactory;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -20,30 +24,64 @@ class SongRepositoryTest extends BaseRepositoryTest {
     @Autowired
     SongRepository songRepository;
 
-    @ParameterizedTest
-    @MethodSource("findExistSongByTitleAndArtistWhenExistParameters")
-    @DisplayName("OK - Song title, Artist 로 Song 을 찾는 테스트")
-    void find_by_title_and_artist_when_exist(String songTitle, String artist) {
+    @Test
+    @DisplayName("OK - (Normal) Song title, Artist 로 Song 을 찾는 테스트")
+    void find_by_title_and_artist_when_exist() {
         // given
-        List<Song> songs = createMockSongs();
+        Song song = createSong();
+        String title = song.getSongTitle();
+        String artist = song.getArtist();
 
         // when
-        songRepository.saveAll(songs);
-        Song song = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songTitle, artist)
-                                   .orElseThrow(SongNotFoundException::new);
+        songRepository.save(song);
+        Song foundSong = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(title, artist)
+                .orElseThrow(SongNotFoundException::new);
 
         // then
         assertAll(
-                () -> assertThat(song.getSongTitle()).containsIgnoringCase(songTitle),
-                () -> assertThat(song.getArtist()).isEqualToIgnoringCase(artist)
+                () -> assertThat(foundSong.getSongTitle()).containsIgnoringCase(title),
+                () -> assertThat(foundSong.getArtist()).isEqualToIgnoringCase(artist)
         );
     }
 
-    private static Stream<Arguments> findExistSongByTitleAndArtistWhenExistParameters() {
-        return Stream.of(
-                Arguments.of("Something Just Like This", "Coldplay"),
-                Arguments.of("Something just like", "coldplay"),
-                Arguments.of("something just like this", "ColdPlay")
+    @Test
+    @DisplayName("OK - (LowerCase) Song title, Artist 로 Song 을 찾는 테스트")
+    void find_by_lower_case_title_and_artist_when_exist() {
+        // given
+        Song song = createSong();
+        String lowerCasedTitle = song.getSongTitle().toLowerCase();
+        String lowerCasedArtist = song.getArtist().toLowerCase();
+
+        // when
+        songRepository.save(song);
+        Song foundSong = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(lowerCasedTitle, lowerCasedArtist)
+                                       .orElseThrow(SongNotFoundException::new);
+
+        // then
+        assertAll(
+                () -> assertThat(foundSong.getSongTitle()).containsIgnoringCase(lowerCasedTitle),
+                () -> assertThat(foundSong.getArtist()).isEqualToIgnoringCase(lowerCasedArtist)
+        );
+    }
+
+    @Test
+    @DisplayName("OK - (Substring, Lowercase) Song title, Artist 로 Song 을 찾는 테스트")
+    void find_by_substring_title_and_lowercase_artist_when_exist() {
+        // given
+        Song song = createSong();
+        int beginIndex = 5;
+        String subStringTitle = song.getSongTitle().substring(beginIndex);
+        String lowerCasedArtist = song.getArtist().toLowerCase();
+
+        // when
+        songRepository.save(song);
+        Song foundSong = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(subStringTitle, lowerCasedArtist)
+                                       .orElseThrow(SongNotFoundException::new);
+
+        // then
+        assertAll(
+                () -> assertThat(foundSong.getSongTitle()).containsIgnoringCase(subStringTitle),
+                () -> assertThat(foundSong.getArtist()).isEqualToIgnoringCase(lowerCasedArtist)
         );
     }
 
@@ -52,7 +90,7 @@ class SongRepositoryTest extends BaseRepositoryTest {
     @DisplayName("Not found - 존재하지 않는 Song을 찾는 경우")
     void find_by_title_and_artist_when_not_exist(String title, String artist) {
         // given
-        List<Song> songs = createMockSongs();
+        List<Song> songs = createSongs();
 
         // when
         songRepository.saveAll(songs);
@@ -68,21 +106,5 @@ class SongRepositoryTest extends BaseRepositoryTest {
                 Arguments.of("Not exist title", "Not exist artist"),
                 Arguments.of("Something not exist title", "Something not exist artist")
         );
-    }
-
-    private List<Song> createMockSongs() {
-        Song firstSong = Song.builder().songTitle("exist title")
-                                       .artist("exist artist")
-                                       .imageUrl("exist image URL")
-                                       .build();
-        Song secondSong = Song.builder().songTitle("Hey Jude")
-                                        .artist("The Beatles")
-                                        .imageUrl("http://thebeatles.img")
-                                        .build();
-        Song thirdSong = Song.builder().songTitle("Something Just Like This")
-                                       .artist("Coldplay")
-                                       .imageUrl("http://coldplay.img")
-                                       .build();
-        return List.of(firstSong, secondSong, thirdSong);
     }
 }

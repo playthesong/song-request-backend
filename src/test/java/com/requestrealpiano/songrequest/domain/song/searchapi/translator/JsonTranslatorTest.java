@@ -28,11 +28,10 @@ class JsonTranslatorTest {
     @ParameterizedTest
     @MethodSource("mapJsonToLastFmResponseParameters")
     @DisplayName("LastFM JSON 응답으로부터 DTO를 생성하는 테스트")
-    void map_json_to_lastfm_response(int first, int totalCount, String artist,
+    void map_json_to_lastfm_response(Path testJsonPath, int first, int totalCount, String artist,
                                      String title, String imageUrl) throws IOException {
         // given
-        Path jsonFilePath = Path.of("src/test/resources/expectedresponse/lastfm/lastfm_response.json");
-        String testJson = Files.readString(jsonFilePath);
+        String testJson = Files.readString(testJsonPath);
 
         // when
         SearchApiResponse lastFmResponse = jsonTranslator.mapToLastFmResponse(testJson);
@@ -51,8 +50,9 @@ class JsonTranslatorTest {
 
     private static Stream<Arguments> mapJsonToLastFmResponseParameters() {
         return Stream.of(
-                Arguments.of(0, 10, "김동률", "감사",
-                             "https://www.last.fm/music/%EA%B9%80%EB%8F%99%EB%A5%A0/_/%EA%B0%90%EC%82%AC")
+                Arguments.of(Path.of("src/test/resources/expectedresponse/lastfm/lastfm_response.json"),
+                                     0, 10, "김동률", "감사",
+                                     "https://www.last.fm/music/%EA%B9%80%EB%8F%99%EB%A5%A0/_/%EA%B0%90%EC%82%AC")
         );
     }
 }
