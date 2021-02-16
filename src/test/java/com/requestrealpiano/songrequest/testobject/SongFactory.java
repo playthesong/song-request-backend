@@ -3,7 +3,9 @@ package com.requestrealpiano.songrequest.testobject;
 import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class SongFactory {
@@ -17,6 +19,16 @@ public class SongFactory {
                    .requestCount(1)
                    .build();
 
+    }
+
+    public static Song createSongOf(String songTitle, String artist, String imageUrl) {
+        return Song.builder()
+                   .songTitle(songTitle)
+                   .albumTitle("Album title")
+                   .artist(artist)
+                   .imageUrl(imageUrl)
+                   .requestCount(1)
+                   .build();
     }
 
     public static List<Song> createSongs() {
@@ -43,6 +55,14 @@ public class SongFactory {
                                  .title("New Title")
                                  .artist("New Artist")
                                  .imageUrl("New Image URL")
+                                 .build();
+    }
+
+    public static SongRequest createSongRequestOf(String title, String artist, String imageUrl) {
+        return SongRequestBuilder.newBuilder()
+                                 .title(title)
+                                 .artist(artist)
+                                 .imageUrl(imageUrl)
                                  .build();
     }
 }
