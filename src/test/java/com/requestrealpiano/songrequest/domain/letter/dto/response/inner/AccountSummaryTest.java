@@ -5,6 +5,7 @@ import com.requestrealpiano.songrequest.testobject.AccountFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AccountSummaryTest {
@@ -13,7 +14,7 @@ class AccountSummaryTest {
     @DisplayName("Account 객체로부터 AccountSummary DTO를 생성하는 테스트")
     void create_new_account_summary() {
         // given
-        Account account = AccountFactory.createMember();
+        Account account = createMember();
 
         // when
         AccountSummary accountSummary = AccountSummary.from(account);

@@ -1,25 +1,23 @@
 package com.requestrealpiano.songrequest.testobject;
 
-import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
-import com.requestrealpiano.songrequest.domain.song.Song;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class LetterFactory {
 
-    public static Letter createOne() {
+    public static Letter createLetter() {
         return Letter.builder()
                      .songStory("Song story")
                      .requestStatus(RequestStatus.WAITING)
-                     .song(SongFactory.createOne())
+                     .song(SongFactory.createSong())
                      .account(AccountFactory.createMember())
                      .build();
     }
 
-    public static List<Letter> createList() {
+    public static List<Letter> createLetters() {
         Letter firstLetter = Letter.builder()
                                    .songStory("Song Story 1")
                                    .requestStatus(RequestStatus.WAITING)

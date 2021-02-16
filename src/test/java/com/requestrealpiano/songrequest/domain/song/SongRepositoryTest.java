@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongs;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -26,7 +28,7 @@ class SongRepositoryTest extends BaseRepositoryTest {
     @DisplayName("OK - (Normal) Song title, Artist 로 Song 을 찾는 테스트")
     void find_by_title_and_artist_when_exist() {
         // given
-        Song song = SongFactory.createOne();
+        Song song = createSong();
         String title = song.getSongTitle();
         String artist = song.getArtist();
 
@@ -46,7 +48,7 @@ class SongRepositoryTest extends BaseRepositoryTest {
     @DisplayName("OK - (LowerCase) Song title, Artist 로 Song 을 찾는 테스트")
     void find_by_lower_case_title_and_artist_when_exist() {
         // given
-        Song song = SongFactory.createOne();
+        Song song = createSong();
         String lowerCasedTitle = song.getSongTitle().toLowerCase();
         String lowerCasedArtist = song.getArtist().toLowerCase();
 
@@ -66,7 +68,7 @@ class SongRepositoryTest extends BaseRepositoryTest {
     @DisplayName("OK - (Substring, Lowercase) Song title, Artist 로 Song 을 찾는 테스트")
     void find_by_substring_title_and_lowercase_artist_when_exist() {
         // given
-        Song song = SongFactory.createOne();
+        Song song = createSong();
         int beginIndex = 5;
         String subStringTitle = song.getSongTitle().substring(beginIndex);
         String lowerCasedArtist = song.getArtist().toLowerCase();
@@ -88,7 +90,7 @@ class SongRepositoryTest extends BaseRepositoryTest {
     @DisplayName("Not found - 존재하지 않는 Song을 찾는 경우")
     void find_by_title_and_artist_when_not_exist(String title, String artist) {
         // given
-        List<Song> songs = SongFactory.createList();
+        List<Song> songs = createSongs();
 
         // when
         songRepository.saveAll(songs);

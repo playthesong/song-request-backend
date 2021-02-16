@@ -11,6 +11,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,8 +23,8 @@ class LetterTest {
     @DisplayName("정적 메서드 of()로부터 새로운 Letter를 생성하는 테스트")
     void create_new_letter_by_of(String songStory, RequestStatus defaultStatus) {
         // given
-        Account account = AccountFactory.createMember();
-        Song song = SongFactory.createOne();
+        Account account = createMember();
+        Song song = createSong();
 
         // when
         Letter letter = Letter.of(songStory, account, song);

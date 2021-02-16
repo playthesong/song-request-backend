@@ -8,7 +8,7 @@ import java.util.List;
 
 public class SongFactory {
 
-    public static Song createOne() {
+    public static Song createSong() {
         return Song.builder()
                    .songTitle("Song title")
                    .albumTitle("Album title")
@@ -19,7 +19,7 @@ public class SongFactory {
 
     }
 
-    public static List<Song> createList() {
+    public static List<Song> createSongs() {
         Song firstSong = Song.builder()
                              .songTitle("Wonderwall")
                              .artist("Oasis")
@@ -38,7 +38,7 @@ public class SongFactory {
         return List.of(firstSong, secondSong, thirdSong);
     }
 
-    public static SongRequest createRequest() {
+    public static SongRequest createSongRequest() {
         return SongRequestBuilder.newBuilder()
                                  .title("New Title")
                                  .artist("New Artist")

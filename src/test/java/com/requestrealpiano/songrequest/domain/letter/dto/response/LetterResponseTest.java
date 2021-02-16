@@ -5,9 +5,7 @@ import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.AccountSummary;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.SongSummary;
 import com.requestrealpiano.songrequest.domain.song.Song;
-import com.requestrealpiano.songrequest.testobject.AccountFactory;
 import com.requestrealpiano.songrequest.testobject.LetterFactory;
-import com.requestrealpiano.songrequest.testobject.SongFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +18,7 @@ class LetterResponseTest {
     @DisplayName("Letter를 통해 Letter DTO를 생성하는 테스트")
     void create_new_letter_response() {
         // given
-        Letter letter = LetterFactory.createOne();
+        Letter letter = LetterFactory.createLetter();
         Song song = letter.getSong();
         Account account = letter.getAccount();
 

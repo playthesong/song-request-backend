@@ -10,6 +10,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -20,7 +22,7 @@ class SongTest {
     @DisplayName("SongRequest(DTO) 로부터 새로운 Song 을 생성하는 테스트")
     void create_new_song_by_request(int initialCount) {
         // given
-        SongRequest songRequest = SongFactory.createRequest();
+        SongRequest songRequest = createSongRequest();
 
         // when
         Song song = Song.from(songRequest);
@@ -44,7 +46,7 @@ class SongTest {
     @DisplayName("requestCount 증가 메서드 테스트")
     void increase_request_count() {
         // given
-        Song song = SongFactory.createOne();
+        Song song = createSong();
         int initialCount = song.getRequestCount();
         int increasedCount = initialCount + 1;
 
