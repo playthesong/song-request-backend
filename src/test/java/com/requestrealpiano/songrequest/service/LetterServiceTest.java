@@ -100,13 +100,13 @@ class LetterServiceTest {
         assertThatThrownBy(() -> letterService.findLetter(invalidId)).isInstanceOf(LetterNotFoundException.class);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("createNewLetterParameters")
     @DisplayName("새로운 Letter를 생성하는 테스트")
-    void create_new_letter() {
+    void create_new_letter(String songStory, SongRequest songRequest, Long accountId) {
         // given
-        NewLetterRequest newLetterRequest = createNewLetterRequest();
+        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
 
-        String songStory = newLetterRequest.getSongStory();
         Account account = createMember();
         Song song = createSong();
         Letter newLetter = Letter.of(songStory, account, song);
@@ -123,6 +123,12 @@ class LetterServiceTest {
                 () -> assertThat(letterResponse.getSong().getTitle()).isEqualTo(newLetter.getSong().getSongTitle()),
                 () -> assertThat(letterResponse.getAccount().getName()).isEqualTo(newLetter.getAccount().getName()),
                 () -> assertThat(letterResponse.getAccount().getAvatarUrl()).isEqualTo(newLetter.getAccount().getAvatarUrl())
+        );
+    }
+
+    private static Stream<Arguments> createNewLetterParameters() {
+        return Stream.of(
+                Arguments.of("Song story", createSongRequest(), 1L)
         );
     }
 }
