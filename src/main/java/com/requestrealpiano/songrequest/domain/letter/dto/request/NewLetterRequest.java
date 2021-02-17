@@ -6,12 +6,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class NewLetterRequest {
 
+    @Size(max = 500)
     private String songStory;
 
+    @Valid
     @JsonProperty("song")
     private SongRequest songRequest;
 
