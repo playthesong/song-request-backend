@@ -1,15 +1,13 @@
 package com.requestrealpiano.songrequest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
-import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.AccountSummary;
-import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.SongSummary;
+import com.requestrealpiano.songrequest.global.error.ErrorCode;
 import com.requestrealpiano.songrequest.service.LetterService;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,12 +21,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,8 +42,11 @@ class LetterControllerTest {
     @MockBean
     LetterService letterService;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @Test
-    @DisplayName("전체 신청곡 목록 조회 API 테스트")
+    @DisplayName("OK - 전체 신청곡 목록 조회 API 테스트")
     void find_all_letters() throws Exception {
         // given
         List<LetterResponse> letterResponses = createLetterResponses();
@@ -92,12 +92,11 @@ class LetterControllerTest {
 
     @ParameterizedTest
     @MethodSource("createNewLetterParameters")
-    @DisplayName("새로운 Letter 생성 API 테스트")
+    @DisplayName("OK - 새로운 Letter 생성 API 테스트")
     void create_new_Letter(String songStory, SongRequest songRequest, Long accountId) throws Exception {
         // given
         NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
         LetterResponse response = createLetterResponse();
-        ObjectMapper objectMapper = new ObjectMapper();
 
         // when
         when(letterService.createNewLetter(any(NewLetterRequest.class))).thenReturn(response);
@@ -114,6 +113,43 @@ class LetterControllerTest {
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isNotEmpty())
         ;
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidNewLetterRequestParameters")
+    @DisplayName("BAD_REQUEST - 유효하지 않은 값으로 Letter 등록 요청 테스트")
+    void invalid_new_letter_request(String title, String artist, String imageUrl, String songStory,
+                                    Long accountId) throws Exception {
+        // given
+        SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
+        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/letters")
+                                                      .accept(MediaType.APPLICATION_JSON)
+                                                      .contentType(MediaType.APPLICATION_JSON)
+                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
+
+        // then
+        resultActions.andDo(print())
+                     .andExpect(status().isBadRequest())
+                     .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
+                     .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
+                     .andExpect(jsonPath("errors").isEmpty())
+        ;
+    }
+
+    private static Stream<Arguments> invalidNewLetterRequestParameters() {
+        return Stream.of(
+                Arguments.of(StringUtils.repeat("Invalid length of title", 100), "Artist", "http://imageUrl",
+                        "Song story", 1L),
+                Arguments.of("Title", StringUtils.repeat("Invalid length of Artist", 5), "http://imageUrl",
+                        "Song story", 1L),
+                Arguments.of("Title", "Artist", StringUtils.repeat("http://Invalid_imageUrl", 10),
+                        "Song story", 1L),
+                Arguments.of("Title", "Artist", "http://imageUrl",
+                        StringUtils.repeat("Song Story", 100), 1L)
+        );
     }
 
     private static Stream<Arguments> createNewLetterParameters() {
