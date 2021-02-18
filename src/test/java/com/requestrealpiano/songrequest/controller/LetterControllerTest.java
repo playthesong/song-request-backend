@@ -7,6 +7,7 @@ import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequ
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.service.LetterService;
+import com.requestrealpiano.songrequest.testconfig.RestDocsConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -28,11 +32,17 @@ import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ContextConfiguration(classes = RestDocsConfiguration.class)
+@AutoConfigureRestDocs
 @WebMvcTest(controllers = LetterController.class)
 class LetterControllerTest {
 
@@ -64,6 +74,26 @@ class LetterControllerTest {
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isArray())
                      .andExpect(jsonPath("data.length()").value(letterResponses.size()))
+                     .andDo(document("find-letters",
+                         responseFields(
+                             fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("API 요청 성공 여부"),
+                             fieldWithPath("statusMessage").type(JsonFieldType.STRING).description("상태 메시지"),
+                             fieldWithPath("data").type(JsonFieldType.ARRAY).description("신청곡 목록 데이터"),
+                             fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("신청곡 ID"),
+                             fieldWithPath("data[].songStory").type(JsonFieldType.STRING).description("사연 내용"),
+                             fieldWithPath("data[].requestStatus").type(JsonFieldType.STRING).description("신청곡 요청 상태"),
+                             fieldWithPath("data[].createdDateTime").type(JsonFieldType.STRING).description("신청곡 등록 일시"),
+                             fieldWithPath("data[].song").type(JsonFieldType.OBJECT).description("신청곡 음원 정보"),
+                             fieldWithPath("data[].song.id").type(JsonFieldType.NUMBER).description("신청곡 음원 ID"),
+                             fieldWithPath("data[].song.title").type(JsonFieldType.STRING).description("음원 제목"),
+                             fieldWithPath("data[].song.artist").type(JsonFieldType.STRING).description("아티스트"),
+                             fieldWithPath("data[].song.imageUrl").type(JsonFieldType.STRING).description("앨범 이미지"),
+                             fieldWithPath("data[].account").type(JsonFieldType.OBJECT).description("신청자 정보"),
+                             fieldWithPath("data[].account.id").type(JsonFieldType.NUMBER).description("신청자 ID"),
+                             fieldWithPath("data[].account.name").type(JsonFieldType.STRING).description("신청자 이름"),
+                             fieldWithPath("data[].account.avatarUrl").type(JsonFieldType.STRING).description("신청자 프로필 이미지")
+                         )
+                     ))
         ;
     }
 
