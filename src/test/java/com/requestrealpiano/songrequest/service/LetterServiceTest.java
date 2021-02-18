@@ -8,6 +8,7 @@ import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterReque
 import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.error.exception.LetterNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -91,7 +92,8 @@ class LetterServiceTest {
         when(letterRepository.findById(invalidId)).thenReturn(Optional.empty());
 
         // then
-        assertThatThrownBy(() -> letterService.findLetter(invalidId)).isInstanceOf(LetterNotFoundException.class);
+        assertThatThrownBy(() -> letterService.findLetter(invalidId)).isInstanceOf(LetterNotFoundException.class)
+                                                                     .hasMessage(ErrorCode.LETTER_NOT_FOUND.getMessage());
     }
 
     @ParameterizedTest
