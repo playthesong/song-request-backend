@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.global.error;
+package com.requestrealpiano.songrequest.global.error.response;
 
 import lombok.Getter;
 

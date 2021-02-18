@@ -5,7 +5,7 @@ import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterReque
 import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
-import com.requestrealpiano.songrequest.global.error.ErrorCode;
+import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.service.LetterService;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;

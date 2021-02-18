@@ -1,6 +1,6 @@
 package com.requestrealpiano.songrequest.global.error.exception;
 
-import com.requestrealpiano.songrequest.global.error.ErrorCode;
+import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 
 public class EntityNotFoundException extends BusinessException {
 

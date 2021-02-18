@@ -1,6 +1,8 @@
 package com.requestrealpiano.songrequest.global.error;
 
 import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
+import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
+import com.requestrealpiano.songrequest.global.error.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
