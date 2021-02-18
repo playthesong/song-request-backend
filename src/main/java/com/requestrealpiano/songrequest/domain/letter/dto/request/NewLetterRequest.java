@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 @Getter
 public class NewLetterRequest {
 
-    @Size(max = 500)
+    @Size(max = 500, message = "사연은 500자 미만이어야 합니다.")
     private String songStory;
 
     @Valid
