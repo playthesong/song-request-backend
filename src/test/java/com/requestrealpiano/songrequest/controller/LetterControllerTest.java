@@ -141,6 +141,8 @@ class LetterControllerTest {
 
     private static Stream<Arguments> invalidNewLetterRequestParameters() {
         return Stream.of(
+                Arguments.of("", "Artist", "http://imageUrl", "Song story", 1L),
+                Arguments.of("Title", "", "http://imageUrl", "Song story", 1L),
                 Arguments.of(StringUtils.repeat("Invalid length of title", 100), "Artist", "http://imageUrl",
                         "Song story", 1L),
                 Arguments.of("Title", StringUtils.repeat("Invalid length of Artist", 5), "http://imageUrl",
