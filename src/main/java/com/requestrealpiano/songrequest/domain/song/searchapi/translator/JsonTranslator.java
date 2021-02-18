@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
+import com.requestrealpiano.songrequest.global.error.exception.SearchResultParsingException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -13,13 +14,16 @@ import java.util.List;
 @Component
 public class JsonTranslator {
 
-    // TODO: JsonProcessingException 처리
-    public SearchApiResponse mapToLastFmResponse(String json) throws JsonProcessingException {
+    public SearchApiResponse mapToLastFmResponse(String json) {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode rootNode = objectMapper.readTree(json);
-        JsonNode dataNode = rootNode.get("results");
-        List<LastFmTrack> tracks = extractTracks(dataNode, objectMapper);
-        return SearchApiResponse.from(tracks);
+        try {
+            JsonNode rootNode = objectMapper.readTree(json);
+            JsonNode dataNode = rootNode.get("results");
+            List<LastFmTrack> tracks = extractTracks(dataNode, objectMapper);
+            return SearchApiResponse.from(tracks);
+        } catch (JsonProcessingException exception) {
+            throw new SearchResultParsingException();
+        }
     }
 
     private List<LastFmTrack> extractTracks(JsonNode dataNode, ObjectMapper objectMapper) {

@@ -2,6 +2,9 @@ package com.requestrealpiano.songrequest.domain.song.searchapi.translator;
 
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
+import com.requestrealpiano.songrequest.global.error.exception.ParsingFailedException;
+import com.requestrealpiano.songrequest.global.error.exception.SearchResultParsingException;
+import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,11 +52,32 @@ class JsonTranslatorTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("jsonParsingFailedParameters")
+    @DisplayName("ERROR - ParsingFailedException 테스트")
+    void json_parsing_failed(String wrongLastFmResult) {
+        // given
+        String errorMessage = ErrorCode.SEARCH_RESULT_ERROR.getMessage();
+
+        // then
+        assertThatThrownBy(() -> jsonTranslator.mapToLastFmResponse(wrongLastFmResult))
+                .isExactlyInstanceOf(SearchResultParsingException.class)
+                .isInstanceOf(ParsingFailedException.class)
+                .hasMessage(errorMessage);
+
+    }
+
     private static Stream<Arguments> mapJsonToLastFmResponseParameters() {
         return Stream.of(
                 Arguments.of(Path.of("src/test/resources/expectedresponse/lastfm/lastfm_response.json"),
                                      0, 10, "김동률", "감사",
                                      "https://www.last.fm/music/%EA%B9%80%EB%8F%99%EB%A5%A0/_/%EA%B0%90%EC%82%AC")
+        );
+    }
+
+    private static Stream<Arguments> jsonParsingFailedParameters() {
+        return Stream.of(
+                Arguments.of("Something wrong result")
         );
     }
 }

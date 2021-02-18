@@ -1,6 +1,8 @@
 package com.requestrealpiano.songrequest.global.error;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
+import com.requestrealpiano.songrequest.global.error.exception.ParsingFailedException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.error.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -36,5 +38,13 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = exception.getErrorCode();
         ErrorResponse errorResponse = ErrorResponse.from(errorCode);
         return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(errorCode.getStatusCode()));
+    }
+
+    @ExceptionHandler(ParsingFailedException.class)
+    protected ResponseEntity<ErrorResponse> handleParsingFailedException(ParsingFailedException exception) {
+        log.error("handleJsonProcessingException", exception);
+        ErrorCode errorCode = exception.getErrorCode();
+        ErrorResponse errorResponse = ErrorResponse.from(errorCode);
+        return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(errorResponse.getStatusCode()));
     }
 }
