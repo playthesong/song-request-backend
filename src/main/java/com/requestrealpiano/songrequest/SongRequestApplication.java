@@ -9,14 +9,16 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
+import static com.requestrealpiano.songrequest.global.constant.JpaProperties.ASIA_SEOUL;
+
 @EnableConfigurationProperties(value = {ManiaDbProperties.class, LastFmProperties.class})
 @SpringBootApplication
 public class SongRequestApplication {
 
     @PostConstruct
     public void setTimeZone() {
-        String SEOUL = "Asia/Seoul";
-        TimeZone.setDefault(TimeZone.getTimeZone(SEOUL));
+        TimeZone KST = TimeZone.getTimeZone(ASIA_SEOUL);
+        TimeZone.setDefault(KST);
     }
 
     public static void main(String[] args) {
