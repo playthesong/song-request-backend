@@ -9,7 +9,7 @@ import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequ
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
-import com.requestrealpiano.songrequest.global.error.exception.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

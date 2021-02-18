@@ -5,19 +5,16 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.i
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbArtistData;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbData;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.inner.ManiaDbTrackData;
-import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTranslator;
 import com.requestrealpiano.songrequest.global.error.exception.ParsingFailedException;
-import com.requestrealpiano.songrequest.global.error.exception.SearchResultParsingException;
+import com.requestrealpiano.songrequest.global.error.exception.parsing.SearchResultParsingException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.IOException;
 import java.nio.file.Files;

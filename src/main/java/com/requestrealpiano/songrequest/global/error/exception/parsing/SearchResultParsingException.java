@@ -1,5 +1,6 @@
-package com.requestrealpiano.songrequest.global.error.exception;
+package com.requestrealpiano.songrequest.global.error.exception.parsing;
 
+import com.requestrealpiano.songrequest.global.error.exception.ParsingFailedException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import lombok.Getter;
 

@@ -3,7 +3,7 @@ package com.requestrealpiano.songrequest.domain.song.searchapi.translator;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.global.error.exception.ParsingFailedException;
-import com.requestrealpiano.songrequest.global.error.exception.SearchResultParsingException;
+import com.requestrealpiano.songrequest.global.error.exception.parsing.SearchResultParsingException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;

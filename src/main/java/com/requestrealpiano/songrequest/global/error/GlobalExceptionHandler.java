@@ -1,6 +1,5 @@
 package com.requestrealpiano.songrequest.global.error;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
 import com.requestrealpiano.songrequest.global.error.exception.ParsingFailedException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;

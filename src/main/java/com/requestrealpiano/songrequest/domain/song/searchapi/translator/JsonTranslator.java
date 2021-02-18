@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
-import com.requestrealpiano.songrequest.global.error.exception.SearchResultParsingException;
+import com.requestrealpiano.songrequest.global.error.exception.parsing.SearchResultParsingException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

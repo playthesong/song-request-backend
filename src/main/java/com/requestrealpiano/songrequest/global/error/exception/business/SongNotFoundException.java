@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.global.error.exception;
+package com.requestrealpiano.songrequest.global.error.exception.business;
 
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 

@@ -8,8 +8,8 @@ import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterReque
 import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
 import com.requestrealpiano.songrequest.domain.song.Song;
-import com.requestrealpiano.songrequest.global.error.exception.AccountNotFoundException;
-import com.requestrealpiano.songrequest.global.error.exception.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
