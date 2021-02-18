@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
+import static com.requestrealpiano.songrequest.global.constant.ValidationCondition.*;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class NewLetterRequest {
 
-    @Size(max = 500, message = "사연은 500자 미만이어야 합니다.")
+    @Size(max = SONG_STORY_MAX, message = SONG_STORY_MESSAGE)
     private String songStory;
 
     @Valid

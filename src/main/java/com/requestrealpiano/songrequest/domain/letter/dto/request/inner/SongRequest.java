@@ -7,19 +7,21 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 
+import static com.requestrealpiano.songrequest.global.constant.ValidationCondition.*;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class SongRequest {
 
-    @NotEmpty(message = "제목은 필수 입니다.")
-    @Size(min = 1, max = 30, message = "제목은 30자 미만 입니다.")
+    @NotEmpty(message = NOT_EMPTY_MESSAGE)
+    @Size(min = TITLE_MIN, max = TITLE_MAX, message = TITLE_MESSAGE)
     private String title;
 
-    @NotEmpty(message = "아티스트 정보는 필수 입니다.")
-    @Size(min = 1, max = 30, message = "아티스트는 30자 미만 입니다.")
+    @NotEmpty(message = NOT_EMPTY_MESSAGE)
+    @Size(min = ARTIST_MIN, max = ARTIST_MAX, message = ARTIST_MESSAGE)
     private String artist;
 
-    @Size(max = 100, message = "유효한 이미지 정보가 아닙니다.")
+    @Size(max = IMAGE_MAX, message = IMAGE_MESSAGE)
     private String imageUrl;
 
     SongRequest(String title, String artist, String imageUrl) {
