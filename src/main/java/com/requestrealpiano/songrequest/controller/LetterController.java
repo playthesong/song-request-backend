@@ -7,6 +7,7 @@ import com.requestrealpiano.songrequest.service.LetterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 import static com.requestrealpiano.songrequest.global.response.ApiResponse.OK;
@@ -31,7 +32,7 @@ public class LetterController {
     }
 
     @PostMapping
-    public ApiResponse<LetterResponse> createNew(@RequestBody NewLetterRequest newLetterRequest) {
+    public ApiResponse<LetterResponse> createNew(@RequestBody @Valid NewLetterRequest newLetterRequest) {
         LetterResponse newLetter = letterService.createNewLetter(newLetterRequest);
         return OK(newLetter);
     }

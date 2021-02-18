@@ -5,5 +5,5 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApi
 
 public interface SearchApiService {
 
-    SearchApiResponse requestSearchApiResponse(String artist, String title) throws JsonProcessingException;
+    SearchApiResponse requestSearchApiResponse(String artist, String title);
 }

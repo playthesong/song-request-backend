@@ -14,9 +14,8 @@ public class LastFmApiService implements SearchApiService {
     private final LastFmRestClient lastFmRestClient;
     private final JsonTranslator jsonTranslator;
 
-    // TODO: JsonProcessingException 처리
     @Override
-    public SearchApiResponse requestSearchApiResponse(String artist, String title) throws JsonProcessingException {
+    public SearchApiResponse requestSearchApiResponse(String artist, String title) {
         String rawJson = lastFmRestClient.searchLastFm(artist, title);
         return jsonTranslator.mapToLastFmResponse(rawJson);
     }
