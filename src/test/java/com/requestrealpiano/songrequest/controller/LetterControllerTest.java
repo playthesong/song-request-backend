@@ -135,7 +135,7 @@ class LetterControllerTest {
                      .andExpect(status().isBadRequest())
                      .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
                      .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
-                     .andExpect(jsonPath("errors").isEmpty())
+                     .andExpect(jsonPath("errors").isNotEmpty())
         ;
     }
 
