@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.testconfig;
+package com.requestrealpiano.songrequest.controller.restdocs;
 
 import org.springframework.boot.test.autoconfigure.restdocs.RestDocsMockMvcConfigurationCustomizer;
 import org.springframework.boot.test.context.TestConfiguration;
