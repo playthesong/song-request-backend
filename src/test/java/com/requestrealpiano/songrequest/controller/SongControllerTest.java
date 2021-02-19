@@ -54,7 +54,7 @@ class SongControllerTest extends BaseControllerTest {
 
         // when
         when(songService.searchSong(artist, title)).thenReturn(maniaDbResponse);
-        ResultActions result = mockMvc.perform(get("/songs")
+        ResultActions result = mockMvc.perform(get("/api/songs")
                                                 .param("artist", artist)
                                                 .param("title", title)
                                                 .accept(MediaType.APPLICATION_JSON));
@@ -79,7 +79,7 @@ class SongControllerTest extends BaseControllerTest {
     @DisplayName("BAD_REQUEST - 유효하지 않은 제목, 아티스트로 요청 테스트")
     void search_by_invalid_params(String artist, String title) throws Exception {
         // when
-        ResultActions resultActions = mockMvc.perform(get("/songs")
+        ResultActions resultActions = mockMvc.perform(get("/api/songs")
                                                       .param("artist", artist)
                                                       .param("title", title)
                                                       .accept(MediaType.APPLICATION_JSON));
@@ -112,7 +112,7 @@ class SongControllerTest extends BaseControllerTest {
         // when
         when(songService.searchSong(artist, title)).thenReturn(response);
 
-        ResultActions result = mockMvc.perform(get("/songs")
+        ResultActions result = mockMvc.perform(get("/api/songs")
                                                .param("artist", artist)
                                                .param("title", title)
                                                .accept(MediaType.APPLICATION_JSON));

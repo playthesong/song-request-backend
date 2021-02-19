@@ -14,7 +14,7 @@ import static com.requestrealpiano.songrequest.global.response.ApiResponse.OK;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/letters")
+@RequestMapping("/api/letters")
 public class LetterController {
 
     private final LetterService letterService;

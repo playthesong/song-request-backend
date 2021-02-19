@@ -65,7 +65,7 @@ class LetterControllerTest extends BaseControllerTest {
 
         // when
         when(letterService.findAllLetters()).thenReturn(letterResponses);
-        ResultActions resultActions = mockMvc.perform(get("/letters")
+        ResultActions resultActions = mockMvc.perform(get("/api/letters")
                                                       .accept(APPLICATION_JSON));
 
         // then
@@ -94,7 +94,7 @@ class LetterControllerTest extends BaseControllerTest {
         // when
         when(letterService.findLetter(letterId)).thenReturn(letterResponse);
 
-        ResultActions resultActions = mockMvc.perform(RestDocumentationRequestBuilders.get("/letters/{id}", letterId)
+        ResultActions resultActions = mockMvc.perform(RestDocumentationRequestBuilders.get("/api/letters/{id}", letterId)
                                                       .accept(APPLICATION_JSON));
 
         // then
@@ -124,7 +124,7 @@ class LetterControllerTest extends BaseControllerTest {
 
         // when
         when(letterService.createNewLetter(any(NewLetterRequest.class))).thenReturn(response);
-        ResultActions resultActions = mockMvc.perform(post("/letters")
+        ResultActions resultActions = mockMvc.perform(post("/api/letters")
                                                       .accept(APPLICATION_JSON)
                                                       .contentType(APPLICATION_JSON)
                                                       .content(objectMapper.writeValueAsString(newLetterRequest)));
@@ -154,7 +154,7 @@ class LetterControllerTest extends BaseControllerTest {
         NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
 
         // when
-        ResultActions resultActions = mockMvc.perform(post("/letters")
+        ResultActions resultActions = mockMvc.perform(post("/api/letters")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newLetterRequest)));
