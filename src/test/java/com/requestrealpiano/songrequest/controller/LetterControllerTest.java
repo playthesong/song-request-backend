@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.controller.restdocs.PathParameters;
+import com.requestrealpiano.songrequest.controller.restdocs.RequestFields;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.controller.restdocs.RestDocsConfiguration;
 import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
@@ -35,8 +36,7 @@ import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.beneathPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -105,7 +105,7 @@ class LetterControllerTest {
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isNotEmpty())
                      .andDo(document("find-letter",
-                             pathParameters(PathParameters.letterIdParameters()),
+                             pathParameters(PathParameters.letterIdParameter()),
                              responseFields(ResponseFields.common())
                                      .andWithPrefix("data.", ResponseFields.letter()),
                              responseFields(beneathPath("data.song.").withSubsectionId("song"), ResponseFields.song()),
@@ -115,32 +115,8 @@ class LetterControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("invalidNewLetterRequestParameters")
-    @DisplayName("BAD_REQUEST - 유효하지 않은 값으로 Letter 등록 요청 테스트")
-    void invalid_new_letter_request(String title, String artist, String imageUrl, String songStory,
-                                    Long accountId) throws Exception {
-        // given
-        SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
-
-        // when
-        ResultActions resultActions = mockMvc.perform(post("/letters")
-                                                      .accept(MediaType.APPLICATION_JSON)
-                                                      .contentType(MediaType.APPLICATION_JSON)
-                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
-
-        // then
-        resultActions.andDo(print())
-                     .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
-                     .andExpect(jsonPath("errors").isNotEmpty())
-        ;
-    }
-
-    @ParameterizedTest
     @MethodSource("createNewLetterParameters")
-    @DisplayName("OK - 새로운 Letter 생성 API 테스트")
+    @DisplayName("OK - 새로운 Letter 등록 API 테스트")
     void create_new_Letter(String songStory, SongRequest songRequest, Long accountId) throws Exception {
         // given
         NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
@@ -160,6 +136,35 @@ class LetterControllerTest {
                      .andExpect(jsonPath("success").value(true))
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isNotEmpty())
+                     .andDo(document("create-letter",
+                             requestFields(RequestFields.createLetter()),
+                             responseFields(ResponseFields.common())
+                                 .andWithPrefix("data.", ResponseFields.letter())
+                     ))
+        ;
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidNewLetterRequestParameters")
+    @DisplayName("BAD_REQUEST - 유효하지 않은 값으로 Letter 등록 요청 테스트")
+    void invalid_new_letter_request(String title, String artist, String imageUrl, String songStory,
+                                    Long accountId) throws Exception {
+        // given
+        SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
+        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/letters")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(newLetterRequest)));
+
+        // then
+        resultActions.andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
+                .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
+                .andExpect(jsonPath("errors").isNotEmpty())
         ;
     }
 
