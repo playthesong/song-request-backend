@@ -75,6 +75,27 @@ class SongControllerTest extends BaseControllerTest {
     }
 
     @ParameterizedTest
+    @MethodSource("searchByInvalidParams")
+    @DisplayName("BAD_REQUEST - 유효하지 않은 제목, 아티스트로 요청 테스트")
+    void search_by_invalid_params(String artist, String title) throws Exception {
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/songs")
+                                                      .param("artist", artist)
+                                                      .param("title", title)
+                                                      .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andDo(print())
+                     .andExpect(status().isBadRequest())
+                     .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
+                     .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
+                     .andDo(document("search-song-error",
+                             responseFields(ResponseFields.error())
+                     ))
+        ;
+    }
+
+    @ParameterizedTest
     @MethodSource("searchLastFmApiParameters")
     @DisplayName("OK - LastFM 검색 결과 반환 API 테스트")
     void search_lastfm_api(String artist, String title, String imageUrl) throws Exception {
@@ -103,24 +124,6 @@ class SongControllerTest extends BaseControllerTest {
               .andExpect(jsonPath("success").value(true))
               .andExpect(jsonPath("statusMessage").value("OK"))
               .andExpect(jsonPath("data.totalCount").value(totalCount))
-        ;
-    }
-
-    @ParameterizedTest
-    @MethodSource("searchByInvalidParams")
-    @DisplayName("BAD_REQUEST - 유효하지 않은 제목, 아티스트로 요청 테스트")
-    void search_by_invalid_params(String artist, String title) throws Exception {
-        // when
-        ResultActions resultActions = mockMvc.perform(get("/songs")
-                                                      .param("artist", artist)
-                                                      .param("title", title)
-                                                      .accept(MediaType.APPLICATION_JSON));
-
-        // then
-        resultActions.andDo(print())
-                     .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
         ;
     }
 
