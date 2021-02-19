@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.requestrealpiano.songrequest.controller.restdocs.PathParameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.controller.restdocs.RestDocsConfiguration;
 import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.beneathPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -91,7 +94,7 @@ class LetterControllerTest {
         // when
         when(letterService.findLetter(letterId)).thenReturn(letterResponse);
 
-        ResultActions resultActions = mockMvc.perform(get("/letters/{id}", letterId)
+        ResultActions resultActions = mockMvc.perform(RestDocumentationRequestBuilders.get("/letters/{id}", letterId)
                                                       .accept(MediaType.APPLICATION_JSON));
 
         // then
@@ -102,6 +105,7 @@ class LetterControllerTest {
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isNotEmpty())
                      .andDo(document("find-letter",
+                             pathParameters(PathParameters.letterIdParameters()),
                              responseFields(ResponseFields.common())
                                      .andWithPrefix("data.", ResponseFields.letter()),
                              responseFields(beneathPath("data.song.").withSubsectionId("song"), ResponseFields.song()),
