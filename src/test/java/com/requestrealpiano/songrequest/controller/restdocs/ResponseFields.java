@@ -19,6 +19,17 @@ public class ResponseFields {
         );
     }
 
+    // Error
+    public static List<FieldDescriptor> error() {
+        return List.of(
+                fieldWithPath("statusCode").type(JsonFieldType.NUMBER).description("에러 상태 코드"),
+                fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                fieldWithPath("errors[]").type(JsonFieldType.ARRAY).description("에러 상세 내역"),
+                fieldWithPath("errors[].value").type(JsonFieldType.STRING).description("에러 발생 필드 값"),
+                fieldWithPath("errors[].reason").type(JsonFieldType.STRING).description("에러 발생 원인")
+        );
+    }
+
     // Letter
     public static List<FieldDescriptor> letter() {
         return List.of(
