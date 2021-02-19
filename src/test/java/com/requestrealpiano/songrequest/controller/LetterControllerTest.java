@@ -11,6 +11,7 @@ import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequ
 import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.service.LetterService;
+import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,10 +45,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ContextConfiguration(classes = RestDocsConfiguration.class)
-@AutoConfigureRestDocs
 @WebMvcTest(controllers = LetterController.class)
-class LetterControllerTest {
+class LetterControllerTest extends BaseControllerTest {
 
     @Autowired
     MockMvc mockMvc;

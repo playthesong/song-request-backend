@@ -5,6 +5,7 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApi
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.service.SongService;
+import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,12 +25,14 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
 @WebMvcTest(controllers = SongController.class)
-class SongControllerTest {
+class SongControllerTest extends BaseControllerTest {
 
     @Autowired
     MockMvc mockMvc;
