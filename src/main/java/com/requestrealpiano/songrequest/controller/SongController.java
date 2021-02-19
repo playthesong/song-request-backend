@@ -18,7 +18,7 @@ import static com.requestrealpiano.songrequest.global.response.ApiResponse.OK;
 @RequiredArgsConstructor
 @Validated
 @RestController
-@RequestMapping("/songs")
+@RequestMapping("/api/songs")
 public class SongController {
 
     private final SongService songService;

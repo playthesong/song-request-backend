@@ -1,7 +1,7 @@
 package com.requestrealpiano.songrequest.domain.song;
 
 import com.requestrealpiano.songrequest.domain.letter.Letter;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.youtubecontent.YoutubeContent;
 import lombok.AccessLevel;
 import lombok.Builder;

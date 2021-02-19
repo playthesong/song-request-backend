@@ -1,10 +1,10 @@
-package com.requestrealpiano.songrequest.domain.letter.dto.response;
+package com.requestrealpiano.songrequest.domain.letter.response;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
-import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.AccountSummary;
-import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.SongSummary;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.AccountSummary;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.SongSummary;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import lombok.Builder;
 import lombok.Getter;

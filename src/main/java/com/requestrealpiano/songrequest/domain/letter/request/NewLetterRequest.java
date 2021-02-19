@@ -1,7 +1,7 @@
-package com.requestrealpiano.songrequest.domain.letter.dto.request;
+package com.requestrealpiano.songrequest.domain.letter.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

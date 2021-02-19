@@ -1,11 +1,9 @@
 package com.requestrealpiano.songrequest.testobject;
 
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequestBuilder;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.song.Song;
-import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class SongFactory {

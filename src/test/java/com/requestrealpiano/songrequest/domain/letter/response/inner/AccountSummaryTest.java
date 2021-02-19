@@ -1,7 +1,6 @@
-package com.requestrealpiano.songrequest.domain.letter.dto.response.inner;
+package com.requestrealpiano.songrequest.domain.letter.response.inner;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
-import com.requestrealpiano.songrequest.testobject.AccountFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

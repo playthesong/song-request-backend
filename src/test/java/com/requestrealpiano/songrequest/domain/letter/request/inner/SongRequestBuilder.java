@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.domain.letter.dto.request.inner;
+package com.requestrealpiano.songrequest.domain.letter.request.inner;
 
 public class SongRequestBuilder {
 

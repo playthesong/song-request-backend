@@ -1,10 +1,13 @@
 package com.requestrealpiano.songrequest.controller;
 
+import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
+import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.service.SongService;
+import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,12 +27,16 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
 @WebMvcTest(controllers = SongController.class)
-class SongControllerTest {
+class SongControllerTest extends BaseControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -47,7 +54,7 @@ class SongControllerTest {
 
         // when
         when(songService.searchSong(artist, title)).thenReturn(maniaDbResponse);
-        ResultActions result = mockMvc.perform(get("/songs")
+        ResultActions result = mockMvc.perform(get("/api/songs")
                                                 .param("artist", artist)
                                                 .param("title", title)
                                                 .accept(MediaType.APPLICATION_JSON));
@@ -59,6 +66,32 @@ class SongControllerTest {
               .andExpect(jsonPath("success").value(true))
               .andExpect(jsonPath("statusMessage").value("OK"))
               .andExpect(jsonPath("data.totalCount").value(totalCount))
+              .andDo(document("search-song",
+                      requestParameters(Parameters.searchSong()),
+                      responseFields(ResponseFields.common())
+                              .andWithPrefix("data.", ResponseFields.searchSongResult())
+              ))
+        ;
+    }
+
+    @ParameterizedTest
+    @MethodSource("searchByInvalidParams")
+    @DisplayName("BAD_REQUEST - 유효하지 않은 제목, 아티스트로 요청 테스트")
+    void search_by_invalid_params(String artist, String title) throws Exception {
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/api/songs")
+                                                      .param("artist", artist)
+                                                      .param("title", title)
+                                                      .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andDo(print())
+                     .andExpect(status().isBadRequest())
+                     .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
+                     .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
+                     .andDo(document("search-song-error",
+                             responseFields(ResponseFields.error())
+                     ))
         ;
     }
 
@@ -79,7 +112,7 @@ class SongControllerTest {
         // when
         when(songService.searchSong(artist, title)).thenReturn(response);
 
-        ResultActions result = mockMvc.perform(get("/songs")
+        ResultActions result = mockMvc.perform(get("/api/songs")
                                                .param("artist", artist)
                                                .param("title", title)
                                                .accept(MediaType.APPLICATION_JSON));
@@ -91,24 +124,6 @@ class SongControllerTest {
               .andExpect(jsonPath("success").value(true))
               .andExpect(jsonPath("statusMessage").value("OK"))
               .andExpect(jsonPath("data.totalCount").value(totalCount))
-        ;
-    }
-
-    @ParameterizedTest
-    @MethodSource("searchByInvalidParams")
-    @DisplayName("BAD_REQUEST - 유효하지 않은 제목, 아티스트로 요청 테스트")
-    void search_by_invalid_params(String artist, String title) throws Exception {
-        // when
-        ResultActions resultActions = mockMvc.perform(get("/songs")
-                                                      .param("artist", artist)
-                                                      .param("title", title)
-                                                      .accept(MediaType.APPLICATION_JSON));
-
-        // then
-        resultActions.andDo(print())
-                     .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
         ;
     }
 

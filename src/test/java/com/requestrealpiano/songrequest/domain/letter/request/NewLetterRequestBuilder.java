@@ -1,6 +1,6 @@
-package com.requestrealpiano.songrequest.domain.letter.dto.request;
+package com.requestrealpiano.songrequest.domain.letter.request;
 
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 
 public class NewLetterRequestBuilder {
 
