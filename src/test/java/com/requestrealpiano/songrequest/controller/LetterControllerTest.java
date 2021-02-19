@@ -101,6 +101,12 @@ class LetterControllerTest {
                      .andExpect(jsonPath("success").value(true))
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isNotEmpty())
+                     .andDo(document("find-letter",
+                             responseFields(ResponseFields.common())
+                                     .andWithPrefix("data.", ResponseFields.letter()),
+                             responseFields(beneathPath("data.song.").withSubsectionId("song"), ResponseFields.song()),
+                             responseFields(beneathPath("data.account.").withSubsectionId("account"), ResponseFields.account())
+                     ))
         ;
     }
 

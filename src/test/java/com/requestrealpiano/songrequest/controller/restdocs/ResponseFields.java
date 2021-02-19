@@ -15,7 +15,7 @@ public class ResponseFields {
         return List.of(
                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("API 요청 성공 여부"),
                 fieldWithPath("statusMessage").type(JsonFieldType.STRING).description("상태 메시지"),
-                fieldWithPath("data").type(JsonFieldType.ARRAY).description("응답 데이터")
+                fieldWithPath("data").type(JsonFieldType.VARIES).description("응답 데이터")
         );
     }
 
