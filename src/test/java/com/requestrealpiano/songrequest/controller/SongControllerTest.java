@@ -1,5 +1,7 @@
 package com.requestrealpiano.songrequest.controller;
 
+import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
+import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
@@ -27,6 +29,8 @@ import java.util.stream.Stream;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -62,6 +66,11 @@ class SongControllerTest extends BaseControllerTest {
               .andExpect(jsonPath("success").value(true))
               .andExpect(jsonPath("statusMessage").value("OK"))
               .andExpect(jsonPath("data.totalCount").value(totalCount))
+              .andDo(document("search-song",
+                      requestParameters(Parameters.searchSong()),
+                      responseFields(ResponseFields.common())
+                              .andWithPrefix("data.", ResponseFields.searchSongResult())
+              ))
         ;
     }
 

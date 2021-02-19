@@ -52,6 +52,16 @@ public class ResponseFields {
         );
     }
 
+    public static List<FieldDescriptor> searchSongResult() {
+        return List.of(
+                fieldWithPath("totalCount").type(JsonFieldType.NUMBER).description("검색 결과 수"),
+                fieldWithPath("tracks[]").type(JsonFieldType.ARRAY).description("검색 결과 목록"),
+                fieldWithPath("tracks[].title").type(JsonFieldType.STRING).description("음원 제목"),
+                fieldWithPath("tracks[].artist").type(JsonFieldType.STRING).description("아티스트"),
+                fieldWithPath("tracks[].imageUrl").type(JsonFieldType.STRING).description("앨범 이미지")
+        );
+    }
+
     // Account
     public static List<FieldDescriptor> account() {
         return List.of(
