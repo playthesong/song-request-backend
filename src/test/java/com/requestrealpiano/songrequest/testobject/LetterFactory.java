@@ -3,12 +3,12 @@ package com.requestrealpiano.songrequest.testobject;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequestBuilder;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
-import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
-import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.AccountSummary;
-import com.requestrealpiano.songrequest.domain.letter.dto.response.inner.SongSummary;
+import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequestBuilder;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.AccountSummary;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.SongSummary;
 import com.requestrealpiano.songrequest.domain.song.Song;
 
 import java.time.LocalDateTime;

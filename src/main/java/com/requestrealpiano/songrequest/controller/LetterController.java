@@ -1,7 +1,7 @@
 package com.requestrealpiano.songrequest.controller;
 
-import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
-import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
+import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
 import com.requestrealpiano.songrequest.global.response.ApiResponse;
 import com.requestrealpiano.songrequest.service.LetterService;
 import lombok.RequiredArgsConstructor;

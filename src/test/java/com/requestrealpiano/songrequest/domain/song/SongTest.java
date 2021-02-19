@@ -1,7 +1,6 @@
 package com.requestrealpiano.songrequest.domain.song;
 
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
-import com.requestrealpiano.songrequest.testobject.SongFactory;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
