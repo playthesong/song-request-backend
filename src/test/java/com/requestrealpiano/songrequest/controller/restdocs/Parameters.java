@@ -4,10 +4,10 @@ import org.springframework.restdocs.request.ParameterDescriptor;
 
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 
-public class PathParameters {
+public class Parameters {
 
     // Letter
-    public static ParameterDescriptor letterIdParameter() {
+    public static ParameterDescriptor letterId() {
         return parameterWithName("id").description("신청곡 ID");
     }
 }

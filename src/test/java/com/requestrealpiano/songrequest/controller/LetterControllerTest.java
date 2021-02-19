@@ -1,7 +1,7 @@
 package com.requestrealpiano.songrequest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.requestrealpiano.songrequest.controller.restdocs.PathParameters;
+import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.RequestFields;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.controller.restdocs.RestDocsConfiguration;
@@ -22,7 +22,6 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,6 +34,8 @@ import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -66,12 +67,12 @@ class LetterControllerTest {
         // when
         when(letterService.findAllLetters()).thenReturn(letterResponses);
         ResultActions resultActions = mockMvc.perform(get("/letters")
-                                                      .accept(MediaType.APPLICATION_JSON));
+                                                      .accept(APPLICATION_JSON));
 
         // then
         resultActions.andDo(print())
                      .andExpect(status().isOk())
-                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                      .andExpect(jsonPath("success").value(true))
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isArray())
@@ -95,17 +96,17 @@ class LetterControllerTest {
         when(letterService.findLetter(letterId)).thenReturn(letterResponse);
 
         ResultActions resultActions = mockMvc.perform(RestDocumentationRequestBuilders.get("/letters/{id}", letterId)
-                                                      .accept(MediaType.APPLICATION_JSON));
+                                                      .accept(APPLICATION_JSON));
 
         // then
         resultActions.andDo(print())
                      .andExpect(status().isOk())
-                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                      .andExpect(jsonPath("success").value(true))
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isNotEmpty())
                      .andDo(document("find-letter",
-                             pathParameters(PathParameters.letterIdParameter()),
+                             pathParameters(Parameters.letterId()),
                              responseFields(ResponseFields.common())
                                      .andWithPrefix("data.", ResponseFields.letter()),
                              responseFields(beneathPath("data.song.").withSubsectionId("song"), ResponseFields.song()),
@@ -125,14 +126,14 @@ class LetterControllerTest {
         // when
         when(letterService.createNewLetter(any(NewLetterRequest.class))).thenReturn(response);
         ResultActions resultActions = mockMvc.perform(post("/letters")
-                                                      .accept(MediaType.APPLICATION_JSON)
-                                                      .contentType(MediaType.APPLICATION_JSON)
+                                                      .accept(APPLICATION_JSON)
+                                                      .contentType(APPLICATION_JSON)
                                                       .content(objectMapper.writeValueAsString(newLetterRequest)));
 
         // then
         resultActions.andDo(print())
                      .andExpect(status().isOk())
-                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                      .andExpect(jsonPath("success").value(true))
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isNotEmpty())
@@ -155,8 +156,8 @@ class LetterControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(post("/letters")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(newLetterRequest)));
 
         // then
