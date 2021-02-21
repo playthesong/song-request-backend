@@ -14,6 +14,7 @@ import com.requestrealpiano.songrequest.service.searchapi.ManiaDbApiService;
 import com.requestrealpiano.songrequest.service.searchapi.SearchApiService;
 import com.requestrealpiano.songrequest.testconfig.annotation.LastFm;
 import com.requestrealpiano.songrequest.testconfig.annotation.ManiaDb;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+@Disabled
 @SpringBootTest(classes = {ManiaDbApiService.class, ManiaDbRestClient.class, LastFmApiService.class, LastFmRestClient.class,
                            JsonTranslator.class, XmlTranslator.class, SearchApiServiceTest.TestConfiguration.class})
 class SearchApiServiceTest {
