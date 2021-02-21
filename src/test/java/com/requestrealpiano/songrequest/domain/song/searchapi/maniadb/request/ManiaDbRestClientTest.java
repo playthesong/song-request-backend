@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.request;
 
 import com.requestrealpiano.songrequest.config.searchapi.ManiaDbProperties;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+@Disabled
 @SpringBootTest(classes = {ManiaDbRestClient.class, ManiaDbRestClientTest.TestConfiguration.class})
 class ManiaDbRestClientTest {
 
