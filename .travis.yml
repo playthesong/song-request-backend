@@ -13,11 +13,6 @@ cache:
 
 script: "./gradlew clean build"
 
-notifications:
-  email:
-    recipients:
-      - museopkim0214@gmail.com
-
 before_deploy:
   - zip -r songrequest-backend *
   - mkdir -p deploy
@@ -27,11 +22,35 @@ deploy:
   - provider: s3
     access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_SECRET_KEY
+
     bucket: songrequest-backend-build
     region: ap-northeast-2
+
     skip_cleanup: true
     acl: private
     local_dir: deploy
+
     wait-until-deployed: true
+
     on:
       all_branches: true
+
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+
+    bucket: songrequest-backend-build
+    key: songrequest-backend.zip
+
+    bundle_type: zip
+    application: songrequest-backend
+
+    deployment_group: songrequest-backend-group
+
+    region: ap-northeast-2
+    wait-until-deployed: true
+
+  notifications:
+    email:
+      recipients:
+        - museopkim0214@gmail.com
