@@ -1,0 +1,6 @@
+version: 0.0
+os: linux
+file:
+  - source: /
+    destination: /home/ubuntu/app/step2/zip/
+    overwrite: yes
