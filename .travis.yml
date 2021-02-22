@@ -14,9 +14,13 @@ cache:
 script: "./gradlew clean build"
 
 before_deploy:
-  - zip -r songrequest-backend *
-  - mkdir -p deploy
-  - mv songrequest-backend.zip deploy/songrequest-backend.zip
+  - mkdir -p before-deploy
+  - cp scripts/*.sh before-deploy/
+  - cp appspec.yml before-deploy/
+  - cp build/libs*.jar before-deploy
+  - cd before-deploy && zip -r before-deploy *
+  - cd ../ && mkdir -p deloy
+  - mv before-deploy/before-deploy.zip deploy/songrequest-backend.zip
 
 deploy:
   - provider: s3
