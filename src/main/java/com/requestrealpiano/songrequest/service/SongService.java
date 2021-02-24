@@ -1,7 +1,6 @@
 package com.requestrealpiano.songrequest.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.domain.song.SongRepository;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
@@ -28,7 +27,7 @@ public class SongService {
                              });
     }
 
-    public SearchApiResponse searchSong(String artist, String title) throws JsonProcessingException {
+    public SearchApiResponse searchSong(String artist, String title) {
         return searchApiService.requestSearchApiResponse(artist, title);
     }
 }

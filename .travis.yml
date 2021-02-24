@@ -1,0 +1,63 @@
+language: java
+jdk:
+  - openjdk11
+
+branches:
+  only:
+    - main
+
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+    - '$HOME/.gradle'
+
+script: "./gradlew clean build"
+
+before_deploy:
+  - mkdir -p before-deploy
+  - cp scripts/*.sh before-deploy/
+  - cp appspec.yml before-deploy/
+  - cp build/libs/*.jar before-deploy
+  - cd before-deploy && zip -r before-deploy *
+  - cd ../ && mkdir -p deploy
+  - mv before-deploy/before-deploy.zip deploy/songrequest-backend.zip
+
+deploy:
+  - provider: s3
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+
+    bucket: songrequest-backend-build
+    region: ap-northeast-2
+
+    skip_cleanup: true
+    acl: private
+    local_dir: deploy
+
+    wait-until-deployed: true
+
+    on:
+      all_branches: true
+
+  - provider: codedeploy
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_SECRET_KEY
+
+    bucket: songrequest-backend-build
+    key: songrequest-backend.zip
+
+    bundle_type: zip
+    application: songrequest-backend
+
+    deployment_group: songrequest-backend-group
+
+    region: ap-northeast-2
+    wait-until-deployed: true
+
+    on:
+      all_branches: true
+
+notifications:
+  email:
+    recipients:
+      - museopkim0214@gmail.com

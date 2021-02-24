@@ -17,9 +17,8 @@ public class ManiaDbApiService implements SearchApiService {
     private final ManiaDbRestClient maniaDbRestClient;
     private final XmlTranslator xmlTranslator;
 
-    // TODO: JsonProcessingException 처리
     @Override
-    public SearchApiResponse requestSearchApiResponse(String artist, String title) throws JsonProcessingException {
+    public SearchApiResponse requestSearchApiResponse(String artist, String title) {
         String rawXml = maniaDbRestClient.searchManiaDb(artist, title);
         ManiaDbClientResponse maniaDbData = xmlTranslator.mapToManiaDbData(rawXml);
         return SearchApiResponse.from(maniaDbData);

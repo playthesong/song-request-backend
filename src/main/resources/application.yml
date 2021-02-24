@@ -5,6 +5,38 @@ spring:
 ---
 
 spring:
+  profiles: prod
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
+lastfm:
+  url: http://ws.audioscrobbler.com/2.0
+  method: track.search
+  limit: 10
+  apiKey: ${LASTFM_API_KEY}
+  format: json
+
+maniadb:
+  url: http://maniadb.com/api/search/
+  method: song
+  display: 10
+  apiKey: ${MANIADB_API_KEY}
+  version: 0.5
+
+---
+
+spring:
   profiles: dev
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver

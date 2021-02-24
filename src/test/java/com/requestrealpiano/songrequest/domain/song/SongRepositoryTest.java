@@ -1,8 +1,7 @@
 package com.requestrealpiano.songrequest.domain.song;
 
-import com.requestrealpiano.songrequest.global.error.SongNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.business.SongNotFoundException;
 import com.requestrealpiano.songrequest.testconfig.BaseRepositoryTest;
-import com.requestrealpiano.songrequest.testobject.SongFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

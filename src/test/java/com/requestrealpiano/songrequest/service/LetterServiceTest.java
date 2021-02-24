@@ -2,17 +2,14 @@ package com.requestrealpiano.songrequest.service;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
-import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
-import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequest;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.NewLetterRequestBuilder;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequest;
-import com.requestrealpiano.songrequest.domain.letter.dto.request.inner.SongRequestBuilder;
-import com.requestrealpiano.songrequest.domain.letter.dto.response.LetterResponse;
+import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
 import com.requestrealpiano.songrequest.domain.song.Song;
-import com.requestrealpiano.songrequest.global.error.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,10 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
@@ -97,7 +92,8 @@ class LetterServiceTest {
         when(letterRepository.findById(invalidId)).thenReturn(Optional.empty());
 
         // then
-        assertThatThrownBy(() -> letterService.findLetter(invalidId)).isInstanceOf(LetterNotFoundException.class);
+        assertThatThrownBy(() -> letterService.findLetter(invalidId)).isInstanceOf(LetterNotFoundException.class)
+                                                                     .hasMessage(ErrorCode.LETTER_NOT_FOUND.getMessage());
     }
 
     @ParameterizedTest
