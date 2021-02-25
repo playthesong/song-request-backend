@@ -64,6 +64,13 @@ spring:
             redirectUri: http://localhost:8080/login/oauth2/code/google
             scope: email, profile
 
+jwt:
+  tokenSecret: ${TOKEN_SECRET}
+  tokenExpiration: ${TOKEN_EXPIRATION}
+  authorizedRedirectUri: http://localhost:3000/auth/jwt
+
+
+
 lastfm:
   url: http://ws.audioscrobbler.com/2.0
   method: track.search

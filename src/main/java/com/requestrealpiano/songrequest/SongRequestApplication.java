@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest;
 
 import com.requestrealpiano.songrequest.config.searchapi.LastFmProperties;
 import com.requestrealpiano.songrequest.config.searchapi.ManiaDbProperties;
+import com.requestrealpiano.songrequest.config.security.jwt.JwtProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -11,7 +12,7 @@ import java.util.TimeZone;
 
 import static com.requestrealpiano.songrequest.global.constant.JpaProperties.ASIA_SEOUL;
 
-@EnableConfigurationProperties(value = {ManiaDbProperties.class, LastFmProperties.class})
+@EnableConfigurationProperties(value = {JwtProperties.class, ManiaDbProperties.class, LastFmProperties.class})
 @SpringBootApplication
 public class SongRequestApplication {
 
