@@ -38,11 +38,13 @@ maniadb:
 
 spring:
   profiles: dev
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/songrequest?useUnicode=yes&serverTimezone=UTC&characterEncoding=UTF-8
     username: admin
     password: password
+
   jpa:
     database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
     open-in-view: false
@@ -51,6 +53,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: ${CLIENT_ID}
+            clientSecret: ${CLIENT_SECRET}
+            redirectUri: http://localhost:8080/login/oauth2/code/google
+            scope: email, profile
 
 lastfm:
   url: http://ws.audioscrobbler.com/2.0
