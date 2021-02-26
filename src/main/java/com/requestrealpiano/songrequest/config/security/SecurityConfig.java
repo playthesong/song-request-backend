@@ -19,15 +19,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf()
-            .disable();
+        http.csrf().disable()
+            .httpBasic().disable();
 
         http.authorizeRequests()
             .antMatchers("/api/**").hasAnyRole(Role.MEMBER.getKey(), Role.ADMIN.getKey())
             .anyRequest().authenticated();
 
-//        http.sessionManagement()
-//            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.oauth2Login()
                 .userInfoEndpoint()
