@@ -1,9 +1,9 @@
 package com.requestrealpiano.songrequest.config.security;
 
+import com.requestrealpiano.songrequest.config.security.oauth.CustomAuthenticationSuccessHandler;
 import com.requestrealpiano.songrequest.config.security.oauth.CustomOAuth2UserService;
 import com.requestrealpiano.songrequest.domain.account.Role;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -23,14 +24,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-            .antMatchers("/api/**").hasAnyRole(Role.MEMBER.getKey(), Role.ADMIN.getKey())
+            .antMatchers("/", "/oauth2/authorization/**").permitAll()
+            .antMatchers("/api/**").hasAnyRole(Role.MEMBER.getValue(), Role.ADMIN.getValue())
             .anyRequest().authenticated();
 
         http.sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.oauth2Login()
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService);
+            .userInfoEndpoint()
+            .userService(customOAuth2UserService)
+                .and()
+            .successHandler(customAuthenticationSuccessHandler);
     }
 }
