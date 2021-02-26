@@ -67,9 +67,8 @@ spring:
 jwt:
   tokenSecret: ${TOKEN_SECRET}
   tokenExpiration: ${TOKEN_EXPIRATION}
-  authorizedRedirectUri: http://localhost:3000/auth/jwt
-
-
+  header: Authorization
+  headerPrefix: 'Bearer '
 
 lastfm:
   url: http://ws.audioscrobbler.com/2.0
