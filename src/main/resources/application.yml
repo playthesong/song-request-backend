@@ -30,6 +30,12 @@ spring:
             redirectUri: ${REDIRECT_URI}
             scope: email, profile
 
+jwt:
+  tokenSecret: ${TOKEN_SECRET}
+  tokenExpiration: ${TOKEN_EXPIRATION}
+  header: Authorization
+  headerPrefix: 'Bearer '
+
 lastfm:
   url: http://ws.audioscrobbler.com/2.0
   method: track.search
