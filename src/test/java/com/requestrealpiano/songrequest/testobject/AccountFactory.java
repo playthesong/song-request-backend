@@ -20,7 +20,7 @@ public class AccountFactory {
     // Role - Member
     public static Account createMember() {
         return Account.builder()
-                      .googleOauthId(1L)
+                      .googleOauthId("771713471123")
                       .name("Username")
                       .email("User email")
                       .role(Role.MEMBER)
