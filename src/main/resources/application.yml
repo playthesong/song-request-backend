@@ -20,6 +20,16 @@ spring:
       hibernate:
         format_sql: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            redirectUri: http://localhost:8080/login/oauth2/code/google
+            scope: email, profile
+
 lastfm:
   url: http://ws.audioscrobbler.com/2.0
   method: track.search
