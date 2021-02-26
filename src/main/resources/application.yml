@@ -27,7 +27,7 @@ spring:
           google:
             client-id: ${CLIENT_ID}
             client-secret: ${CLIENT_SECRET}
-            redirectUri: http://localhost:8080/login/oauth2/code/google
+            redirectUri: ${REDIRECT_URI}
             scope: email, profile
 
 lastfm:
