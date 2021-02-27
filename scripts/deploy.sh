@@ -31,6 +31,10 @@ echo "> $JAR_NAME에 실행 권한 추가"
 
 chmod +x $JAR_NAME
 
+echo "> 환경 변수 추가"
+
+source ~/.bashrc
+
 echo "> $JAR_NAME 실행"
 
 nohup java -jar \
