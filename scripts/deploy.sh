@@ -33,6 +33,8 @@ chmod +x $JAR_NAME
 
 echo "> 환경 변수 추가"
 
+chmod +x ~/.bashrc
+
 source ~/.bashrc
 
 echo "> $JAR_NAME 실행"
