@@ -27,7 +27,7 @@ spring:
           google:
             client-id: ${CLIENT_ID}
             client-secret: ${CLIENT_SECRET}
-            redirectUri: ${REDIRECT_URI}
+            redirect-uri: ${REDIRECT_URI}
             scope: email, profile
 
 jwt:
@@ -77,7 +77,7 @@ spring:
           google:
             client-id: ${CLIENT_ID}
             client-secret: ${CLIENT_SECRET}
-            redirectUri: http://localhost:8080/login/oauth2/code/google
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
             scope: email, profile
 
 jwt:
