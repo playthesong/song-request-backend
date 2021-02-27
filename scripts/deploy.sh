@@ -1,6 +1,7 @@
 #!/bin/bash
 
 REPOSITORY=/home/ubuntu/app/songrequest
+ENVIRONMENT_PATH=/home/ubuntu/.bashrc
 PROJECT_NAME=song-request
 
 echo "> Build 파일 복사"
@@ -33,9 +34,9 @@ chmod +x $JAR_NAME
 
 echo "> 환경 변수 추가"
 
-chmod +x ~/.bashrc
+chmod +x $ENVIRONMENT_PATH
 
-source ~/.bashrc
+source $ENVIRONMENT_PATH
 
 echo "> $JAR_NAME 실행"
 
