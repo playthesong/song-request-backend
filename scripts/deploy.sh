@@ -1,7 +1,7 @@
 #!/bin/bash
 
 REPOSITORY=/home/ubuntu/app/songrequest
-ENVIRONMENT_PATH=/home/ubuntu/.bashrc
+APPLICATION_PROPERTIES=/home/ubuntu/app/
 PROJECT_NAME=song-request
 
 echo "> Build 파일 복사"
@@ -32,14 +32,9 @@ echo "> $JAR_NAME에 실행 권한 추가"
 
 chmod +x $JAR_NAME
 
-echo "> 환경 변수 추가"
-
-chmod +x $ENVIRONMENT_PATH
-
-source $ENVIRONMENT_PATH
-
 echo "> $JAR_NAME 실행"
 
 nohup java -jar \
+  -Dspring.config.location=$APPLICATION_PROPERTIES
   -Dspring.profiles.active=prod \
   $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
