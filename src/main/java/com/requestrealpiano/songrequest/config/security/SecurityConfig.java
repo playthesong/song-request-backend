@@ -24,8 +24,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-            .antMatchers("/", "/login/oauth2/code/**").permitAll()
-            .antMatchers("/api/**").hasAnyRole(Role.MEMBER.getValue(), Role.ADMIN.getValue())
+            .antMatchers("/**").permitAll()
+//            .antMatchers("/", "/login/oauth2/code/**").permitAll()
+//            .antMatchers("/api/**").hasAnyRole(Role.MEMBER.getValue(), Role.ADMIN.getValue())
             .anyRequest().authenticated();
 
         http.sessionManagement()
