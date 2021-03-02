@@ -19,7 +19,8 @@ if [ -z "$CURRENT_PID" ]; then
 else
   echo "> kill -15 $CURRENT_PID"
   kill -15 $CURRENT_PID
-  sleep 5
+  sleep 10
+  echo "애플리케이션 종료 확인 pid : $CURRENT_PID"
 fi
 
 echo "> 새 애플리케이션 배포"
