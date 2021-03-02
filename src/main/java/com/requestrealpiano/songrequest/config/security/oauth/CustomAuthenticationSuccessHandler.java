@@ -22,6 +22,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         response.addHeader(HttpHeaders.LOCATION, "http://localhost:3000");
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtProperties.getHeaderPrefix() + "Token");
-        response.setStatus(HttpServletResponse.SC_CREATED);
+        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
     }
 }
