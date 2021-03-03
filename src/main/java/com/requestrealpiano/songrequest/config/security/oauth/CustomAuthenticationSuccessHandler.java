@@ -19,11 +19,14 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final JwtProperties jwtProperties;
 
+    @Value("${oauth2.successUrl}")
+    private String defaultSuccessUrl;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Cookie cookie = new Cookie("jwt_token", "Token");
         cookie.setDomain(jwtProperties.getTokenUrl());
         response.addCookie(cookie);
-        response.sendRedirect(jwtProperties.getTokenUrl());
+        response.sendRedirect(defaultSuccessUrl);
     }
 }
