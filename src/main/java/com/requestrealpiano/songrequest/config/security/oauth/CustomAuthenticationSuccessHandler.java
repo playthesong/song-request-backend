@@ -8,6 +8,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,8 +21,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        response.addHeader(HttpHeaders.LOCATION, "http://localhost:3000");
-        response.addHeader(HttpHeaders.AUTHORIZATION, jwtProperties.getHeaderPrefix() + "Token");
-        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+        response.addCookie(new Cookie("jwt_token", jwtProperties.getHeaderPrefix() + "Token"));
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }
