@@ -32,14 +32,12 @@ spring:
             redirect-uri: http://localhost:8080/login/oauth2/code/google
             scope: email, profile
 
-oauth2:
-  successUrl: http://localhost:3000
-
 jwt:
   tokenSecret: ${TOKEN_SECRET}
   tokenExpiration: ${TOKEN_EXPIRATION}
   header: Authorization
   headerPrefix: 'Bearer '
+  tokenDomain: ${TOKEN_DOMAIN}
   tokenUrl: ${TOKEN_URL}
 
 lastfm:
