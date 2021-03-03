@@ -2,7 +2,7 @@ package com.requestrealpiano.songrequest.config.security.oauth;
 
 import com.requestrealpiano.songrequest.config.security.jwt.JwtProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -24,6 +24,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         Cookie cookie = new Cookie("jwt_token", "Token");
         cookie.setDomain(jwtProperties.getTokenDomain());
         response.addCookie(cookie);
-        response.sendRedirect(jwtProperties.getTokenUrl());
+        response.setHeader(HttpHeaders.LOCATION, jwtProperties.getTokenUrl());
+        response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
     }
 }
