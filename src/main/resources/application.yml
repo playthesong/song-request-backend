@@ -37,6 +37,7 @@ jwt:
   tokenExpiration: ${TOKEN_EXPIRATION}
   header: Authorization
   headerPrefix: 'Bearer '
+  tokenUrl: ${TOKEN_URL}
 
 lastfm:
   url: http://ws.audioscrobbler.com/2.0

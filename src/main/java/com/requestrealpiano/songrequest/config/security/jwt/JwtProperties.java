@@ -15,4 +15,5 @@ public class JwtProperties {
     private final long tokenExpiration;
     private final String header;
     private final String headerPrefix;
+    private final String tokenUrl;
 }
