@@ -21,7 +21,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        Cookie cookie = new Cookie("jwt_token", jwtProperties.getHeaderPrefix() + "Token");
+        Cookie cookie = new Cookie("jwt_token", "Token");
         cookie.setDomain(jwtProperties.getTokenUrl());
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
