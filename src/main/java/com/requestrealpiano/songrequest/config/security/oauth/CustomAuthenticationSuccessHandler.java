@@ -19,14 +19,11 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final JwtProperties jwtProperties;
 
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
-    private String defaultSuccessUrl;
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Cookie cookie = new Cookie("jwt_token", "Token");
         cookie.setDomain(jwtProperties.getTokenUrl());
         response.addCookie(cookie);
-        response.sendRedirect(defaultSuccessUrl);
+        response.sendRedirect(jwtProperties.getTokenUrl());
     }
 }
