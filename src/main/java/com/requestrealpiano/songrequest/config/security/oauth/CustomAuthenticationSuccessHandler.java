@@ -24,6 +24,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         Cookie cookie = new Cookie("jwt_token", "Token");
         cookie.setDomain(jwtProperties.getTokenUrl());
         response.addCookie(cookie);
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.sendRedirect(jwtProperties.getTokenUrl());
     }
 }
