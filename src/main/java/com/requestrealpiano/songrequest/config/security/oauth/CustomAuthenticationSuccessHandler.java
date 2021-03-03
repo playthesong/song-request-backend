@@ -2,7 +2,7 @@ package com.requestrealpiano.songrequest.config.security.oauth;
 
 import com.requestrealpiano.songrequest.config.security.jwt.JwtProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -19,11 +19,14 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
 
     private final JwtProperties jwtProperties;
 
+    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    private String defaultSuccessUrl;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         Cookie cookie = new Cookie("jwt_token", "Token");
         cookie.setDomain(jwtProperties.getTokenUrl());
         response.addCookie(cookie);
-        response.sendRedirect(jwtProperties.getTokenUrl());
+        response.sendRedirect(defaultSuccessUrl);
     }
 }
