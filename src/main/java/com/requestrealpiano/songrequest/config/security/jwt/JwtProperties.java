@@ -12,7 +12,10 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 public class JwtProperties {
 
     private final String tokenSecret;
-    private final long tokenExpiration;
+    private final String tokenExpiration;
     private final String header;
     private final String headerPrefix;
+    private final String tokenDomain;
+    private final String tokenUrl;
+    private final String generationKey;
 }
