@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.config.security;
 
+import com.requestrealpiano.songrequest.config.security.jwt.JwtProperties;
 import com.requestrealpiano.songrequest.config.security.oauth.CustomAuthenticationSuccessHandler;
 import com.requestrealpiano.songrequest.config.security.oauth.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final JwtProperties jwtProperties;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -46,7 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .userInfoEndpoint()
             .userService(customOAuth2UserService)
                 .and()
-            .successHandler(customAuthenticationSuccessHandler);
+            .successHandler(customAuthenticationSuccessHandler)
+            .defaultSuccessUrl(jwtProperties.getTokenUrl(), true);
     }
 
     @Bean
