@@ -1,10 +1,9 @@
 package com.requestrealpiano.songrequest.service;
 
 import com.requestrealpiano.songrequest.config.security.jwt.JwtTokenProvider;
-import com.requestrealpiano.songrequest.config.security.oauth.OAuthAccount;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
-import com.requestrealpiano.songrequest.global.error.exception.auth.TokenGenerationKeyNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.JwtValidationException;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +18,7 @@ public class AccountService {
 
     public String generateJwtToken(String generationKey) {
         if (StringUtils.isEmpty(generationKey)) {
-            throw new TokenGenerationKeyNotFoundException();
+            throw new JwtValidationException();
         }
 
         String email = jwtTokenProvider.parseGenerationKey(generationKey);
