@@ -2,7 +2,7 @@ package com.requestrealpiano.songrequest.config.security.jwt;
 
 import com.requestrealpiano.songrequest.config.security.jwt.claims.AccountClaims;
 import com.requestrealpiano.songrequest.domain.account.Account;
-import com.requestrealpiano.songrequest.global.error.exception.auth.TokenGenerationKeyNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.JwtValidationException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -38,9 +38,8 @@ public class JwtTokenProvider {
             return claims.getBody()
                          .get(EMAIL, String.class);
         } catch (JwtException exception) {
-            System.out.println("================" + exception.getMessage());
+            throw new JwtValidationException();
         }
-        return null;
     }
 
     public String createJwtToken(Account account) {
@@ -66,7 +65,7 @@ public class JwtTokenProvider {
                          .after(new Date());
         } catch (JwtException exception) {
             System.out.println("유효기간 만료");
-            throw new TokenGenerationKeyNotFoundException();
+            throw new JwtValidationException();
         }
     }
 
@@ -79,12 +78,24 @@ public class JwtTokenProvider {
             return claims.getBody()
                          .get(USER, AccountClaims.class);
         } catch (JwtException exception) {
-            throw new TokenGenerationKeyNotFoundException();
+            throw new JwtValidationException();
         }
     }
 
     private String extractToken(String authorizationHeader) {
-        int tokenBeginIndex = jwtProperties.getHeaderPrefix().length();
-        return StringUtils.substring(authorizationHeader, tokenBeginIndex);
+        if (isTokenContained(authorizationHeader)) {
+            int tokenBeginIndex = jwtProperties.getHeaderPrefix().length();
+            return StringUtils.substring(authorizationHeader, tokenBeginIndex);
+        }
+
+        throw new JwtValidationException();
+    }
+
+    private boolean isTokenContained(String authorization) {
+        if (StringUtils.isEmpty(authorization)) {
+            return false;
+        }
+
+        return authorization.startsWith(jwtProperties.getHeaderPrefix());
     }
 }
