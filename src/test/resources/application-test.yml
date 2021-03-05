@@ -19,3 +19,11 @@ spring:
             client-secret: ${CLIENT_SECRET}
             redirectUri: http://localhost:8080/login/oauth2/code/google
             scope: email, profile
+
+jwt:
+  tokenSecret: ${TOKEN_SECRET}
+  tokenExpiration: ${TOKEN_EXPIRATION}
+  header: Authorization
+  headerPrefix: 'Bearer '
+  tokenDomain: ${TOKEN_DOMAIN}
+  tokenUrl: http://localhost:3000
