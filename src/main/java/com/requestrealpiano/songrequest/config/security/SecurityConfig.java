@@ -2,7 +2,6 @@ package com.requestrealpiano.songrequest.config.security;
 
 import com.requestrealpiano.songrequest.config.security.oauth.CustomAuthenticationSuccessHandler;
 import com.requestrealpiano.songrequest.config.security.oauth.CustomOAuth2UserService;
-import com.requestrealpiano.songrequest.domain.account.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

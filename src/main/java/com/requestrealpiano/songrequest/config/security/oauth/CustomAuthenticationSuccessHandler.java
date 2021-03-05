@@ -3,6 +3,8 @@ package com.requestrealpiano.songrequest.config.security.oauth;
 import com.requestrealpiano.songrequest.config.security.jwt.JwtProperties;
 import com.requestrealpiano.songrequest.config.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
