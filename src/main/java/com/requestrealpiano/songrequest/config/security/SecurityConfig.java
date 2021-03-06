@@ -1,15 +1,20 @@
 package com.requestrealpiano.songrequest.config.security;
 
-import com.requestrealpiano.songrequest.config.security.jwt.JwtProperties;
+import com.requestrealpiano.songrequest.config.security.filter.JwtAuthorizationFilter;
+import com.requestrealpiano.songrequest.config.security.jwt.JwtTokenProvider;
+import com.requestrealpiano.songrequest.config.security.oauth.CustomAccessDeniedHandler;
 import com.requestrealpiano.songrequest.config.security.oauth.CustomAuthenticationSuccessHandler;
 import com.requestrealpiano.songrequest.config.security.oauth.CustomOAuth2UserService;
+import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -26,7 +31,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-    private final JwtProperties jwtProperties;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final AccountRepository accountRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -37,18 +44,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
             .antMatchers("/**").permitAll()
-//            .antMatchers("/", "/login/oauth2/code/**").permitAll()
+//            .antMatchers("/", "/api/account/token").permitAll()
 //            .antMatchers("/api/**").hasAnyRole(Role.MEMBER.getValue(), Role.ADMIN.getValue())
             .anyRequest().authenticated();
 
         http.sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        http.addFilterBefore(JwtAuthorizationFilter.of(authenticationManager(), accountRepository, jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
         http.oauth2Login()
             .userInfoEndpoint()
             .userService(customOAuth2UserService)
                 .and()
             .successHandler(customAuthenticationSuccessHandler);
+
+        http.exceptionHandling()
+            .accessDeniedHandler(customAccessDeniedHandler);
     }
 
     @Bean
@@ -64,4 +76,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return source;
     }
 
+    @Override
+    @Bean
+    protected AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
 }
