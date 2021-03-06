@@ -7,6 +7,8 @@ public enum ErrorCode {
 
     // Common
     INVALID_INPUT_VALUE(400, "입력한 요청 값이 올바르지 않습니다. 다시 요청 해주세요."),
+    UNAUTHENTICATED_ERROR(401, "인증이 필요합니다. 로그인 이후 다시 시도 해주세요."),
+    ACCESS_DENIED_ERROR(403, "해당 요청에 대한 접근 권한이 없습니다."),
     SEARCH_RESULT_ERROR(500, "검색 결과를 가져오지 못했습니다. 다시 요청 해주세요."),
     METHOD_NOT_ALLOWED(405, "지원하지 않는 요청 메소드 입니다."),
     INTERNAL_SERVER_ERROR(500, "서버에서 요청을 처리하지 못했습니다."),
