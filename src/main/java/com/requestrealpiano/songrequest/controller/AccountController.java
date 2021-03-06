@@ -1,5 +1,8 @@
 package com.requestrealpiano.songrequest.controller;
 
+import com.requestrealpiano.songrequest.config.security.oauth.LoginAccount;
+import com.requestrealpiano.songrequest.config.security.oauth.OAuthAccount;
+import com.requestrealpiano.songrequest.global.response.ApiResponse;
 import com.requestrealpiano.songrequest.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -23,5 +26,10 @@ public class AccountController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.add(HttpHeaders.AUTHORIZATION, jwtToken);
         return new ResponseEntity<>(responseHeaders, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/token/validation")
+    public ApiResponse<OAuthAccount> validateToken(@RequestHeader HttpHeaders httpHeaders) {
+        return null;
     }
 }
