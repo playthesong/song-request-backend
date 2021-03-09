@@ -1,15 +1,14 @@
-package com.requestrealpiano.songrequest.config.security.filter;
+package com.requestrealpiano.songrequest.security.filter;
 
-import com.requestrealpiano.songrequest.config.security.jwt.JwtTokenProvider;
-import com.requestrealpiano.songrequest.config.security.jwt.claims.AccountClaims;
-import com.requestrealpiano.songrequest.config.security.oauth.OAuthAccount;
+import com.requestrealpiano.songrequest.security.jwt.JwtTokenProvider;
+import com.requestrealpiano.songrequest.security.jwt.claims.AccountClaims;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

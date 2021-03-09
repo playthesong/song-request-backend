@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.config.security.jwt.claims;
+package com.requestrealpiano.songrequest.security.jwt.claims;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.Role;

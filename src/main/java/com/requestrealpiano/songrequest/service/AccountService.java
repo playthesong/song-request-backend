@@ -1,6 +1,6 @@
 package com.requestrealpiano.songrequest.service;
 
-import com.requestrealpiano.songrequest.config.security.jwt.JwtTokenProvider;
+import com.requestrealpiano.songrequest.security.jwt.JwtTokenProvider;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.global.error.exception.JwtValidationException;

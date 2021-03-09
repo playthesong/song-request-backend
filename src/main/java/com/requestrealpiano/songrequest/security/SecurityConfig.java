@@ -1,15 +1,14 @@
-package com.requestrealpiano.songrequest.config.security;
+package com.requestrealpiano.songrequest.security;
 
-import com.requestrealpiano.songrequest.config.security.filter.JwtAuthorizationFilter;
-import com.requestrealpiano.songrequest.config.security.jwt.JwtTokenProvider;
-import com.requestrealpiano.songrequest.config.security.oauth.CustomAccessDeniedHandler;
-import com.requestrealpiano.songrequest.config.security.oauth.CustomAuthenticationSuccessHandler;
-import com.requestrealpiano.songrequest.config.security.oauth.CustomOAuth2UserService;
+import com.requestrealpiano.songrequest.security.filter.JwtAuthorizationFilter;
+import com.requestrealpiano.songrequest.security.jwt.JwtTokenProvider;
+import com.requestrealpiano.songrequest.security.oauth.CustomAccessDeniedHandler;
+import com.requestrealpiano.songrequest.security.oauth.CustomAuthenticationSuccessHandler;
+import com.requestrealpiano.songrequest.security.oauth.CustomOAuth2UserService;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;

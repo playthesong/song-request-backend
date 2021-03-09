@@ -1,6 +1,6 @@
-package com.requestrealpiano.songrequest.config.security.jwt;
+package com.requestrealpiano.songrequest.security.jwt;
 
-import com.requestrealpiano.songrequest.config.security.jwt.claims.AccountClaims;
+import com.requestrealpiano.songrequest.security.jwt.claims.AccountClaims;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.global.error.exception.JwtValidationException;
 import io.jsonwebtoken.*;

@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.config.security.jwt;
+package com.requestrealpiano.songrequest.security.jwt;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

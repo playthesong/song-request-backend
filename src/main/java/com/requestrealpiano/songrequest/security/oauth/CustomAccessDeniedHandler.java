@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.config.security.oauth;
+package com.requestrealpiano.songrequest.security.oauth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
