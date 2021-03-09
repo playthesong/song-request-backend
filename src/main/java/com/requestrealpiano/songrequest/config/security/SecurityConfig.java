@@ -38,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/api/account/token");
+        web.ignoring().antMatchers("/api/accounts/token");
     }
 
 
@@ -58,7 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.addFilterBefore(JwtAuthorizationFilter.of(authenticationManager(), accountRepository, jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(JwtAuthorizationFilter.of(accountRepository, jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         http.oauth2Login()
             .userInfoEndpoint()
@@ -81,11 +81,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Override
-    @Bean
-    protected AuthenticationManager authenticationManager() throws Exception {
-        return super.authenticationManager();
     }
 }
