@@ -15,8 +15,12 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final JwtProperties jwtProperties;
-    private final String USER = "user";
+
+    private final String ID = "id";
     private final String EMAIL = "email";
+    private final String NAME = "name";
+    private final String AVATAR_URL = "avatarUrl";
+    private final String ROLE = "role";
 
     public String createGenerationKey(String email) {
         Date now = new Date();
@@ -48,7 +52,11 @@ public class JwtTokenProvider {
                               .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
                               .setIssuedAt(now)
                               .setExpiration(new Date(now.getTime() + Long.parseLong(jwtProperties.getTokenExpiration())))
-                              .claim(USER, AccountClaims.from(account))
+                              .claim(ID, account.getId())
+                              .claim(EMAIL, account.getEmail())
+                              .claim(NAME, account.getName())
+                              .claim(AVATAR_URL, account.getAvatarUrl())
+                              .claim(ROLE, account.getRoleKey())
                               .signWith(SignatureAlgorithm.HS256, jwtProperties.getTokenSecret())
                               .compact();
         return jwtProperties.getHeaderPrefix() + jwtToken;
@@ -69,20 +77,20 @@ public class JwtTokenProvider {
         }
     }
 
-    public AccountClaims parseJwtToken(String authorization) {
-        String jwtToken = extractToken(authorization);
+    public AccountClaims parseJwtToken(String jwtToken) {
         try {
             Jws<Claims> claims = Jwts.parser()
                                      .setSigningKey(jwtProperties.getTokenSecret())
                                      .parseClaimsJws(jwtToken);
-            return claims.getBody()
-                         .get(USER, AccountClaims.class);
+            Claims body = claims.getBody();
+
+            return AccountClaims.from(body);
         } catch (JwtException exception) {
             throw new JwtValidationException();
         }
     }
 
-    private String extractToken(String authorizationHeader) {
+    public String extractToken(String authorizationHeader) {
         if (isTokenContained(authorizationHeader)) {
             int tokenBeginIndex = jwtProperties.getHeaderPrefix().length();
             return StringUtils.substring(authorizationHeader, tokenBeginIndex);

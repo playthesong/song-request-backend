@@ -54,6 +54,8 @@ public class Account extends BaseTimeEntity {
         this.requestCount = requestCount;
     }
 
+    public String getRoleKey() { return role.getKey(); }
+
     public String getRoleValue() {
         return role.getValue();
     }
