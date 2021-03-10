@@ -15,7 +15,6 @@ public class JwtProperties {
     private final String tokenExpiration;
     private final String header;
     private final String headerPrefix;
-    private final String tokenDomain;
     private final String tokenUrl;
     private final String generationKeySecret;
     private final String generationKeyExpiration;
