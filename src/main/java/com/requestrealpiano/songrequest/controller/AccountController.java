@@ -17,7 +17,7 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @GetMapping("/token")
+    @GetMapping("/auth")
     public ResponseEntity<Void> generateToken(@RequestHeader HttpHeaders httpHeaders) {
         String jwtToken = accountService.generateJwtToken(httpHeaders.getFirst(HttpHeaders.AUTHORIZATION));
         HttpHeaders responseHeaders = new HttpHeaders();
