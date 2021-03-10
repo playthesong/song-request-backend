@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 
-        web.ignoring().antMatchers(HttpMethod.GET, "/api/accounts/token")
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/accounts/auth")
                       .antMatchers(HttpMethod.GET, "/api/letters/**")
                       .antMatchers(HttpMethod.GET, "/api/songs")
         ;

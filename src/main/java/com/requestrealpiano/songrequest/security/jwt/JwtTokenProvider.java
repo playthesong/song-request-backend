@@ -1,8 +1,10 @@
 package com.requestrealpiano.songrequest.security.jwt;
 
-import com.requestrealpiano.songrequest.security.jwt.claims.AccountClaims;
 import com.requestrealpiano.songrequest.domain.account.Account;
-import com.requestrealpiano.songrequest.global.error.exception.JwtValidationException;
+import com.requestrealpiano.songrequest.global.error.exception.jwt.JwtExpirationException;
+import com.requestrealpiano.songrequest.global.error.exception.jwt.JwtInvalidTokenException;
+import com.requestrealpiano.songrequest.global.error.exception.jwt.JwtRequiredException;
+import com.requestrealpiano.songrequest.security.jwt.claims.AccountClaims;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -37,12 +39,14 @@ public class JwtTokenProvider {
         String generationKey = extractToken(authorization);
         try {
             Jws<Claims> claims = Jwts.parser()
-                                     .setSigningKey(jwtProperties.getGenerationKeySecret())
-                                     .parseClaimsJws(generationKey);
+                    .setSigningKey(jwtProperties.getGenerationKeySecret())
+                    .parseClaimsJws(generationKey);
             return claims.getBody()
                          .get(EMAIL, String.class);
+        } catch (ExpiredJwtException exception) {
+            throw new JwtExpirationException();
         } catch (JwtException exception) {
-            throw new JwtValidationException();
+            throw new JwtInvalidTokenException();
         }
     }
 
@@ -71,9 +75,10 @@ public class JwtTokenProvider {
             return claims.getBody()
                          .getExpiration()
                          .after(new Date());
+        } catch (ExpiredJwtException exception) {
+            throw new JwtExpirationException();
         } catch (JwtException exception) {
-            System.out.println("유효기간 만료");
-            throw new JwtValidationException();
+            throw new JwtInvalidTokenException();
         }
     }
 
@@ -85,8 +90,10 @@ public class JwtTokenProvider {
             Claims body = claims.getBody();
 
             return AccountClaims.from(body);
+        } catch (ExpiredJwtException exception) {
+            throw new JwtExpirationException();
         } catch (JwtException exception) {
-            throw new JwtValidationException();
+            throw new JwtInvalidTokenException();
         }
     }
 
@@ -95,8 +102,7 @@ public class JwtTokenProvider {
             int tokenBeginIndex = jwtProperties.getHeaderPrefix().length();
             return StringUtils.substring(authorizationHeader, tokenBeginIndex);
         }
-
-        throw new JwtValidationException();
+        throw new JwtRequiredException();
     }
 
     private boolean isTokenContained(String authorization) {
