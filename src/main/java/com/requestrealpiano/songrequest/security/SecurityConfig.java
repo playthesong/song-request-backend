@@ -7,8 +7,10 @@ import com.requestrealpiano.songrequest.security.oauth.CustomAuthenticationSucce
 import com.requestrealpiano.songrequest.security.oauth.CustomOAuth2UserService;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,7 +39,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/api/accounts/token");
+        web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+
+        web.ignoring().antMatchers(HttpMethod.GET, "/api/accounts/token")
+                      .antMatchers(HttpMethod.GET, "/api/letters/**")
+                      .antMatchers(HttpMethod.GET, "/api/songs")
+        ;
     }
 
 
