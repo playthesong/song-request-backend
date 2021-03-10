@@ -24,18 +24,6 @@ public class AccountClaims {
         this.role = role;
     }
 
-    public static AccountClaims from(Account account) {
-        Role role = account.getRole();
-
-        return AccountClaims.builder()
-                            .id(account.getId())
-                            .name(account.getName())
-                            .email(account.getEmail())
-                            .avatarUrl(account.getAvatarUrl())
-                            .role(role.getKey())
-                            .build();
-    }
-
     public static AccountClaims from(Claims claims) {
         return AccountClaims.builder()
                             .id(claims.get("id", Long.class))
