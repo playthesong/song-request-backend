@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.security.filter.JwtAuthorizationFilter;
 import com.requestrealpiano.songrequest.security.jwt.JwtTokenProvider;
 import com.requestrealpiano.songrequest.security.oauth.CustomAccessDeniedHandler;
@@ -17,9 +18,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,13 +39,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final AccountRepository accountRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 
         web.ignoring().antMatchers(HttpMethod.GET, "/api/accounts/auth")
-                      .antMatchers(HttpMethod.GET, "/api/letters/**")
+//                      .antMatchers(HttpMethod.GET, "/api/letters/**")
                       .antMatchers(HttpMethod.GET, "/api/songs")
         ;
     }
@@ -64,7 +68,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.addFilterBefore(JwtAuthorizationFilter.of(accountRepository, jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(characterEncodingFilter(), CsrfFilter.class)
+            .addFilterBefore(JwtAuthorizationFilter.of(accountRepository, jwtTokenProvider, objectMapper), UsernamePasswordAuthenticationFilter.class);
 
         http.oauth2Login()
             .userInfoEndpoint()
@@ -74,6 +79,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.exceptionHandling()
             .accessDeniedHandler(customAccessDeniedHandler);
+    }
+
+    public CharacterEncodingFilter characterEncodingFilter() {
+        CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
+        encodingFilter.setEncoding("UTF-8");
+        encodingFilter.setForceEncoding(true);
+        return encodingFilter;
     }
 
     @Bean
