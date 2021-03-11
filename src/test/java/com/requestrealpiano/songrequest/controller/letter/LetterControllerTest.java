@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.controller;
+package com.requestrealpiano.songrequest.controller.letter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
@@ -32,8 +32,7 @@ import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -64,7 +63,6 @@ class LetterControllerTest extends BaseControllerTest {
         // then
         resultActions.andDo(print())
                      .andExpect(status().isOk())
-                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                      .andExpect(jsonPath("success").value(true))
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isArray())
@@ -93,7 +91,6 @@ class LetterControllerTest extends BaseControllerTest {
         // then
         resultActions.andDo(print())
                      .andExpect(status().isOk())
-                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                      .andExpect(jsonPath("success").value(true))
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isNotEmpty())
@@ -126,7 +123,6 @@ class LetterControllerTest extends BaseControllerTest {
         // then
         resultActions.andDo(print())
                      .andExpect(status().isOk())
-                     .andExpect(header().string(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE))
                      .andExpect(jsonPath("success").value(true))
                      .andExpect(jsonPath("statusMessage").value("OK"))
                      .andExpect(jsonPath("data").isNotEmpty())
@@ -150,9 +146,9 @@ class LetterControllerTest extends BaseControllerTest {
 
         // when
         ResultActions resultActions = mockMvc.perform(post("/api/letters")
-                .accept(APPLICATION_JSON)
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newLetterRequest)));
+                                                      .accept(APPLICATION_JSON)
+                                                      .contentType(APPLICATION_JSON)
+                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
 
         // then
         resultActions.andDo(print())
@@ -160,7 +156,7 @@ class LetterControllerTest extends BaseControllerTest {
                      .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
                      .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
                      .andExpect(jsonPath("errors").isNotEmpty())
-                     .andDo(document("error-create-letter",
+                     .andDo(document("create-letter-invalid-parameters",
                              responseFields(ResponseFields.error())
                      ))
         ;
@@ -188,7 +184,7 @@ class LetterControllerTest extends BaseControllerTest {
                      .andExpect(jsonPath("statusCode").value(ErrorCode.UNAUTHENTICATED_ERROR.getStatusCode()))
                      .andExpect(jsonPath("message").value(ErrorCode.UNAUTHENTICATED_ERROR.getMessage()))
                      .andExpect(jsonPath("errors").isEmpty())
-                     .andDo(document("error-create-letter",
+                     .andDo(document("create-letter-unauthorized",
                              responseFields(ResponseFields.error())
                      ))
         ;
