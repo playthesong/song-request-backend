@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
@@ -163,6 +164,40 @@ class LetterControllerTest extends BaseControllerTest {
                              responseFields(ResponseFields.error())
                      ))
         ;
+    }
+
+    @ParameterizedTest
+    @MethodSource("unAuthorizedUserCreateLetterParameters")
+    @WithAnonymousUser
+    @DisplayName("UNAUTHORIZED - 권한이 없는 사용자가 등록을 요청하는 테스트")
+    void unauthorized_user_create_letter(String title, String artist, String imageUrl, String songStory,
+                                         Long accountId) throws Exception {
+        // given
+        SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
+        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/api/letters")
+                                                      .accept(APPLICATION_JSON)
+                                                      .contentType(APPLICATION_JSON)
+                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
+
+        // then
+        resultActions.andDo(print())
+                     .andExpect(status().isUnauthorized())
+                     .andExpect(jsonPath("statusCode").value(ErrorCode.UNAUTHENTICATED_ERROR.getStatusCode()))
+                     .andExpect(jsonPath("message").value(ErrorCode.UNAUTHENTICATED_ERROR.getMessage()))
+                     .andExpect(jsonPath("errors").isEmpty())
+                     .andDo(document("error-create-letter",
+                             responseFields(ResponseFields.error())
+                     ))
+        ;
+    }
+
+    private static Stream<Arguments> unAuthorizedUserCreateLetterParameters() {
+        return Stream.of(
+            Arguments.of("New Title", "New Artist", "http://imageUrl", "Song story", 1L)
+        );
     }
 
     private static Stream<Arguments> invalidNewLetterRequestParameters() {
