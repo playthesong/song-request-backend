@@ -12,13 +12,12 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTran
 import com.requestrealpiano.songrequest.service.searchapi.LastFmApiService;
 import com.requestrealpiano.songrequest.service.searchapi.ManiaDbApiService;
 import com.requestrealpiano.songrequest.service.searchapi.SearchApiService;
-import com.requestrealpiano.songrequest.testconfig.annotation.LastFm;
-import com.requestrealpiano.songrequest.testconfig.annotation.ManiaDb;
+import com.requestrealpiano.songrequest.testconfig.searchapi.LastFm;
+import com.requestrealpiano.songrequest.testconfig.searchapi.ManiaDb;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
