@@ -11,19 +11,17 @@ import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.service.LetterService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
+import com.requestrealpiano.songrequest.testconfig.security.WithMember;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
@@ -43,12 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Disabled
-@WebMvcTest(controllers = LetterController.class)
 class LetterControllerTest extends BaseControllerTest {
-
-    @Autowired
-    MockMvc mockMvc;
 
     @MockBean
     LetterService letterService;
@@ -114,6 +107,7 @@ class LetterControllerTest extends BaseControllerTest {
     }
 
     @ParameterizedTest
+    @WithMember
     @MethodSource("createNewLetterParameters")
     @DisplayName("OK - 새로운 Letter 등록 API 테스트")
     void create_new_Letter(String songStory, SongRequest songRequest, Long accountId) throws Exception {
@@ -144,6 +138,7 @@ class LetterControllerTest extends BaseControllerTest {
     }
 
     @ParameterizedTest
+    @WithMember
     @MethodSource("invalidNewLetterRequestParameters")
     @DisplayName("BAD_REQUEST - 유효하지 않은 값으로 Letter 등록 요청 테스트")
     void invalid_new_letter_request(String title, String artist, String imageUrl, String songStory,
