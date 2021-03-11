@@ -5,8 +5,8 @@ import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.error.response.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -16,17 +16,17 @@ import java.io.IOException;
 
 @RequiredArgsConstructor
 @Component
-public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
-        String errorResponse = objectMapper.writeValueAsString(ErrorResponse.from(accessDeniedError));
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        ErrorCode unAuthenticationError = ErrorCode.UNAUTHENTICATED_ERROR;
+        String errorResponse = objectMapper.writeValueAsString(ErrorResponse.from(unAuthenticationError));
         response.getWriter().print(errorResponse);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(accessDeniedError.getStatusCode());
+        response.setStatus(unAuthenticationError.getStatusCode());
         response.getWriter().flush();
         response.getWriter().close();
     }

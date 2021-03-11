@@ -1,9 +1,11 @@
 package com.requestrealpiano.songrequest.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.security.filter.JwtAuthorizationFilter;
 import com.requestrealpiano.songrequest.security.jwt.JwtTokenProvider;
 import com.requestrealpiano.songrequest.security.oauth.CustomAccessDeniedHandler;
+import com.requestrealpiano.songrequest.security.oauth.CustomAuthenticationEntryPoint;
 import com.requestrealpiano.songrequest.security.oauth.CustomAuthenticationSuccessHandler;
 import com.requestrealpiano.songrequest.security.oauth.CustomOAuth2UserService;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
@@ -36,6 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final AccountRepository accountRepository;
     private final JwtTokenProvider jwtTokenProvider;
@@ -46,11 +49,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 
         web.ignoring().antMatchers(HttpMethod.GET, "/api/accounts/auth")
-//                      .antMatchers(HttpMethod.GET, "/api/letters/**")
+                      .antMatchers(HttpMethod.GET, "/api/letters/**")
                       .antMatchers(HttpMethod.GET, "/api/songs")
         ;
     }
-
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -60,9 +62,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-            .antMatchers("/**").permitAll()
+//            .antMatchers("/**").permitAll()
 //            .antMatchers("/", "/api/account/token").permitAll()
-//            .antMatchers("/api/letters").hasAnyRole(Role.MEMBER.getValue(), Role.ADMIN.getValue())
+            .antMatchers("/api/letters").hasAnyRole(Role.MEMBER.getValue(), Role.ADMIN.getValue())
             .anyRequest().authenticated();
 
         http.sessionManagement()
@@ -78,6 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .successHandler(customAuthenticationSuccessHandler);
 
         http.exceptionHandling()
+            .authenticationEntryPoint(customAuthenticationEntryPoint)
             .accessDeniedHandler(customAccessDeniedHandler);
     }
 
