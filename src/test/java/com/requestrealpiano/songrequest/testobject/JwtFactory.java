@@ -44,4 +44,12 @@ public class JwtFactory {
         JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(jwtProperties);
         return jwtTokenProvider.createJwtToken(account);
     }
+
+    // JwtToken - Expired
+    public static String createExpiredJwtTokenOf(Account account) {
+        JwtProperties jwtProperties = createJwtPropertiesOf("TestJwtSecret", "0", "Authorization",
+                                                "Bearer ", "http://localhost:3000", "TestGenerationKeySecret", "10000");
+        JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(jwtProperties);
+        return jwtTokenProvider.createJwtToken(account);
+    }
 }

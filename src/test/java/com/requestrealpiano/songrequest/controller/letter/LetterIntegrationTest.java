@@ -13,8 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
-import static com.requestrealpiano.songrequest.testobject.JwtFactory.createInvalidJwtTokenOf;
-import static com.requestrealpiano.songrequest.testobject.JwtFactory.createValidJwtTokenOf;
+import static com.requestrealpiano.songrequest.testobject.JwtFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.createNewLetterRequestOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequest;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -61,7 +60,32 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
         Account account = accountRepository.save(createMember());
         SongRequest songRequest = createSongRequest();
         NewLetterRequest newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
-        String invalidJwtToken = createInvalidJwtTokenOf(account);
+        String expiredJwtToken = createInvalidJwtTokenOf(account);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/api/letters")
+                                                      .accept(APPLICATION_JSON)
+                                                      .contentType(APPLICATION_JSON_VALUE)
+                                                      .header(HttpHeaders.AUTHORIZATION, expiredJwtToken)
+                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
+
+        // then
+        resultActions.andDo(print())
+                     .andExpect(status().isBadRequest())
+                     .andExpect(jsonPath("statusCode").value(ErrorCode.JWT_INVALID_ERROR.getStatusCode()))
+                     .andExpect(jsonPath("message").value(ErrorCode.JWT_INVALID_ERROR.getMessage()))
+                     .andExpect(jsonPath("errors").isEmpty())
+        ;
+    }
+
+    @Test
+    @DisplayName("Expired JWT - 만료된 JWT 토큰과 함께 Letter 생성을 요청하는 테스트")
+    void with_expired_jwt_create_letter() throws Exception {
+        // given
+        Account account = accountRepository.save(createMember());
+        SongRequest songRequest = createSongRequest();
+        NewLetterRequest newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
+        String invalidJwtToken = createExpiredJwtTokenOf(account);
 
         // when
         ResultActions resultActions = mockMvc.perform(post("/api/letters")
@@ -72,9 +96,9 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
 
         // then
         resultActions.andDo(print())
-                     .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.JWT_INVALID_ERROR.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.JWT_INVALID_ERROR.getMessage()))
+                     .andExpect(status().isUnauthorized())
+                     .andExpect(jsonPath("statusCode").value(ErrorCode.JWT_EXPIRATION_ERROR.getStatusCode()))
+                     .andExpect(jsonPath("message").value(ErrorCode.JWT_EXPIRATION_ERROR.getMessage()))
                      .andExpect(jsonPath("errors").isEmpty())
         ;
     }
