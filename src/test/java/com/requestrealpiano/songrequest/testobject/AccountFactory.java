@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.testobject;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.Role;
+import com.requestrealpiano.songrequest.security.jwt.JwtProperties;
 
 public class AccountFactory {
 
@@ -25,7 +26,7 @@ public class AccountFactory {
                       .email("User email")
                       .role(Role.MEMBER)
                       .avatarUrl("http://avatarUrl")
-                      .requestCount(1)
+                      .requestCount(0)
                       .build();
     }
 }

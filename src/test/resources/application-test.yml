@@ -25,7 +25,6 @@ jwt:
   tokenExpiration: 100000
   header: Authorization
   headerPrefix: 'Bearer '
-  tokenDomain: http://localhost:3000/auth/token
   tokenUrl: http://localhost:3000
   generationKeySecret: TestGenerationKeySecret
   generationKeyExpiration: 10000
