@@ -53,4 +53,29 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
                      .andExpect(jsonPath("data").isNotEmpty())
         ;
     }
+
+    @Test
+    @DisplayName("Invalid JWT - 유효하지 않은 JWT 토큰과 함께 Letter 생성을 요청하는 테스트")
+    void with_invalid_jwt_create_letter() throws Exception {
+        // given
+        Account account = accountRepository.save(createMember());
+        SongRequest songRequest = createSongRequest();
+        NewLetterRequest newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
+        String invalidJwtToken = createInvalidJwtTokenOf(account);
+
+        // when
+        ResultActions resultActions = mockMvc.perform(post("/api/letters")
+                                                      .accept(APPLICATION_JSON)
+                                                      .contentType(APPLICATION_JSON_VALUE)
+                                                      .header(HttpHeaders.AUTHORIZATION, invalidJwtToken)
+                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
+
+        // then
+        resultActions.andDo(print())
+                     .andExpect(status().isBadRequest())
+                     .andExpect(jsonPath("statusCode").value(ErrorCode.JWT_INVALID_ERROR.getStatusCode()))
+                     .andExpect(jsonPath("message").value(ErrorCode.JWT_INVALID_ERROR.getMessage()))
+                     .andExpect(jsonPath("errors").isEmpty())
+        ;
+    }
 }
