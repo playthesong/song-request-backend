@@ -1,5 +1,6 @@
-package com.requestrealpiano.songrequest.controller;
+package com.requestrealpiano.songrequest.controller.song;
 
+import com.requestrealpiano.songrequest.controller.SongController;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
