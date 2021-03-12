@@ -11,7 +11,8 @@ import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.service.LetterService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
-import com.requestrealpiano.songrequest.testconfig.security.WithMember;
+import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithGuest;
+import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithMember;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
@@ -143,6 +142,7 @@ class LetterControllerTest extends BaseControllerTest {
         // given
         SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
         NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
+        ErrorCode invalidInputError = ErrorCode.INVALID_INPUT_VALUE;
 
         // when
         ResultActions resultActions = mockMvc.perform(post("/api/letters")
@@ -153,8 +153,8 @@ class LetterControllerTest extends BaseControllerTest {
         // then
         resultActions.andDo(print())
                      .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
+                     .andExpect(jsonPath("statusCode").value(invalidInputError.getStatusCode()))
+                     .andExpect(jsonPath("message").value(invalidInputError.getMessage()))
                      .andExpect(jsonPath("errors").isNotEmpty())
                      .andDo(document("create-letter-invalid-parameters",
                              responseFields(ResponseFields.error())
@@ -164,13 +164,14 @@ class LetterControllerTest extends BaseControllerTest {
 
     @ParameterizedTest
     @MethodSource("unAuthorizedUserCreateLetterParameters")
-    @WithAnonymousUser
-    @DisplayName("UNAUTHORIZED - 권한이 없는 사용자가 등록을 요청하는 테스트")
+    @WithGuest
+    @DisplayName("FORBIDDEN - 권한이 없는 사용자가 등록을 요청하는 테스트")
     void unauthorized_user_create_letter(String title, String artist, String imageUrl, String songStory,
                                          Long accountId) throws Exception {
         // given
         SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
         NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
 
         // when
         ResultActions resultActions = mockMvc.perform(post("/api/letters")
@@ -180,9 +181,9 @@ class LetterControllerTest extends BaseControllerTest {
 
         // then
         resultActions.andDo(print())
-                     .andExpect(status().isUnauthorized())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.UNAUTHENTICATED_ERROR.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.UNAUTHENTICATED_ERROR.getMessage()))
+                     .andExpect(status().isForbidden())
+                     .andExpect(jsonPath("statusCode").value(accessDeniedError.getStatusCode()))
+                     .andExpect(jsonPath("message").value(accessDeniedError.getMessage()))
                      .andExpect(jsonPath("errors").isEmpty())
                      .andDo(document("create-letter-unauthorized",
                              responseFields(ResponseFields.error())
