@@ -7,10 +7,12 @@ import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.in
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
+import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.service.SongService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
+import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithGuest;
+import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithMember;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,8 +20,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -36,8 +41,8 @@ import static org.springframework.restdocs.request.RequestDocumentation.requestP
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Disabled
-@WebMvcTest(controllers = SongController.class)
+@WebMvcTest(controllers = SongController.class,
+            excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class))
 class SongControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -48,6 +53,7 @@ class SongControllerTest extends BaseControllerTest {
 
     @ParameterizedTest
     @MethodSource("searchManiaDbParameters")
+    @WithMember
     @DisplayName("OK - ManiaDB 검색 결과 반환 API 테스트")
     void search_mania_db(String artist, String title) throws Exception {
         // given
@@ -64,7 +70,6 @@ class SongControllerTest extends BaseControllerTest {
         // then
         result.andDo(print())
               .andExpect(status().isOk())
-              .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andExpect(jsonPath("success").value(true))
               .andExpect(jsonPath("statusMessage").value("OK"))
               .andExpect(jsonPath("data.totalCount").value(totalCount))
@@ -78,6 +83,7 @@ class SongControllerTest extends BaseControllerTest {
 
     @ParameterizedTest
     @MethodSource("searchByInvalidParams")
+    @WithMember
     @DisplayName("BAD_REQUEST - 유효하지 않은 제목, 아티스트로 요청 테스트")
     void search_by_invalid_params(String artist, String title) throws Exception {
         // when
@@ -99,6 +105,7 @@ class SongControllerTest extends BaseControllerTest {
 
     @ParameterizedTest
     @MethodSource("searchLastFmApiParameters")
+    @WithMember
     @DisplayName("OK - LastFM 검색 결과 반환 API 테스트")
     void search_lastfm_api(String artist, String title, String imageUrl) throws Exception {
         // given
@@ -122,10 +129,34 @@ class SongControllerTest extends BaseControllerTest {
         // then
         result.andDo(print())
               .andExpect(status().isOk())
-              .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
               .andExpect(jsonPath("success").value(true))
               .andExpect(jsonPath("statusMessage").value("OK"))
               .andExpect(jsonPath("data.totalCount").value(totalCount))
+        ;
+    }
+
+    @ParameterizedTest
+    @MethodSource("searchManiaDbParameters")
+    @WithGuest
+    @DisplayName("FORBIDDEN - 권한이 없는 사용자가 신청곡 검색을 요청하는 테스트")
+    void access_denied_user_search_song(String artist, String title) throws Exception {
+        // given
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/api/songs")
+                                                      .param("artist", artist)
+                                                      .param("title", title)
+                                                      .accept(MediaType.APPLICATION_JSON));
+
+        // then
+        resultActions.andDo(print())
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("statusCode").value(accessDeniedError.getStatusCode()))
+                .andExpect(jsonPath("message").value(accessDeniedError.getMessage()))
+                .andDo(document("search-song-error",
+                        responseFields(ResponseFields.error())
+                ))
         ;
     }
 

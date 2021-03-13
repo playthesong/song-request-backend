@@ -50,7 +50,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         web.ignoring().antMatchers(HttpMethod.GET, "/api/accounts/auth")
                       .antMatchers(HttpMethod.GET, "/api/letters/**")
-                      .antMatchers(HttpMethod.GET, "/api/songs")
         ;
     }
 
@@ -63,8 +62,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
 //            .antMatchers("/**").permitAll()
-//            .antMatchers("/", "/api/account/token").permitAll()
             .antMatchers("/api/letters").hasAnyRole(Role.MEMBER.getKey(), Role.ADMIN.getKey())
+            .antMatchers("/api/songs").hasAnyRole(Role.MEMBER.getKey(), Role.ADMIN.getKey())
             .anyRequest().authenticated();
 
         http.sessionManagement()

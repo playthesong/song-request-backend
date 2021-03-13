@@ -1,6 +1,8 @@
 package com.requestrealpiano.songrequest.controller.letter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.requestrealpiano.songrequest.controller.LetterController;
+import com.requestrealpiano.songrequest.controller.SongController;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.RequestFields;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
@@ -9,8 +11,10 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
+import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.service.LetterService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
+import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithAdmin;
 import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithGuest;
 import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithMember;
 import org.apache.commons.lang3.StringUtils;
@@ -20,8 +24,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
@@ -40,7 +48,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@WebMvcTest(controllers = LetterController.class,
+            excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class))
 class LetterControllerTest extends BaseControllerTest {
+
+    @Autowired
+    MockMvc mockMvc;
 
     @MockBean
     LetterService letterService;
@@ -163,10 +176,10 @@ class LetterControllerTest extends BaseControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("unAuthorizedUserCreateLetterParameters")
+    @MethodSource("accessDeniedUserCreateLetterParameters")
     @WithGuest
-    @DisplayName("FORBIDDEN - 권한이 없는 사용자가 등록을 요청하는 테스트")
-    void unauthorized_user_create_letter(String title, String artist, String imageUrl, String songStory,
+    @DisplayName("FORBIDDEN - 권한이 없는 사용자가 Letter 등록을 요청하는 테스트")
+    void access_denied_user_create_letter(String title, String artist, String imageUrl, String songStory,
                                          Long accountId) throws Exception {
         // given
         SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
@@ -191,7 +204,7 @@ class LetterControllerTest extends BaseControllerTest {
         ;
     }
 
-    private static Stream<Arguments> unAuthorizedUserCreateLetterParameters() {
+    private static Stream<Arguments> accessDeniedUserCreateLetterParameters() {
         return Stream.of(
             Arguments.of("New Title", "New Artist", "http://imageUrl", "Song story", 1L)
         );
