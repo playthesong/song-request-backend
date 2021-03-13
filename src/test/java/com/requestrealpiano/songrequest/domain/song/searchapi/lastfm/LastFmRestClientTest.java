@@ -1,49 +1,66 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.lastfm;
 
-import com.requestrealpiano.songrequest.config.searchapi.LastFmProperties;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@Disabled
-@SpringBootTest(classes = {LastFmRestClient.class, LastFmRestClientTest.TestConfiguration.class})
+@RestClientTest(LastFmRestClient.class)
 class LastFmRestClientTest {
 
     @Autowired
     LastFmRestClient lastFmRestClient;
 
-    @EnableConfigurationProperties(LastFmProperties.class)
-    public static class TestConfiguration { }
+    @Autowired
+    MockRestServiceServer server;
 
-    @Test
-    @DisplayName("검색 파라미터가 Null 또는 빈 문자열일 때 정상 실행 검증 테스트")
-    void test_when_track_or_artist_null() {
-        // given
-        String emptyArtist = "";
-        String emptyTitle = "";
-
-        // then
-        assertThatCode(() -> lastFmRestClient.searchLastFm(emptyArtist, emptyTitle)).doesNotThrowAnyException();
-        assertThatCode(() -> lastFmRestClient.searchLastFm(null, null)).doesNotThrowAnyException();
+    @BeforeEach
+    void setup() {
+        server = MockRestServiceServer.bindTo(new RestTemplate())
+                .build();
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("searchLastFmJsonResponseParameters")
     @DisplayName("LastFM JSON 결과 값 테스트")
-    void search_lastfm_json_response() {
+    void search_lastfm_json_response(Path jsonPath, String requestURI, String artist, String title) throws IOException {
         // given
-        String artist = "김동률";
-        String title = "감사";
+        String testJsonResponse = Files.readString(jsonPath);
 
         // when
-        String json = lastFmRestClient.searchLastFm(artist, title);
+        server.expect(requestTo(requestURI))
+              .andExpect(queryParam("artist", artist))
+              .andExpect(queryParam("title", title))
+              .andExpect(method(HttpMethod.GET))
+              .andRespond(withSuccess(testJsonResponse, MediaType.APPLICATION_JSON));
+
+        String jsonResponse = lastFmRestClient.searchLastFm(artist, title);
 
         // then
-        assertThat(json).contains(artist, title);
+        assertThat(jsonResponse).contains(artist);
+        assertThat(jsonResponse).contains(title);
+    }
+
+    private static Stream<Arguments> searchLastFmJsonResponseParameters() {
+        return Stream.of(
+                Arguments.of(Path.of("src/test/resources/expectedresponse/lastfm/lastfm_response.json"),
+                             "https://www.last.fm", "김동률", "감사")
+        );
     }
 }
