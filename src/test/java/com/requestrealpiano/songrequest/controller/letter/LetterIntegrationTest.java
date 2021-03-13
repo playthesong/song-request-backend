@@ -6,6 +6,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.testconfig.BaseIntegrationTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +29,21 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
     @Autowired
     AccountRepository accountRepository;
 
+    private Account account;
+    private SongRequest songRequest;
+    private NewLetterRequest newLetterRequest;
+
+    @BeforeEach
+    void setup() {
+        account = accountRepository.save(createMember());
+        songRequest = createSongRequest();
+        newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
+    }
+
     @Test
     @DisplayName("Valid JWT - 유효한 JWT 토큰과 함께 Letter 생성을 요청하는 테스트")
     void with_valid_jwt_create_letter() throws Exception {
         // given
-        Account account = accountRepository.save(createMember());
-        SongRequest songRequest = createSongRequest();
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
         String jwtToken = createValidJwtTokenOf(account);
 
         // when
@@ -57,9 +66,6 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Invalid JWT - 유효하지 않은 JWT 토큰과 함께 Letter 생성을 요청하는 테스트")
     void with_invalid_jwt_create_letter() throws Exception {
         // given
-        Account account = accountRepository.save(createMember());
-        SongRequest songRequest = createSongRequest();
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
         String invalidJwtToken = createInvalidJwtTokenOf(account);
 
         // when
@@ -82,9 +88,6 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Expired JWT - 만료된 JWT 토큰과 함께 Letter 생성을 요청하는 테스트")
     void with_expired_jwt_create_letter() throws Exception {
         // given
-        Account account = accountRepository.save(createMember());
-        SongRequest songRequest = createSongRequest();
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
         String expiredJwtToken = createExpiredJwtTokenOf(account);
 
         // when

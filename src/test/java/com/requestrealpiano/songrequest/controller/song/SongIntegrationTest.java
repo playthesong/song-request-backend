@@ -39,7 +39,7 @@ public class SongIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() {
-        account = accountRepository.save(createMember());
+        account = accountRepository.save(createMember());;
         title = "Title";
         artist = "Artist";
     }
@@ -62,10 +62,10 @@ public class SongIntegrationTest extends BaseIntegrationTest {
                                                       .accept(MediaType.APPLICATION_JSON));
         // then
         resultActions.andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("success").value(true))
-                .andExpect(jsonPath("statusMessage").value("OK"))
-                .andExpect(jsonPath("data").isNotEmpty())
+                     .andExpect(status().isOk())
+                     .andExpect(jsonPath("success").value(true))
+                     .andExpect(jsonPath("statusMessage").value("OK"))
+                     .andExpect(jsonPath("data").isNotEmpty())
         ;
     }
 
