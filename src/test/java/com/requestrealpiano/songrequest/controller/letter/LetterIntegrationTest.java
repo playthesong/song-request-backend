@@ -60,13 +60,13 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
         Account account = accountRepository.save(createMember());
         SongRequest songRequest = createSongRequest();
         NewLetterRequest newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
-        String expiredJwtToken = createInvalidJwtTokenOf(account);
+        String invalidJwtToken = createInvalidJwtTokenOf(account);
 
         // when
         ResultActions resultActions = mockMvc.perform(post("/api/letters")
                                                       .accept(APPLICATION_JSON)
                                                       .contentType(APPLICATION_JSON_VALUE)
-                                                      .header(HttpHeaders.AUTHORIZATION, expiredJwtToken)
+                                                      .header(HttpHeaders.AUTHORIZATION, invalidJwtToken)
                                                       .content(objectMapper.writeValueAsString(newLetterRequest)));
 
         // then
@@ -85,13 +85,13 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
         Account account = accountRepository.save(createMember());
         SongRequest songRequest = createSongRequest();
         NewLetterRequest newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
-        String invalidJwtToken = createExpiredJwtTokenOf(account);
+        String expiredJwtToken = createExpiredJwtTokenOf(account);
 
         // when
         ResultActions resultActions = mockMvc.perform(post("/api/letters")
                                                       .accept(APPLICATION_JSON)
                                                       .contentType(APPLICATION_JSON_VALUE)
-                                                      .header(HttpHeaders.AUTHORIZATION, invalidJwtToken)
+                                                      .header(HttpHeaders.AUTHORIZATION, expiredJwtToken)
                                                       .content(objectMapper.writeValueAsString(newLetterRequest)));
 
         // then
