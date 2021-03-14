@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.controller.account;
 
 import com.requestrealpiano.songrequest.controller.AccountController;
 import com.requestrealpiano.songrequest.controller.MockMvcRequest;
+import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.service.AccountService;
@@ -53,9 +54,7 @@ class AccountControllerTest extends BaseControllerTest {
                                                 .doRequest());
 
         // then
-        results.andDo(print())
-               .andExpect(header().string(HttpHeaders.AUTHORIZATION, jwtToken))
-               .andExpect(status().isCreated())
-        ;
+        MockMvcResponse.NO_CONTENT(results)
+                       .andExpect(header().string(HttpHeaders.AUTHORIZATION, jwtToken));
     }
 }

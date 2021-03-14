@@ -13,9 +13,22 @@ public class MockMvcResponse {
     public static ResultActions OK(ResultActions resultActions) throws Exception {
         return resultActions.andDo(print())
                             .andExpect(status().isOk())
-                            .andExpect(jsonPath("success").value(true))
-                            .andExpect(jsonPath("statusMessage").value("OK"))
+                            .andExpect(jsonPath("statusCode").value(200))
                             .andExpect(jsonPath("data").isNotEmpty());
+    }
+
+    // CREATED
+    public static ResultActions CREATED(ResultActions resultActions) throws Exception {
+        return resultActions.andDo(print())
+                            .andExpect(status().isCreated())
+                            .andExpect(jsonPath("statusCode").value(201))
+                            .andExpect(jsonPath("data").isNotEmpty());
+    }
+
+    // NO CONTENT
+    public static ResultActions NO_CONTENT(ResultActions resultActions) throws Exception {
+        return resultActions.andDo(print())
+                            .andExpect(status().isNoContent());
     }
 
     // BAD REQUEST

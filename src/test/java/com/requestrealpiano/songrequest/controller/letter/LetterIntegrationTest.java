@@ -54,7 +54,7 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
                                                 .doRequest());
 
         // then
-        MockMvcResponse.OK(results);
+        MockMvcResponse.CREATED(results);
     }
 
     @Test

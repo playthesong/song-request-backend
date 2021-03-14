@@ -123,7 +123,7 @@ class LetterControllerTest extends BaseControllerTest {
                                                 .doRequest());
 
         // then
-        MockMvcResponse.OK(results)
+        MockMvcResponse.CREATED(results)
                        .andDo(document("create-letter",
                                requestFields(RequestFields.createLetter()),
                                responseFields(ResponseFields.common())
