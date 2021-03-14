@@ -24,24 +24,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = SongController.class,
             excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class))
@@ -64,9 +62,10 @@ class SongControllerTest extends BaseControllerTest {
         // when
         when(songService.searchSong(artist, title)).thenReturn(maniaDbResponse);
 
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs")
-                                                              .param("artist", artist)
-                                                              .param("title", title));
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .doRequest());
 
         // then
         MockMvcResponse.OK(results)
@@ -87,9 +86,10 @@ class SongControllerTest extends BaseControllerTest {
         ErrorCode invalidInputValueError = ErrorCode.INVALID_INPUT_VALUE;
 
         // when
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs")
-                                                              .param("artist", artist)
-                                                              .param("title", title));
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .doRequest());
 
 
         // then
@@ -117,9 +117,10 @@ class SongControllerTest extends BaseControllerTest {
         // when
         when(songService.searchSong(artist, title)).thenReturn(response);
 
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs")
-                                                             .param("artist", artist)
-                                                             .param("title", title));
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .doRequest());
 
         // then
         MockMvcResponse.OK(results);
@@ -134,9 +135,10 @@ class SongControllerTest extends BaseControllerTest {
         ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
 
         // when
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs")
-                                                              .param("artist", artist)
-                                                              .param("title", title));
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .doRequest());
 
         // then
         MockMvcResponse.FORBIDDEN(results, accessDeniedError)

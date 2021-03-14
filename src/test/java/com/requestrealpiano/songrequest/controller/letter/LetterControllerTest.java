@@ -34,6 +34,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,7 +66,8 @@ class LetterControllerTest extends BaseControllerTest {
         // when
         when(letterService.findAllLetters()).thenReturn(letterResponses);
 
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/letters"));
+        ResultActions results = mockMvc.perform(get("/api/letters")
+                                                .doRequest());
 
         // then
         MockMvcResponse.OK(results)
@@ -87,7 +90,8 @@ class LetterControllerTest extends BaseControllerTest {
         // when
         when(letterService.findLetter(letterId)).thenReturn(letterResponse);
 
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/letters/{id}", letterId));
+        ResultActions results = mockMvc.perform(get("/api/letters/{id}", letterId)
+                                                .doRequest());
 
         // then
         MockMvcResponse.OK(results)
@@ -114,7 +118,9 @@ class LetterControllerTest extends BaseControllerTest {
         // when
         when(letterService.createNewLetter(any(NewLetterRequest.class))).thenReturn(response);
 
-        ResultActions results = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody));
+        ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withBody(requestBody)
+                                                .doRequest());
 
         // then
         MockMvcResponse.OK(results)
@@ -139,7 +145,9 @@ class LetterControllerTest extends BaseControllerTest {
         ErrorCode invalidInputError = ErrorCode.INVALID_INPUT_VALUE;
 
         // when
-        ResultActions results = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody));
+        ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withBody(requestBody)
+                                                .doRequest());
 
         // then
         MockMvcResponse.BAD_REQUEST(results, invalidInputError)
@@ -162,7 +170,9 @@ class LetterControllerTest extends BaseControllerTest {
         String requestBody = objectMapper.writeValueAsString(newLetterRequest);
 
         // when
-        ResultActions results = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody));
+        ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withBody(requestBody)
+                                                .doRequest());
 
         // then
         MockMvcResponse.FORBIDDEN(results, accessDeniedError)

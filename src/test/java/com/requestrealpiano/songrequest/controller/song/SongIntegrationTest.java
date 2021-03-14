@@ -15,10 +15,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.JwtFactory.*;
 import static org.mockito.Mockito.when;
@@ -57,9 +59,11 @@ public class SongIntegrationTest extends BaseIntegrationTest {
         // when
         when(maniaDbRestClient.searchManiaDb(artist, title)).thenReturn(testXmlResponse);
 
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs", jwtToken)
-                                                              .param("artist", artist)
-                                                              .param("title", title));
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .withToken(jwtToken)
+                                                .doRequest());
 
         // then
         MockMvcResponse.OK(results);
@@ -73,9 +77,11 @@ public class SongIntegrationTest extends BaseIntegrationTest {
         ErrorCode invalidJwtError = ErrorCode.JWT_INVALID_ERROR;
 
         // when
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs", invalidJwtToken)
-                                                              .param("artist", artist)
-                                                              .param("title", title));
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .withToken(invalidJwtToken)
+                                                .doRequest());
 
         // then
         MockMvcResponse.BAD_REQUEST(results, invalidJwtError);
@@ -89,9 +95,11 @@ public class SongIntegrationTest extends BaseIntegrationTest {
         ErrorCode jwtExpirationError = ErrorCode.JWT_EXPIRATION_ERROR;
 
         // when
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs", expiredJwtToken)
-                                                              .param("artist", artist)
-                                                              .param("title", title));
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .withToken(expiredJwtToken)
+                                                .doRequest());
 
         // then
         MockMvcResponse.UNAUTHORIZED(results, jwtExpirationError);

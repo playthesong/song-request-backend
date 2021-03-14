@@ -1,6 +1,5 @@
 package com.requestrealpiano.songrequest.controller.account;
 
-import com.requestrealpiano.songrequest.controller.MockMvcRequest;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
@@ -13,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.JwtFactory.createExpiredGenerationKeyOf;
 import static com.requestrealpiano.songrequest.testobject.JwtFactory.createInvalidGenerationKeyOf;
@@ -40,7 +40,9 @@ public class AccountIntegrationTest extends BaseIntegrationTest {
         ErrorCode jwtInvalidError = ErrorCode.JWT_INVALID_ERROR;
 
         // when
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/accounts/auth", invalidGenerationKey));
+        ResultActions results = mockMvc.perform(get("/api/accounts/auth")
+                                                .withToken(invalidGenerationKey)
+                                                .doRequest());
 
         // then
         MockMvcResponse.BAD_REQUEST(results, jwtInvalidError);
@@ -54,7 +56,9 @@ public class AccountIntegrationTest extends BaseIntegrationTest {
         ErrorCode jwtExpirationError = ErrorCode.JWT_EXPIRATION_ERROR;
 
         // when
-        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/accounts/auth", expiredGenerationKey));
+        ResultActions results = mockMvc.perform(get("/api/accounts/auth")
+                                                .withToken(expiredGenerationKey)
+                                                .doRequest());
 
         // then
         MockMvcResponse.UNAUTHORIZED(results, jwtExpirationError);
