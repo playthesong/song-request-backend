@@ -18,8 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
-import static com.requestrealpiano.songrequest.testobject.JwtFactory.createValidGenerationKeyOf;
-import static com.requestrealpiano.songrequest.testobject.JwtFactory.createValidJwtTokenOf;
+import static com.requestrealpiano.songrequest.testobject.JwtFactory.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
