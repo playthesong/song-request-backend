@@ -10,36 +10,52 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 public class MockMvcRequest {
 
-    // GET
-    public static MockHttpServletRequestBuilder get(String url) {
-        return MockMvcRequestBuilders.get(url)
-                                     .accept(MediaType.APPLICATION_JSON);
+    public static MockRequest get(String url) {
+        MockRequest request = new MockRequest();
+        request.mockHttpServletRequestBuilder = MockMvcRequestBuilders.get(url)
+                                                                      .accept(MediaType.APPLICATION_JSON);
+        return request;
     }
 
-    public static MockHttpServletRequestBuilder get(String url, String jwtToken) {
-        return MockMvcRequestBuilders.get(url)
-                                     .accept(APPLICATION_JSON)
-                                     .header(HttpHeaders.AUTHORIZATION, jwtToken);
+    public static MockRequest get(String url, Long pathVariable) {
+        MockRequest request = new MockRequest();
+        request.mockHttpServletRequestBuilder = RestDocumentationRequestBuilders.get(url, pathVariable)
+                                                                                .accept(MediaType.APPLICATION_JSON);
+        return request;
     }
 
-    public static MockHttpServletRequestBuilder get(String url, Long pathVariable) {
-        return RestDocumentationRequestBuilders.get(url, pathVariable)
-                                               .accept(MediaType.APPLICATION_JSON);
+    public static MockRequest post(String url) {
+        MockRequest request = new MockRequest();
+        request.mockHttpServletRequestBuilder = MockMvcRequestBuilders.post(url)
+                                                                      .accept(APPLICATION_JSON);
+        return request;
     }
 
-    // POST
-    public static MockHttpServletRequestBuilder post(String url, String content) {
-        return MockMvcRequestBuilders.post(url)
-                                     .accept(APPLICATION_JSON)
-                                     .contentType(APPLICATION_JSON)
-                                     .content(content);
-    }
+    public static class MockRequest {
 
-    public static MockHttpServletRequestBuilder post(String url, String content, String jwtToken) {
-        return MockMvcRequestBuilders.post(url)
-                                     .accept(APPLICATION_JSON)
-                                     .contentType(APPLICATION_JSON)
-                                     .content(content)
-                                     .header(HttpHeaders.AUTHORIZATION, jwtToken);
+        private MockHttpServletRequestBuilder mockHttpServletRequestBuilder;
+
+        private MockRequest() {
+        }
+
+        public MockRequest withParam(String name, String value) {
+            this.mockHttpServletRequestBuilder.param(name, value);
+            return this;
+        }
+
+        public MockRequest withBody(String requestBody) {
+            this.mockHttpServletRequestBuilder.contentType(APPLICATION_JSON)
+                                              .content(requestBody);
+            return this;
+        }
+
+        public MockRequest withToken(String jwtToken) {
+            this.mockHttpServletRequestBuilder.header(HttpHeaders.AUTHORIZATION, jwtToken);
+            return this;
+        }
+
+        public MockHttpServletRequestBuilder doRequest() {
+            return this.mockHttpServletRequestBuilder;
+        }
     }
 }
