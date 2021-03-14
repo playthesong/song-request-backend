@@ -1,5 +1,7 @@
 package com.requestrealpiano.songrequest.controller.song;
 
+import com.requestrealpiano.songrequest.controller.MockMvcRequest;
+import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
@@ -39,7 +41,7 @@ public class SongIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     void setup() {
-        account = accountRepository.save(createMember());;
+        account = accountRepository.save(createMember());
         title = "Title";
         artist = "Artist";
     }
@@ -55,18 +57,12 @@ public class SongIntegrationTest extends BaseIntegrationTest {
         // when
         when(maniaDbRestClient.searchManiaDb(artist, title)).thenReturn(testXmlResponse);
 
-        ResultActions resultActions = mockMvc.perform(get("/api/songs")
-                                                      .param("artist", artist)
-                                                      .param("title", title)
-                                                      .header(HttpHeaders.AUTHORIZATION, jwtToken)
-                                                      .accept(MediaType.APPLICATION_JSON));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs", jwtToken)
+                                                              .param("artist", artist)
+                                                              .param("title", title));
+
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isOk())
-                     .andExpect(jsonPath("success").value(true))
-                     .andExpect(jsonPath("statusMessage").value("OK"))
-                     .andExpect(jsonPath("data").isNotEmpty())
-        ;
+        MockMvcResponse.OK(results);
     }
 
     @Test
@@ -77,19 +73,12 @@ public class SongIntegrationTest extends BaseIntegrationTest {
         ErrorCode invalidJwtError = ErrorCode.JWT_INVALID_ERROR;
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/api/songs")
-                                                      .param("artist", artist)
-                                                      .param("title", title)
-                                                      .header(HttpHeaders.AUTHORIZATION, invalidJwtToken)
-                                                      .accept(MediaType.APPLICATION_JSON));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs", invalidJwtToken)
+                                                              .param("artist", artist)
+                                                              .param("title", title));
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(invalidJwtError.getStatusCode()))
-                     .andExpect(jsonPath("message").value(invalidJwtError.getMessage()))
-                     .andExpect(jsonPath("errors").isEmpty())
-        ;
+        MockMvcResponse.BAD_REQUEST(results, invalidJwtError);
     }
 
     @Test
@@ -100,18 +89,11 @@ public class SongIntegrationTest extends BaseIntegrationTest {
         ErrorCode jwtExpirationError = ErrorCode.JWT_EXPIRATION_ERROR;
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/api/songs")
-                                                      .param("artist", artist)
-                                                      .param("title", title)
-                                                      .header(HttpHeaders.AUTHORIZATION, expiredJwtToken)
-                                                      .accept(MediaType.APPLICATION_JSON));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs", expiredJwtToken)
+                                                              .param("artist", artist)
+                                                              .param("title", title));
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isUnauthorized())
-                     .andExpect(jsonPath("statusCode").value(jwtExpirationError.getStatusCode()))
-                     .andExpect(jsonPath("message").value(jwtExpirationError.getMessage()))
-                     .andExpect(jsonPath("errors").isEmpty())
-        ;
+        MockMvcResponse.UNAUTHORIZED(results, jwtExpirationError);
     }
 }

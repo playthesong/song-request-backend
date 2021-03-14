@@ -1,5 +1,7 @@
 package com.requestrealpiano.songrequest.controller.song;
 
+import com.requestrealpiano.songrequest.controller.MockMvcRequest;
+import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.SongController;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
@@ -58,26 +60,21 @@ class SongControllerTest extends BaseControllerTest {
     void search_mania_db(String artist, String title) throws Exception {
         // given
         SearchApiResponse maniaDbResponse = createMockManiaDbResponse();
-        int totalCount = maniaDbResponse.getTotalCount();
 
         // when
         when(songService.searchSong(artist, title)).thenReturn(maniaDbResponse);
-        ResultActions result = mockMvc.perform(get("/api/songs")
-                                                .param("artist", artist)
-                                                .param("title", title)
-                                                .accept(MediaType.APPLICATION_JSON));
+
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs")
+                                                              .param("artist", artist)
+                                                              .param("title", title));
 
         // then
-        result.andDo(print())
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("success").value(true))
-              .andExpect(jsonPath("statusMessage").value("OK"))
-              .andExpect(jsonPath("data.totalCount").value(totalCount))
-              .andDo(document("search-song",
-                      requestParameters(Parameters.searchSong()),
-                      responseFields(ResponseFields.common())
-                              .andWithPrefix("data.", ResponseFields.searchSongResult())
-              ))
+        MockMvcResponse.OK(results)
+                       .andDo(document("search-song",
+                               requestParameters(Parameters.searchSong()),
+                               responseFields(ResponseFields.common())
+                                       .andWithPrefix("data.", ResponseFields.searchSongResult())
+                       ))
         ;
     }
 
@@ -86,20 +83,20 @@ class SongControllerTest extends BaseControllerTest {
     @WithMember
     @DisplayName("BAD_REQUEST - 유효하지 않은 제목, 아티스트로 요청 테스트")
     void search_by_invalid_params(String artist, String title) throws Exception {
+        // given
+        ErrorCode invalidInputValueError = ErrorCode.INVALID_INPUT_VALUE;
+
         // when
-        ResultActions resultActions = mockMvc.perform(get("/api/songs")
-                                                      .param("artist", artist)
-                                                      .param("title", title)
-                                                      .accept(MediaType.APPLICATION_JSON));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs")
+                                                              .param("artist", artist)
+                                                              .param("title", title));
+
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
-                     .andDo(document("search-song-error",
-                             responseFields(ResponseFields.error())
-                     ))
+        MockMvcResponse.BAD_REQUEST(results, invalidInputValueError)
+                       .andDo(document("search-song-error",
+                               responseFields(ResponseFields.error())
+                       ))
         ;
     }
 
@@ -115,24 +112,17 @@ class SongControllerTest extends BaseControllerTest {
                                        .imageUrl(imageUrl)
                                        .build();
         List<LastFmTrack> tracks = Collections.singletonList(track);
-        int totalCount = tracks.size();
         SearchApiResponse response = SearchApiResponse.from(tracks);
 
         // when
         when(songService.searchSong(artist, title)).thenReturn(response);
 
-        ResultActions result = mockMvc.perform(get("/api/songs")
-                                               .param("artist", artist)
-                                               .param("title", title)
-                                               .accept(MediaType.APPLICATION_JSON));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs")
+                                                             .param("artist", artist)
+                                                             .param("title", title));
 
         // then
-        result.andDo(print())
-              .andExpect(status().isOk())
-              .andExpect(jsonPath("success").value(true))
-              .andExpect(jsonPath("statusMessage").value("OK"))
-              .andExpect(jsonPath("data.totalCount").value(totalCount))
-        ;
+        MockMvcResponse.OK(results);
     }
 
     @ParameterizedTest
@@ -144,19 +134,15 @@ class SongControllerTest extends BaseControllerTest {
         ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/api/songs")
-                                                      .param("artist", artist)
-                                                      .param("title", title)
-                                                      .accept(MediaType.APPLICATION_JSON));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/songs")
+                                                              .param("artist", artist)
+                                                              .param("title", title));
 
         // then
-        resultActions.andDo(print())
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("statusCode").value(accessDeniedError.getStatusCode()))
-                .andExpect(jsonPath("message").value(accessDeniedError.getMessage()))
-                .andDo(document("search-song-error",
-                        responseFields(ResponseFields.error())
-                ))
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError)
+                       .andDo(document("search-song-error",
+                               responseFields(ResponseFields.error())
+                       ))
         ;
     }
 
