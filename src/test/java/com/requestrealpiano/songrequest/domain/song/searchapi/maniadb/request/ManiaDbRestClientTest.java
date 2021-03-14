@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.request;
 
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+@Disabled
 @RestClientTest(ManiaDbRestClient.class)
 class ManiaDbRestClientTest {
 
