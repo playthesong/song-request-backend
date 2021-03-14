@@ -1,5 +1,7 @@
 package com.requestrealpiano.songrequest.controller.account;
 
+import com.requestrealpiano.songrequest.controller.MockMvcRequest;
+import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
@@ -9,17 +11,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.JwtFactory.createExpiredGenerationKeyOf;
 import static com.requestrealpiano.songrequest.testobject.JwtFactory.createInvalidGenerationKeyOf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class AccountIntegrationTest extends BaseIntegrationTest {
 
@@ -44,16 +40,10 @@ public class AccountIntegrationTest extends BaseIntegrationTest {
         ErrorCode jwtInvalidError = ErrorCode.JWT_INVALID_ERROR;
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/api/accounts/auth")
-                                                      .accept(MediaType.APPLICATION_JSON)
-                                                      .header(HttpHeaders.AUTHORIZATION, invalidGenerationKey));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/accounts/auth", invalidGenerationKey));
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(jwtInvalidError.getStatusCode()))
-                     .andExpect(jsonPath("message").value(jwtInvalidError.getMessage()))
-        ;
+        MockMvcResponse.BAD_REQUEST(results, jwtInvalidError);
     }
 
     @Test
@@ -64,15 +54,9 @@ public class AccountIntegrationTest extends BaseIntegrationTest {
         ErrorCode jwtExpirationError = ErrorCode.JWT_EXPIRATION_ERROR;
 
         // when
-        ResultActions resultActions = mockMvc.perform(get("/api/accounts/auth")
-                                                      .accept(MediaType.APPLICATION_JSON)
-                                                      .header(HttpHeaders.AUTHORIZATION, expiredGenerationKey));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/accounts/auth", expiredGenerationKey));
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isUnauthorized())
-                     .andExpect(jsonPath("statusCode").value(jwtExpirationError.getStatusCode()))
-                     .andExpect(jsonPath("message").value(jwtExpirationError.getMessage()))
-        ;
+        MockMvcResponse.UNAUTHORIZED(results, jwtExpirationError);
     }
 }

@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.controller.account;
 
 import com.requestrealpiano.songrequest.controller.AccountController;
+import com.requestrealpiano.songrequest.controller.MockMvcRequest;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.service.AccountService;
@@ -46,14 +47,12 @@ class AccountControllerTest extends BaseControllerTest {
         // when
         when(accountService.generateJwtToken(validGenerationKey)).thenReturn(jwtToken);
 
-        ResultActions resultActions = mockMvc.perform(get("/api/accounts/auth")
-                                                      .accept(MediaType.APPLICATION_JSON)
-                                                      .header(HttpHeaders.AUTHORIZATION, validGenerationKey));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/accounts/auth", validGenerationKey));
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(header().string(HttpHeaders.AUTHORIZATION, jwtToken))
-                     .andExpect(status().isCreated())
+        results.andDo(print())
+               .andExpect(header().string(HttpHeaders.AUTHORIZATION, jwtToken))
+               .andExpect(status().isCreated())
         ;
     }
 }

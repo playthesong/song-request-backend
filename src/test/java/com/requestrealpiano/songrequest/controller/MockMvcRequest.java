@@ -16,6 +16,12 @@ public class MockMvcRequest {
                                      .accept(MediaType.APPLICATION_JSON);
     }
 
+    public static MockHttpServletRequestBuilder get(String url, String jwtToken) {
+        return MockMvcRequestBuilders.get(url)
+                                     .accept(APPLICATION_JSON)
+                                     .header(HttpHeaders.AUTHORIZATION, jwtToken);
+    }
+
     public static MockHttpServletRequestBuilder get(String url, Long pathVariable) {
         return RestDocumentationRequestBuilders.get(url, pathVariable)
                                                .accept(MediaType.APPLICATION_JSON);
