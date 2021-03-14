@@ -21,48 +21,76 @@ public class JwtFactory {
      *
      */
 
-    // JwtProperties
-    public static JwtProperties createJwtProperties() {
+    // JwtProperties - Valid
+    public static JwtProperties createValidJwtProperties() {
         return new JwtProperties("TestJwtSecret", "100000", "Authorization",
                      "Bearer ", "http://localhost:3000", "TestGenerationKeySecret", "10000");
     }
 
-    public static JwtProperties createJwtPropertiesOf(String tokenSecret, String tokenExpiration, String header,
-                                                      String headerPrefix, String tokenUrl, String generationKeySecret,
-                                                      String generationKeyExpiration) {
-        return new JwtProperties(tokenSecret, tokenExpiration, header, headerPrefix, tokenUrl, generationKeySecret,
-                                 generationKeyExpiration);
+    // JwtProperties - Invalid
+    public static JwtProperties createInvalidJwtProperties() {
+        return new JwtProperties("InvalidJwtTokenSecret", "10000",
+                          "Authorization", "Bearer ", "http://localhost:3000", "InvalidTestGenerationKey", "10000");
     }
 
-    // JwtTokenProvider
-    public static JwtTokenProvider createJwtTokenProvider() {
-        return new JwtTokenProvider(createJwtProperties());
+    // JwtProperties - Expired
+    public static JwtProperties createExpiredJwtProperties() {
+        return new JwtProperties("TestJwtSecret", "0", "Authorization",
+                     "Bearer ", "http://localhost:3000", "TestGenerationKeySecret", "10000");
+    }
+
+    // JwtProperties - Invalid GenerationKey
+    public static JwtProperties createInvalidGenerationKeyJwtProperties() {
+        return new JwtProperties("TestJwtSecret", "100000", "Authorization",
+                     "Bearer ", "http://localhost:3000", "InvalidGenerationKeySecret", "10000");
+    }
+
+    // JwtProperties - Expired GenerationKey
+    public static JwtProperties createExpiredGenerationKeyJwtProperties() {
+        return new JwtProperties("TestJwtSecret", "100000", "Authorization",
+                     "Bearer ", "http://localhost:3000", "InvalidGenerationKeySecret", "0");
     }
 
     // JwtToken - Valid
-    public static String createValidJwtToken() {
-        JwtTokenProvider jwtTokenProvider = createJwtTokenProvider();
-        return jwtTokenProvider.createJwtToken(createMember());
-    }
-
     public static String createValidJwtTokenOf(Account account) {
-        JwtTokenProvider jwtTokenProvider = createJwtTokenProvider();
+        JwtProperties jwtProperties = createValidJwtProperties();
+        JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(jwtProperties);
         return jwtTokenProvider.createJwtToken(account);
     }
 
     // JwtToken - Invalid
     public static String createInvalidJwtTokenOf(Account account) {
-        JwtProperties jwtProperties = createJwtPropertiesOf("InvalidJwtTokenSecret", "10000",
-                                                     "Authorization", "Bearer ", "http://localhost:3000", "InvalidTestGenerationKey", "10000");
+        JwtProperties jwtProperties = createInvalidJwtProperties();
         JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(jwtProperties);
         return jwtTokenProvider.createJwtToken(account);
     }
 
     // JwtToken - Expired
     public static String createExpiredJwtTokenOf(Account account) {
-        JwtProperties jwtProperties = createJwtPropertiesOf("TestJwtSecret", "0", "Authorization",
-                                                "Bearer ", "http://localhost:3000", "TestGenerationKeySecret", "10000");
+        JwtProperties jwtProperties = createExpiredJwtProperties();
         JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(jwtProperties);
         return jwtTokenProvider.createJwtToken(account);
     }
+
+    // GenerationKey - Valid
+    public static String createValidGenerationKeyOf(String email) {
+        JwtProperties jwtProperties = createValidJwtProperties();
+        JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(jwtProperties);
+        return "Bearer " + jwtTokenProvider.createGenerationKey(email);
+    }
+
+    // GenerationKey - Invalid
+    public static String createInvalidGenerationKeyOf(String email) {
+        JwtProperties jwtProperties = createInvalidGenerationKeyJwtProperties();
+        JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(jwtProperties);
+        return "Bearer " + jwtTokenProvider.createGenerationKey(email);
+    }
+
+    // GenerationKey - Expired
+    public static String createExpiredGenerationKeyOf(String email) {
+        JwtProperties jwtProperties = createExpiredGenerationKeyJwtProperties();
+        JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(jwtProperties);
+        return "Bearer " + jwtTokenProvider.createGenerationKey(email);
+    }
+
 }
