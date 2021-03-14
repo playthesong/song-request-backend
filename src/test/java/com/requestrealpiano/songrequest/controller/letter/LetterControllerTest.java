@@ -64,10 +64,10 @@ class LetterControllerTest extends BaseControllerTest {
         // when
         when(letterService.findAllLetters()).thenReturn(letterResponses);
 
-        ResultActions result = mockMvc.perform(MockMvcRequest.get("/api/letters"));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/letters"));
 
         // then
-        MockMvcResponse.OK(result)
+        MockMvcResponse.OK(results)
                        .andDo(document("find-letters",
                            responseFields(ResponseFields.common())
                                    .andWithPrefix("data[].", ResponseFields.letter()),
@@ -87,10 +87,10 @@ class LetterControllerTest extends BaseControllerTest {
         // when
         when(letterService.findLetter(letterId)).thenReturn(letterResponse);
 
-        ResultActions result = mockMvc.perform(MockMvcRequest.get("/api/letters/{id}", letterId));
+        ResultActions results = mockMvc.perform(MockMvcRequest.get("/api/letters/{id}", letterId));
 
         // then
-        MockMvcResponse.OK(result)
+        MockMvcResponse.OK(results)
                        .andDo(document("find-letter",
                                pathParameters(Parameters.letterId()),
                                responseFields(ResponseFields.common())
@@ -114,10 +114,10 @@ class LetterControllerTest extends BaseControllerTest {
         // when
         when(letterService.createNewLetter(any(NewLetterRequest.class))).thenReturn(response);
 
-        ResultActions result = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody));
+        ResultActions results = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody));
 
         // then
-        MockMvcResponse.OK(result)
+        MockMvcResponse.OK(results)
                        .andDo(document("create-letter",
                                requestFields(RequestFields.createLetter()),
                                responseFields(ResponseFields.common())
@@ -139,10 +139,10 @@ class LetterControllerTest extends BaseControllerTest {
         ErrorCode invalidInputError = ErrorCode.INVALID_INPUT_VALUE;
 
         // when
-        ResultActions result = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody));
+        ResultActions results = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody));
 
         // then
-        MockMvcResponse.BAD_REQUEST(result, invalidInputError)
+        MockMvcResponse.BAD_REQUEST(results, invalidInputError)
                        .andDo(document("create-letter-invalid-parameters",
                                responseFields(ResponseFields.error())
                        ))
@@ -162,10 +162,10 @@ class LetterControllerTest extends BaseControllerTest {
         String requestBody = objectMapper.writeValueAsString(newLetterRequest);
 
         // when
-        ResultActions result = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody));
+        ResultActions results = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody));
 
         // then
-        MockMvcResponse.FORBIDDEN(result, accessDeniedError)
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError)
                        .andDo(document("create-letter-unauthorized",
                                responseFields(ResponseFields.error())
                        ))

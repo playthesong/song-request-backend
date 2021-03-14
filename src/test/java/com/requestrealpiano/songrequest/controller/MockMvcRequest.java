@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.controller;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
@@ -26,5 +27,13 @@ public class MockMvcRequest {
                                      .accept(APPLICATION_JSON)
                                      .contentType(APPLICATION_JSON)
                                      .content(content);
+    }
+
+    public static MockHttpServletRequestBuilder post(String url, String content, String jwtToken) {
+        return MockMvcRequestBuilders.post(url)
+                                     .accept(APPLICATION_JSON)
+                                     .contentType(APPLICATION_JSON)
+                                     .content(content)
+                                     .header(HttpHeaders.AUTHORIZATION, jwtToken);
     }
 }

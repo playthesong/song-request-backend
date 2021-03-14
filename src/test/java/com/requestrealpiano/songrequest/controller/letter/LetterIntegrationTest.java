@@ -1,5 +1,7 @@
 package com.requestrealpiano.songrequest.controller.letter;
 
+import com.requestrealpiano.songrequest.controller.MockMvcRequest;
+import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
@@ -10,19 +12,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.JwtFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.createNewLetterRequestOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequest;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class LetterIntegrationTest extends BaseIntegrationTest {
 
@@ -45,21 +40,13 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
     void with_valid_jwt_create_letter() throws Exception {
         // given
         String jwtToken = createValidJwtTokenOf(account);
+        String requestBody = objectMapper.writeValueAsString(newLetterRequest);
 
         // when
-        ResultActions resultActions = mockMvc.perform(post("/api/letters")
-                                                      .accept(APPLICATION_JSON)
-                                                      .contentType(APPLICATION_JSON_VALUE)
-                                                      .header(HttpHeaders.AUTHORIZATION, jwtToken)
-                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
+        ResultActions results = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody, jwtToken));
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isOk())
-                     .andExpect(jsonPath("success").value(true))
-                     .andExpect(jsonPath("statusMessage").value("OK"))
-                     .andExpect(jsonPath("data").isNotEmpty())
-        ;
+        MockMvcResponse.OK(results);
     }
 
     @Test
@@ -67,21 +54,14 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
     void with_invalid_jwt_create_letter() throws Exception {
         // given
         String invalidJwtToken = createInvalidJwtTokenOf(account);
+        String requestBody = objectMapper.writeValueAsString(newLetterRequest);
+        ErrorCode jwtInvalidError = ErrorCode.JWT_INVALID_ERROR;
 
         // when
-        ResultActions resultActions = mockMvc.perform(post("/api/letters")
-                                                      .accept(APPLICATION_JSON)
-                                                      .contentType(APPLICATION_JSON_VALUE)
-                                                      .header(HttpHeaders.AUTHORIZATION, invalidJwtToken)
-                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
+        ResultActions results = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody, invalidJwtToken));
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.JWT_INVALID_ERROR.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.JWT_INVALID_ERROR.getMessage()))
-                     .andExpect(jsonPath("errors").isEmpty())
-        ;
+        MockMvcResponse.BAD_REQUEST(results, jwtInvalidError);
     }
 
     @Test
@@ -89,20 +69,13 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
     void with_expired_jwt_create_letter() throws Exception {
         // given
         String expiredJwtToken = createExpiredJwtTokenOf(account);
+        String requestBody = objectMapper.writeValueAsString(newLetterRequest);
+        ErrorCode jwtExpirationError = ErrorCode.JWT_EXPIRATION_ERROR;
 
         // when
-        ResultActions resultActions = mockMvc.perform(post("/api/letters")
-                                                      .accept(APPLICATION_JSON)
-                                                      .contentType(APPLICATION_JSON_VALUE)
-                                                      .header(HttpHeaders.AUTHORIZATION, expiredJwtToken)
-                                                      .content(objectMapper.writeValueAsString(newLetterRequest)));
+        ResultActions results = mockMvc.perform(MockMvcRequest.post("/api/letters", requestBody, expiredJwtToken));
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isUnauthorized())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.JWT_EXPIRATION_ERROR.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.JWT_EXPIRATION_ERROR.getMessage()))
-                     .andExpect(jsonPath("errors").isEmpty())
-        ;
+        MockMvcResponse.UNAUTHORIZED(results, jwtExpirationError);
     }
 }

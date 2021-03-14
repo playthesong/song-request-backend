@@ -26,6 +26,14 @@ public class MockMvcResponse {
                             .andExpect(jsonPath("message").value(errorCode.getMessage()));
     }
 
+    // UNAUTHORIZED
+    public static ResultActions UNAUTHORIZED(ResultActions resultActions, ErrorCode errorCode) throws Exception {
+        return resultActions.andDo(print())
+                            .andExpect(status().isUnauthorized())
+                            .andExpect(jsonPath("statusCode").value(errorCode.getStatusCode()))
+                            .andExpect(jsonPath("message").value(errorCode.getMessage()));
+    }
+
     // FORBIDDEN
     public static ResultActions FORBIDDEN(ResultActions resultActions, ErrorCode errorCode) throws Exception {
         return resultActions.andDo(print())
