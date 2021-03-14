@@ -5,17 +5,15 @@ import lombok.Getter;
 @Getter
 public class ApiResponse<T> {
 
-    private final boolean success;
-    private final String statusMessage;
+    private final int statusCode;
     private final T data;
 
-    private ApiResponse(boolean success, String statusMessage, T data) {
-        this.success = success;
-        this.statusMessage = statusMessage;
+    private ApiResponse(int statusCode, T data) {
+        this.statusCode = statusCode;
         this.data = data;
     }
 
-    public static <T> ApiResponse<T> OK(T data) {
-        return new ApiResponse<>(true, "OK", data);
+    public static <T> ApiResponse<T> SUCCESS(StatusCode statusCode, T data) {
+        return new ApiResponse<>(statusCode.getCode(), data);
     }
 }

@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.config.security.jwt;
+package com.requestrealpiano.songrequest.security.jwt;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +15,7 @@ public class JwtProperties {
     private final String tokenExpiration;
     private final String header;
     private final String headerPrefix;
-    private final String tokenDomain;
     private final String tokenUrl;
+    private final String generationKeySecret;
+    private final String generationKeyExpiration;
 }

@@ -1,6 +1,5 @@
 package com.requestrealpiano.songrequest.service.searchapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.JsonTranslator;

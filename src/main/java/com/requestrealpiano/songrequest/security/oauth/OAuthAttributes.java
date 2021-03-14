@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.config.security.oauth;
+package com.requestrealpiano.songrequest.security.oauth;
 
 import lombok.Builder;
 import lombok.Getter;

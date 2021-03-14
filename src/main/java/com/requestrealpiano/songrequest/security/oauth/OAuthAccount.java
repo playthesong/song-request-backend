@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.config.security.oauth;
+package com.requestrealpiano.songrequest.security.oauth;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import lombok.Builder;
@@ -35,8 +35,22 @@ public class OAuthAccount implements OAuth2User {
         this.requestCount = requestCount;
     }
 
+    public static OAuthAccount from(Account account) {
+        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(account.getRoleValue()));
+
+        return OAuthAccount.builder()
+                           .authorities(authorities)
+                           .id(account.getId())
+                           .googleOAuthId(account.getGoogleOauthId())
+                           .name(account.getName())
+                           .email(account.getEmail())
+                           .avatarUrl(account.getAvatarUrl())
+                           .requestCount(account.getRequestCount())
+                           .build();
+    }
+
     public static OAuthAccount of(Map<String, Object> attributes, Account account) {
-        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(account.getRoleKey()));
+        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(account.getRoleValue()));
 
         return OAuthAccount.builder()
                            .attributes(attributes)

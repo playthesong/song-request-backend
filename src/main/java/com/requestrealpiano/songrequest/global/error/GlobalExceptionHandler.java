@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.global.error;
 
 import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
+import com.requestrealpiano.songrequest.global.error.exception.JwtValidationException;
 import com.requestrealpiano.songrequest.global.error.exception.ParsingFailedException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.error.response.ErrorResponse;
@@ -37,6 +38,14 @@ public class GlobalExceptionHandler {
         log.error("handleHttpRequestMethodNotSupportedException", exception);
         ErrorResponse errorResponse = ErrorResponse.from(ErrorCode.METHOD_NOT_ALLOWED);
         return new ResponseEntity<>(errorResponse, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler(JwtValidationException.class)
+    protected ResponseEntity<ErrorResponse> handleJwtValidationException(JwtValidationException exception) {
+        log.error("handleJwtValidationException", exception);
+        ErrorCode errorCode = exception.getErrorCode();
+        ErrorResponse errorResponse = ErrorResponse.from(errorCode);
+        return new ResponseEntity<>(errorResponse, HttpStatus.valueOf(errorResponse.getStatusCode()));
     }
 
     @ExceptionHandler(ParsingFailedException.class)

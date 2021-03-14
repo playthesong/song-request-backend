@@ -37,8 +37,9 @@ jwt:
   tokenExpiration: ${TOKEN_EXPIRATION}
   header: Authorization
   headerPrefix: 'Bearer '
-  tokenDomain: ${TOKEN_DOMAIN}
-  tokenUrl: ${TOKEN_URL}
+  tokenUrl: http://localhost:3000/auth/token
+  generationKeySecret: ${GENERATION_KEY}
+  generationKeyExpiration: 10000
 
 lastfm:
   url: http://ws.audioscrobbler.com/2.0

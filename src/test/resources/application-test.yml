@@ -21,9 +21,10 @@ spring:
             scope: email, profile
 
 jwt:
-  tokenSecret: ${TOKEN_SECRET}
-  tokenExpiration: ${TOKEN_EXPIRATION}
+  tokenSecret: TestJwtSecret
+  tokenExpiration: 100000
   header: Authorization
   headerPrefix: 'Bearer '
-  tokenDomain: ${TOKEN_DOMAIN}
   tokenUrl: http://localhost:3000
+  generationKeySecret: TestGenerationKeySecret
+  generationKeyExpiration: 10000

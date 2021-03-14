@@ -1,6 +1,6 @@
 package com.requestrealpiano.songrequest.domain.account;
 
-import com.requestrealpiano.songrequest.config.security.oauth.OAuthAttributes;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAttributes;
 import com.requestrealpiano.songrequest.domain.base.BaseTimeEntity;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import lombok.AccessLevel;
@@ -9,9 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,8 +51,10 @@ public class Account extends BaseTimeEntity {
         this.requestCount = requestCount;
     }
 
-    public String getRoleKey() {
-        return role.getKey();
+    public String getRoleKey() { return role.getKey(); }
+
+    public String getRoleValue() {
+        return role.getValue();
     }
 
     public Account updateProfile(OAuthAttributes attributes) {

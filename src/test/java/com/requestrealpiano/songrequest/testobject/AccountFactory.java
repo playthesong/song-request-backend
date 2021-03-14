@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.testobject;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.Role;
+import com.requestrealpiano.songrequest.security.jwt.JwtProperties;
 
 public class AccountFactory {
 
@@ -15,6 +16,7 @@ public class AccountFactory {
      * createMockObjectOf(T parameter1, T parameter2, ...)
      *   - Test parameter 에 의존하는 테스트 객체 생성
      *     (ex. 예외 검증, 경우의 수를 따져야 하는 테스트)
+     *
      */
 
     // Role - Member
@@ -25,7 +27,7 @@ public class AccountFactory {
                       .email("User email")
                       .role(Role.MEMBER)
                       .avatarUrl("http://avatarUrl")
-                      .requestCount(1)
+                      .requestCount(0)
                       .build();
     }
 }
