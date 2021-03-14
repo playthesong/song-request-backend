@@ -4,8 +4,6 @@ import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.security.jwt.JwtProperties;
 import com.requestrealpiano.songrequest.security.jwt.JwtTokenProvider;
 
-import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
-
 public class JwtFactory {
 
     /*
@@ -48,7 +46,7 @@ public class JwtFactory {
     // JwtProperties - Expired GenerationKey
     public static JwtProperties createExpiredGenerationKeyJwtProperties() {
         return new JwtProperties("TestJwtSecret", "100000", "Authorization",
-                     "Bearer ", "http://localhost:3000", "InvalidGenerationKeySecret", "0");
+                     "Bearer ", "http://localhost:3000", "TestGenerationKeySecret", "0");
     }
 
     // JwtToken - Valid
