@@ -5,38 +5,6 @@ spring:
 ---
 
 spring:
-  profiles: prod
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-  jpa:
-    database-platform: org.hibernate.dialect.MySQL57InnoDBDialect
-    open-in-view: false
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        format_sql: true
-
-lastfm:
-  url: http://ws.audioscrobbler.com/2.0
-  method: track.search
-  limit: 10
-  apiKey: ${LASTFM_API_KEY}
-  format: json
-
-maniadb:
-  url: http://maniadb.com/api/search/
-  method: song
-  display: 10
-  apiKey: ${MANIADB_API_KEY}
-  version: 0.5
-
----
-
-spring:
   profiles: dev
 
   datasource:
@@ -59,10 +27,19 @@ spring:
       client:
         registration:
           google:
-            clientId: ${CLIENT_ID}
-            clientSecret: ${CLIENT_SECRET}
-            redirectUri: http://localhost:8080/login/oauth2/code/google
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
             scope: email, profile
+
+jwt:
+  tokenSecret: ${TOKEN_SECRET}
+  tokenExpiration: ${TOKEN_EXPIRATION}
+  header: Authorization
+  headerPrefix: 'Bearer '
+  tokenUrl: http://localhost:3000/auth/token
+  generationKeySecret: ${GENERATION_KEY}
+  generationKeyExpiration: 10000
 
 lastfm:
   url: http://ws.audioscrobbler.com/2.0

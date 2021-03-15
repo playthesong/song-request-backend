@@ -9,3 +9,22 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            redirectUri: http://localhost:8080/login/oauth2/code/google
+            scope: email, profile
+
+jwt:
+  tokenSecret: TestJwtSecret
+  tokenExpiration: 100000
+  header: Authorization
+  headerPrefix: 'Bearer '
+  tokenUrl: http://localhost:3000
+  generationKeySecret: TestGenerationKeySecret
+  generationKeyExpiration: 10000

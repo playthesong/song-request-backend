@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.domain.account;
 
+import com.requestrealpiano.songrequest.security.oauth.OAuthAttributes;
 import com.requestrealpiano.songrequest.domain.base.BaseTimeEntity;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import lombok.AccessLevel;
@@ -8,9 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +23,7 @@ public class Account extends BaseTimeEntity {
     private Long id;
 
     @Column(name = "google_oauth_id")
-    private Long googleOauthId;
+    private String googleOauthId;
 
     private String name;
 
@@ -44,12 +42,36 @@ public class Account extends BaseTimeEntity {
     private List<Letter> letters = new ArrayList<>();
 
     @Builder
-    private Account(Long googleOauthId, String name, String email, Role role, String avatarUrl, Integer requestCount) {
+    private Account(String googleOauthId, String name, String email, Role role, String avatarUrl, Integer requestCount) {
         this.googleOauthId = googleOauthId;
         this.name = name;
         this.email = email;
         this.role = role;
         this.avatarUrl = avatarUrl;
         this.requestCount = requestCount;
+    }
+
+    public String getRoleKey() { return role.getKey(); }
+
+    public String getRoleValue() {
+        return role.getValue();
+    }
+
+    public Account updateProfile(OAuthAttributes attributes) {
+        this.name = attributes.getName();
+        this.email = attributes.getEmail();
+        this.avatarUrl = attributes.getAvatarUrl();
+        return this;
+    }
+
+    public static Account from(OAuthAttributes oAuthAttributes) {
+        return Account.builder()
+                      .googleOauthId(oAuthAttributes.getGoogleOauthId())
+                      .name(oAuthAttributes.getName())
+                      .email(oAuthAttributes.getEmail())
+                      .role(Role.MEMBER)
+                      .avatarUrl(oAuthAttributes.getAvatarUrl())
+                      .requestCount(0)
+                      .build();
     }
 }

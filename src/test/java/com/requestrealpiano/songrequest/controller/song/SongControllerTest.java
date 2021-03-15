@@ -1,13 +1,19 @@
-package com.requestrealpiano.songrequest.controller;
+package com.requestrealpiano.songrequest.controller.song;
 
+import com.requestrealpiano.songrequest.controller.MockMvcRequest;
+import com.requestrealpiano.songrequest.controller.MockMvcResponse;
+import com.requestrealpiano.songrequest.controller.SongController;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
+import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.service.SongService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
+import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithGuest;
+import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithMember;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,26 +22,27 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-@WebMvcTest(controllers = SongController.class)
+@WebMvcTest(controllers = SongController.class,
+            excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class))
 class SongControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -46,57 +53,56 @@ class SongControllerTest extends BaseControllerTest {
 
     @ParameterizedTest
     @MethodSource("searchManiaDbParameters")
+    @WithMember
     @DisplayName("OK - ManiaDB 검색 결과 반환 API 테스트")
     void search_mania_db(String artist, String title) throws Exception {
         // given
         SearchApiResponse maniaDbResponse = createMockManiaDbResponse();
-        int totalCount = maniaDbResponse.getTotalCount();
 
         // when
         when(songService.searchSong(artist, title)).thenReturn(maniaDbResponse);
-        ResultActions result = mockMvc.perform(get("/api/songs")
-                                                .param("artist", artist)
-                                                .param("title", title)
-                                                .accept(MediaType.APPLICATION_JSON));
+
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .doRequest());
 
         // then
-        result.andDo(print())
-              .andExpect(status().isOk())
-              .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-              .andExpect(jsonPath("success").value(true))
-              .andExpect(jsonPath("statusMessage").value("OK"))
-              .andExpect(jsonPath("data.totalCount").value(totalCount))
-              .andDo(document("search-song",
-                      requestParameters(Parameters.searchSong()),
-                      responseFields(ResponseFields.common())
-                              .andWithPrefix("data.", ResponseFields.searchSongResult())
-              ))
+        MockMvcResponse.OK(results)
+                       .andDo(document("search-song",
+                               requestParameters(Parameters.searchSong()),
+                               responseFields(ResponseFields.common())
+                                       .andWithPrefix("data.", ResponseFields.searchSongResult())
+                       ))
         ;
     }
 
     @ParameterizedTest
     @MethodSource("searchByInvalidParams")
+    @WithMember
     @DisplayName("BAD_REQUEST - 유효하지 않은 제목, 아티스트로 요청 테스트")
     void search_by_invalid_params(String artist, String title) throws Exception {
+        // given
+        ErrorCode invalidInputValueError = ErrorCode.INVALID_INPUT_VALUE;
+
         // when
-        ResultActions resultActions = mockMvc.perform(get("/api/songs")
-                                                      .param("artist", artist)
-                                                      .param("title", title)
-                                                      .accept(MediaType.APPLICATION_JSON));
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .doRequest());
+
 
         // then
-        resultActions.andDo(print())
-                     .andExpect(status().isBadRequest())
-                     .andExpect(jsonPath("statusCode").value(ErrorCode.INVALID_INPUT_VALUE.getStatusCode()))
-                     .andExpect(jsonPath("message").value(ErrorCode.INVALID_INPUT_VALUE.getMessage()))
-                     .andDo(document("search-song-error",
-                             responseFields(ResponseFields.error())
-                     ))
+        MockMvcResponse.BAD_REQUEST(results, invalidInputValueError)
+                       .andDo(document("search-song-error",
+                               responseFields(ResponseFields.error())
+                       ))
         ;
     }
 
     @ParameterizedTest
     @MethodSource("searchLastFmApiParameters")
+    @WithMember
     @DisplayName("OK - LastFM 검색 결과 반환 API 테스트")
     void search_lastfm_api(String artist, String title, String imageUrl) throws Exception {
         // given
@@ -106,24 +112,39 @@ class SongControllerTest extends BaseControllerTest {
                                        .imageUrl(imageUrl)
                                        .build();
         List<LastFmTrack> tracks = Collections.singletonList(track);
-        int totalCount = tracks.size();
         SearchApiResponse response = SearchApiResponse.from(tracks);
 
         // when
         when(songService.searchSong(artist, title)).thenReturn(response);
 
-        ResultActions result = mockMvc.perform(get("/api/songs")
-                                               .param("artist", artist)
-                                               .param("title", title)
-                                               .accept(MediaType.APPLICATION_JSON));
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .doRequest());
 
         // then
-        result.andDo(print())
-              .andExpect(status().isOk())
-              .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-              .andExpect(jsonPath("success").value(true))
-              .andExpect(jsonPath("statusMessage").value("OK"))
-              .andExpect(jsonPath("data.totalCount").value(totalCount))
+        MockMvcResponse.OK(results);
+    }
+
+    @ParameterizedTest
+    @MethodSource("searchManiaDbParameters")
+    @WithGuest
+    @DisplayName("FORBIDDEN - 권한이 없는 사용자가 신청곡 검색을 요청하는 테스트")
+    void access_denied_user_search_song(String artist, String title) throws Exception {
+        // given
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+
+        // when
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam("artist", artist)
+                                                .withParam("title", title)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError)
+                       .andDo(document("search-song-error",
+                               responseFields(ResponseFields.error())
+                       ))
         ;
     }
 
