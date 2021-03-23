@@ -39,7 +39,7 @@ public class LetterService {
     }
 
     @Transactional
-    public LetterResponse createNewLetter(NewLetterRequest newLetterRequest) {
+    public LetterResponse createLetter(NewLetterRequest newLetterRequest) {
         SongRequest songRequest = newLetterRequest.getSongRequest();
         String songStory = newLetterRequest.getSongStory();
         Account account = accountRepository.findById(newLetterRequest.getAccountId()).orElseThrow(AccountNotFoundException::new);

@@ -110,7 +110,7 @@ class LetterServiceTest {
         // when
         when(accountRepository.findById(eq(newLetterRequest.getAccountId()))).thenReturn(Optional.of(account));
         when(letterRepository.save(any(Letter.class))).thenReturn(newLetter);
-        LetterResponse letterResponse = letterService.createNewLetter(newLetterRequest);
+        LetterResponse letterResponse = letterService.createLetter(newLetterRequest);
 
         // then
         assertAll(
