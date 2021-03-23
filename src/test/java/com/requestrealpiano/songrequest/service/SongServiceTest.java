@@ -44,7 +44,7 @@ class SongServiceTest {
         // when
         when(songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist()))
                 .thenReturn(Optional.of(existSong));
-        Song song = songService.findSongByRequest(songRequest);
+        Song song = songService.updateRequestCountOrElseCreate(songRequest);
 
         // then
         assertAll(
@@ -74,7 +74,7 @@ class SongServiceTest {
                 .thenReturn(Optional.empty());
         when(songRepository.save(any(Song.class))).thenReturn(newSong);
 
-        Song song = songService.findSongByRequest(songRequest);
+        Song song = songService.updateRequestCountOrElseCreate(songRequest);
 
         // then
         assertAll(

@@ -18,7 +18,7 @@ public class SongService {
     private final SearchApiService searchApiService;
 
     @Transactional
-    public Song findSongByRequest(SongRequest songRequest) {
+    public Song updateRequestCountOrElseCreate(SongRequest songRequest) {
         return songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist())
                              .map(Song::increaseRequestCount)
                              .orElseGet(() -> {
