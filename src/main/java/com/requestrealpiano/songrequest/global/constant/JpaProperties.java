@@ -1,7 +1,7 @@
 package com.requestrealpiano.songrequest.global.constant;
 
-public interface JpaProperties {
+public class JpaProperties {
 
     // Time
-    String ASIA_SEOUL = "Asia/Seoul";
+    public static String Seoul = "Asia/Seoul";
 }
