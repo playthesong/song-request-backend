@@ -10,6 +10,7 @@ import lombok.Getter;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -29,9 +30,9 @@ public class SearchApiResponse {
         List<ManiaDbTrackData> tracks = maniaDbData.getTracks();
         int totalCount = maniaDbData.getTotalCount();
 
-        SearchApiResponse.SearchApiResponseBuilder builder = SearchApiResponse.builder();
+        SearchApiResponseBuilder builder = SearchApiResponse.builder();
         builder.totalCount(totalCount)
-                .build();
+               .build();
 
         if (totalCount == 0) {
             return builder.tracks(Collections.emptyList())
@@ -42,9 +43,19 @@ public class SearchApiResponse {
     }
 
     public static SearchApiResponse from(List<LastFmTrack> tracks) {
-        return SearchApiResponse.builder()
-                                .totalCount(tracks.size())
-                                .tracks(tracks.stream().map(Track::from).collect(Collectors.toList()))
-                                .build();
+        List<LastFmTrack> lastFmTracks = Optional.ofNullable(tracks).orElse(Collections.emptyList());
+        int totalCount = lastFmTracks.size();
+
+        SearchApiResponseBuilder builder = SearchApiResponse.builder();
+        builder.totalCount(totalCount)
+               .build();
+
+        if (totalCount == 0) {
+            return builder.tracks(Collections.emptyList())
+                          .build();
+        }
+
+        return builder.tracks(lastFmTracks.stream().map(Track::from).collect(Collectors.toList()))
+                      .build();
     }
 }
