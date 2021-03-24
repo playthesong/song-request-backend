@@ -27,7 +27,6 @@ public class AccountFactory {
                       .email("User email")
                       .role(Role.MEMBER)
                       .avatarUrl("http://avatarUrl")
-                      .requestCount(0)
                       .build();
     }
 }
