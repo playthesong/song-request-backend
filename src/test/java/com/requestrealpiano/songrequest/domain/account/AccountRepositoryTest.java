@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.domain.account;
 
+import com.requestrealpiano.songrequest.security.oauth.OAuthAttributes;
 import com.requestrealpiano.songrequest.testconfig.BaseRepositoryTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 
-import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class AccountRepositoryTest extends BaseRepositoryTest {
@@ -19,7 +20,8 @@ class AccountRepositoryTest extends BaseRepositoryTest {
     @DisplayName("Account 생성 시 RequestCount 기본 값 설정 테스트")
     void create_account_default_request_count() {
         // given
-        Account account = createMember();
+        OAuthAttributes oAuthAttributes = createOAuthAttributes();
+        Account account = createMemberOf(oAuthAttributes);
         int defaultRequestCount = 0;
 
         // when
