@@ -21,7 +21,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+    public void handle(HttpServletRequest request, HttpServletResponse response,
+                       AccessDeniedException accessDeniedException) throws IOException, ServletException {
         ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
         String errorResponse = objectMapper.writeValueAsString(ErrorResponse.from(accessDeniedError));
         response.getWriter().print(errorResponse);
