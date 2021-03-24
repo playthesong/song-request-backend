@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.service.searchapi;
 
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.JsonTranslator;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,8 @@ public class LastFmApiService implements SearchApiService {
     private final JsonTranslator jsonTranslator;
 
     @Override
-    public SearchApiResponse requestSearchApiResponse(String artist, String title) {
-        String rawJson = lastFmRestClient.searchLastFm(artist, title);
+    public SearchApiResponse requestSearchApiResponse(SearchSongParameters parameters) {
+        String rawJson = lastFmRestClient.searchLastFm(parameters);
         return jsonTranslator.mapToLastFmResponse(rawJson);
     }
 }
