@@ -46,6 +46,7 @@ public class Account extends BaseTimeEntity {
         this.googleOauthId = googleOauthId;
         this.name = name;
         this.email = email;
+        this.role = role;
         this.avatarUrl = avatarUrl;
         this.requestCount = requestCount;
     }
