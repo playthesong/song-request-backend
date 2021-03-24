@@ -13,6 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import static com.requestrealpiano.songrequest.domain.account.Role.ADMIN;
+import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
+
 @TestConfiguration
 @Import({CustomAuthenticationEntryPoint.class, CustomAccessDeniedHandler.class})
 public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
@@ -40,8 +43,8 @@ public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-            .antMatchers("/api/letters").hasAnyRole(Role.MEMBER.getKey(), Role.ADMIN.getKey())
-            .antMatchers("/api/songs").hasAnyRole(Role.MEMBER.getKey(), Role.ADMIN.getKey())
+            .antMatchers("/api/letters").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers("/api/songs").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .anyRequest().authenticated();
 
         http.addFilterBefore(characterEncodingFilter(), CsrfFilter.class);
