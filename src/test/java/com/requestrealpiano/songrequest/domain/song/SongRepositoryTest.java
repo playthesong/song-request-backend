@@ -1,5 +1,7 @@
 package com.requestrealpiano.songrequest.domain.song;
 
+import com.requestrealpiano.songrequest.domain.account.Account;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.global.error.exception.business.SongNotFoundException;
 import com.requestrealpiano.songrequest.testconfig.BaseRepositoryTest;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
-import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongs;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -22,6 +24,22 @@ class SongRepositoryTest extends BaseRepositoryTest {
 
     @Autowired
     SongRepository songRepository;
+
+    @Test
+    @DisplayName("Song 생성 시 RequestCount 기본 값 설정 테스트")
+    void create_song_default_request_count() {
+        // given
+        SongRequest songRequest = createSongRequest();
+        Song song = Song.from(songRequest);
+        int defaultRequestCount = 1;
+
+        // when
+        Song newSong = songRepository.save(song);
+
+        // then
+        assertThat(newSong.getRequestCount()).isNotNull();
+        assertThat(newSong.getRequestCount()).isEqualTo(defaultRequestCount);
+    }
 
     @Test
     @DisplayName("OK - (Normal) Song title, Artist 로 Song 을 찾는 테스트")
@@ -34,7 +52,7 @@ class SongRepositoryTest extends BaseRepositoryTest {
         // when
         songRepository.save(song);
         Song foundSong = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(title, artist)
-                .orElseThrow(SongNotFoundException::new);
+                                       .orElseThrow(SongNotFoundException::new);
 
         // then
         assertAll(

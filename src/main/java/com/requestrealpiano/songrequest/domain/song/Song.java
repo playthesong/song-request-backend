@@ -34,7 +34,7 @@ public class Song {
     private String imageUrl;
 
     @Column(name = "request_count")
-    private int requestCount;
+    private Integer requestCount;
 
     @OneToMany(mappedBy ="song")
     private List<Letter> letters = new ArrayList<>();
@@ -43,7 +43,7 @@ public class Song {
     private List<YoutubeContent> youtubeContent = new ArrayList<>();
 
     @Builder
-    private Song(String songTitle, String albumTitle, String artist, String imageUrl, int requestCount) {
+    private Song(String songTitle, String albumTitle, String artist, String imageUrl, Integer requestCount) {
         this.songTitle = songTitle;
         this.albumTitle = albumTitle;
         this.artist = artist;
@@ -52,19 +52,23 @@ public class Song {
     }
 
     public Song increaseRequestCount() {
-        int increase = 1;
-        this.requestCount += increase;
+        this.requestCount += 1;
         return this;
     }
 
     public static Song from(SongRequest songRequest) {
-        int initialCount = 1;
-
         return Song.builder()
                    .songTitle(songRequest.getTitle())
                    .artist(songRequest.getArtist())
                    .imageUrl(songRequest.getImageUrl())
-                   .requestCount(initialCount)
                    .build();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        // 1 - Song 데이터 생성시 RequestCount 기본 값
+        if (this.requestCount == null) {
+            this.requestCount = 1;
+        }
     }
 }
