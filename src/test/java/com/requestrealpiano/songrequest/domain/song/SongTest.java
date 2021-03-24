@@ -16,10 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class SongTest {
 
-    @ParameterizedTest
-    @MethodSource("createNewSongByRequest")
+    @Test
     @DisplayName("SongRequest(DTO) 로부터 새로운 Song 을 생성하는 테스트")
-    void create_new_song_by_request(int initialCount) {
+    void create_new_song_by_request() {
         // given
         SongRequest songRequest = createSongRequest();
 
@@ -30,14 +29,7 @@ class SongTest {
         assertAll(
                 () -> assertThat(song.getSongTitle()).isEqualTo(songRequest.getTitle()),
                 () -> assertThat(song.getArtist()).isEqualTo(songRequest.getArtist()),
-                () -> assertThat(song.getImageUrl()).isEqualTo(songRequest.getImageUrl()),
-                () -> assertThat(song.getRequestCount()).isEqualTo(initialCount)
-        );
-    }
-
-    private static Stream<Arguments> createNewSongByRequest() {
-        return Stream.of(
-                Arguments.of(1)
+                () -> assertThat(song.getImageUrl()).isEqualTo(songRequest.getImageUrl())
         );
     }
 
