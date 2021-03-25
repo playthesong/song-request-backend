@@ -1,6 +1,5 @@
 package com.requestrealpiano.songrequest.domain.song;
 
-import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.global.error.exception.business.SongNotFoundException;
 import com.requestrealpiano.songrequest.testconfig.BaseRepositoryTest;
@@ -14,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -41,17 +39,13 @@ class SongRepositoryTest extends BaseRepositoryTest {
         assertThat(newSong.getRequestCount()).isEqualTo(defaultRequestCount);
     }
 
-    @Test
-    @DisplayName("OK - (Normal) Song title, Artist 로 Song 을 찾는 테스트")
-    void find_by_title_and_artist_when_exist() {
-        // given
-        Song song = createSong();
-        String title = song.getSongTitle();
-        String artist = song.getArtist();
-
+    @ParameterizedTest
+    @MethodSource("findByTitleAndArtistParameters")
+    @DisplayName("OK - Song title, Artist 로 Song 을 찾는 테스트")
+    void find_by_title_and_artist_when_exist(Song song, String title, String artist) {
         // when
         songRepository.save(song);
-        Song foundSong = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(title, artist)
+        Song foundSong = songRepository.findBySongTitleAndArtist(title, artist)
                                        .orElseThrow(SongNotFoundException::new);
 
         // then
@@ -61,50 +55,9 @@ class SongRepositoryTest extends BaseRepositoryTest {
         );
     }
 
-    @Test
-    @DisplayName("OK - (LowerCase) Song title, Artist 로 Song 을 찾는 테스트")
-    void find_by_lower_case_title_and_artist_when_exist() {
-        // given
-        Song song = createSong();
-        String lowerCasedTitle = song.getSongTitle().toLowerCase();
-        String lowerCasedArtist = song.getArtist().toLowerCase();
-
-        // when
-        songRepository.save(song);
-        Song foundSong = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(lowerCasedTitle, lowerCasedArtist)
-                                       .orElseThrow(SongNotFoundException::new);
-
-        // then
-        assertAll(
-                () -> assertThat(foundSong.getSongTitle()).containsIgnoringCase(lowerCasedTitle),
-                () -> assertThat(foundSong.getArtist()).isEqualToIgnoringCase(lowerCasedArtist)
-        );
-    }
-
-    @Test
-    @DisplayName("OK - (Substring, Lowercase) Song title, Artist 로 Song 을 찾는 테스트")
-    void find_by_substring_title_and_lowercase_artist_when_exist() {
-        // given
-        Song song = createSong();
-        int beginIndex = 5;
-        String subStringTitle = song.getSongTitle().substring(beginIndex);
-        String lowerCasedArtist = song.getArtist().toLowerCase();
-
-        // when
-        songRepository.save(song);
-        Song foundSong = songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(subStringTitle, lowerCasedArtist)
-                                       .orElseThrow(SongNotFoundException::new);
-
-        // then
-        assertAll(
-                () -> assertThat(foundSong.getSongTitle()).containsIgnoringCase(subStringTitle),
-                () -> assertThat(foundSong.getArtist()).isEqualToIgnoringCase(lowerCasedArtist)
-        );
-    }
-
     @ParameterizedTest
     @MethodSource("findByTitleAndArtistWhenNotExistParameters")
-    @DisplayName("Not found - 존재하지 않는 Song을 찾는 경우")
+    @DisplayName("NOT_FOUND - 존재하지 않는 Song을 찾는 경우")
     void find_by_title_and_artist_when_not_exist(String title, String artist) {
         // given
         List<Song> songs = createSongs();
@@ -113,9 +66,32 @@ class SongRepositoryTest extends BaseRepositoryTest {
         songRepository.saveAll(songs);
 
         // then
-        assertThatThrownBy(() -> songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(title, artist)
+        assertThatThrownBy(() -> songRepository.findBySongTitleAndArtist(title, artist)
                                                .orElseThrow(SongNotFoundException::new))
         .isInstanceOf(SongNotFoundException.class);
+    }
+
+    private static Stream<Arguments> findByTitleAndArtistParameters() {
+        // Normal
+        Song song = createSong();
+        String title = song.getSongTitle();
+        String artist = song.getArtist();
+
+        // LowerCase
+        String lowerCasedTitle = song.getSongTitle().toLowerCase();
+        String lowerCasedArtist = song.getArtist().toLowerCase();
+
+        // SubString
+        int beginIndex = 5;
+        String subStringTitle = song.getSongTitle().substring(beginIndex);
+
+        return Stream.of(
+                Arguments.of(song, title, artist),
+                Arguments.of(song, title, lowerCasedArtist),
+                Arguments.of(song, lowerCasedTitle, lowerCasedArtist),
+                Arguments.of(song, subStringTitle, artist),
+                Arguments.of(song, subStringTitle, lowerCasedArtist)
+        );
     }
 
     private static Stream<Arguments> findByTitleAndArtistWhenNotExistParameters() {

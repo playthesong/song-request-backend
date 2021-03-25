@@ -20,7 +20,7 @@ public class SongService {
 
     @Transactional
     public Song updateRequestCountOrElseCreate(SongRequest songRequest) {
-        return songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist())
+        return songRepository.findBySongTitleAndArtist(songRequest.getTitle(), songRequest.getArtist())
                              .map(Song::increaseRequestCount)
                              .orElseGet(() -> {
                                  Song song = Song.from(songRequest);

@@ -42,7 +42,7 @@ class SongServiceTest {
         int increasedCount = initialCount + 1;
 
         // when
-        when(songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist()))
+        when(songRepository.findBySongTitleAndArtist(songRequest.getTitle(), songRequest.getArtist()))
                 .thenReturn(Optional.of(existSong));
         Song song = songService.updateRequestCountOrElseCreate(songRequest);
 
@@ -70,7 +70,7 @@ class SongServiceTest {
         Song newSong = createSongOf(songTitle, artist, imageUrl);
 
         // when
-        when(songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist()))
+        when(songRepository.findBySongTitleAndArtist(songRequest.getTitle(), songRequest.getArtist()))
                 .thenReturn(Optional.empty());
         when(songRepository.save(any(Song.class))).thenReturn(newSong);
 
