@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -77,5 +78,21 @@ class SearchApiResponseTest {
         // then
         assertThat(lastFmResponse.getTotalCount()).isEqualTo(totalCount);
         assertThat(lastFmResponse.getTracks()).hasOnlyElementsOfType(Track.class);
+    }
+
+    @Test
+    @DisplayName("When Null - LastFmTracks 값이 null인 경우 대체 값을 생성하고 반환하는 테스트")
+    void when_null_search_lastfm_response() {
+        // given
+        List<LastFmTrack> tracks = null;
+        int totalCount = 0;
+
+        // when
+        SearchApiResponse lastFmResponse = SearchApiResponse.from(tracks);
+
+        // then
+        assertThatCode(() -> SearchApiResponse.from(tracks)).doesNotThrowAnyException();
+        assertThat(lastFmResponse.getTotalCount()).isEqualTo(totalCount);
+        assertThat(lastFmResponse.getTracks().size()).isEqualTo(totalCount);
     }
 }

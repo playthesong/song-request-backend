@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.lastfm;
 
 import com.requestrealpiano.songrequest.config.searchapi.LastFmProperties;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -17,10 +18,10 @@ public class LastFmRestClient {
 
     private final LastFmProperties lastFmProperties;
 
-    public String searchLastFm(String artist, String track) {
+    public String searchLastFm(SearchSongParameters parameters) {
         RestTemplate restTemplate = new RestTemplate();
-        String checkedArtist = createValidWord(artist);
-        String checkedTrack = createValidWord(track);
+        String checkedArtist = createValidWord(parameters.getArtist());
+        String checkedTrack = createValidWord(parameters.getTitle());
         URI requestURI = createLastFmRequestURI(checkedArtist, checkedTrack);
         return restTemplate.getForObject(requestURI, String.class);
     }

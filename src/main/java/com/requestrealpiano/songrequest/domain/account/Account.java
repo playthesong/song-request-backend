@@ -1,8 +1,8 @@
 package com.requestrealpiano.songrequest.domain.account;
 
-import com.requestrealpiano.songrequest.security.oauth.OAuthAttributes;
 import com.requestrealpiano.songrequest.domain.base.BaseTimeEntity;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAttributes;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -71,7 +71,14 @@ public class Account extends BaseTimeEntity {
                       .email(oAuthAttributes.getEmail())
                       .role(Role.MEMBER)
                       .avatarUrl(oAuthAttributes.getAvatarUrl())
-                      .requestCount(0)
                       .build();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        // 0 - Account 데이터 생성시 RequestCount 기본 값
+        if (this.requestCount == null) {
+            this.requestCount = 0;
+        }
     }
 }

@@ -29,6 +29,8 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static com.requestrealpiano.songrequest.domain.account.Role.ADMIN;
+import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @RequiredArgsConstructor
@@ -61,9 +63,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-//            .antMatchers("/**").permitAll()
-            .antMatchers("/api/letters").hasAnyRole(Role.MEMBER.getKey(), Role.ADMIN.getKey())
-            .antMatchers("/api/songs").hasAnyRole(Role.MEMBER.getKey(), Role.ADMIN.getKey())
+            .antMatchers("/api/letters").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers("/api/songs").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .anyRequest().authenticated();
 
         http.sessionManagement()

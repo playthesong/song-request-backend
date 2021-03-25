@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.maniadb;
 
 import com.requestrealpiano.songrequest.config.searchapi.ManiaDbProperties;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,9 @@ public class ManiaDbRestClient {
 
     private final ManiaDbProperties maniaDbProperties;
 
-    public String searchManiaDb(String artist, String title) {
+    public String searchManiaDb(SearchSongParameters parameters) {
         RestTemplate restTemplate = new RestTemplate();
-        String keyword = createValidKeyword(artist, title);
+        String keyword = createValidKeyword(parameters.getArtist(), parameters.getTitle());
         URI requestURI = createManiaDbRequestURI(keyword);
         return restTemplate.getForObject(requestURI, String.class);
     }

@@ -2,7 +2,7 @@ package com.requestrealpiano.songrequest.testobject;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.Role;
-import com.requestrealpiano.songrequest.security.jwt.JwtProperties;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAttributes;
 
 public class AccountFactory {
 
@@ -27,7 +27,20 @@ public class AccountFactory {
                       .email("User email")
                       .role(Role.MEMBER)
                       .avatarUrl("http://avatarUrl")
-                      .requestCount(0)
                       .build();
+    }
+
+    public static Account createMemberOf(OAuthAttributes oAuthAttributes) {
+        return Account.from(oAuthAttributes);
+    }
+
+    // OAuthAttributes
+    public static OAuthAttributes createOAuthAttributes() {
+        return OAuthAttributes.builder()
+                              .googleOauthId("777177171")
+                              .name("Default Attribute Name")
+                              .email("Default Attribute Email")
+                              .avatarUrl("Default AvatarUrl")
+                              .build();
     }
 }

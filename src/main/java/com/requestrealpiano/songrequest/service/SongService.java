@@ -3,6 +3,7 @@ package com.requestrealpiano.songrequest.service;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.domain.song.SongRepository;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.service.searchapi.SearchApiService;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,8 @@ public class SongService {
     private final SearchApiService searchApiService;
 
     @Transactional
-    public Song findSongByRequest(SongRequest songRequest) {
-        return songRepository.findBySongTitleContainingIgnoreCaseAndArtistIgnoreCase(songRequest.getTitle(), songRequest.getArtist())
+    public Song updateRequestCountOrElseCreate(SongRequest songRequest) {
+        return songRepository.findBySongTitleAndArtist(songRequest.getTitle(), songRequest.getArtist())
                              .map(Song::increaseRequestCount)
                              .orElseGet(() -> {
                                  Song song = Song.from(songRequest);
@@ -27,7 +28,7 @@ public class SongService {
                              });
     }
 
-    public SearchApiResponse searchSong(String artist, String title) {
-        return searchApiService.requestSearchApiResponse(artist, title);
+    public SearchApiResponse searchSong(SearchSongParameters parameters) {
+        return searchApiService.requestSearchApiResponse(parameters);
     }
 }

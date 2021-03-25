@@ -3,6 +3,7 @@ package com.requestrealpiano.songrequest.testobject;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 
 import java.util.List;
 
@@ -78,5 +79,13 @@ public class SongFactory {
                                  .artist(artist)
                                  .imageUrl(imageUrl)
                                  .build();
+    }
+
+    // SearchSongParameters
+    public static SearchSongParameters createSearchSongParametersOf(String artist, String title) {
+        SearchSongParameters parameters = new SearchSongParameters();
+        parameters.setArtist(artist);
+        parameters.setTitle(title);
+        return parameters;
     }
 }

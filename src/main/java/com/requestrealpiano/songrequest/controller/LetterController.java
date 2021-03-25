@@ -3,7 +3,6 @@ package com.requestrealpiano.songrequest.controller;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
 import com.requestrealpiano.songrequest.global.response.ApiResponse;
-import com.requestrealpiano.songrequest.global.response.StatusCode;
 import com.requestrealpiano.songrequest.service.LetterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -39,8 +38,8 @@ public class LetterController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ApiResponse<LetterResponse> createNew(@RequestBody @Valid NewLetterRequest newLetterRequest) {
-        LetterResponse newLetter = letterService.createNewLetter(newLetterRequest);
+    public ApiResponse<LetterResponse> create(@RequestBody @Valid NewLetterRequest newLetterRequest) {
+        LetterResponse newLetter = letterService.createLetter(newLetterRequest);
         return SUCCESS(CREATED, newLetter);
     }
 }

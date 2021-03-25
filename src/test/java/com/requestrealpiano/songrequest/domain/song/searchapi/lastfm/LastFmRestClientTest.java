@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.lastfm;
 
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSearchSongParametersOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -35,7 +37,7 @@ class LastFmRestClientTest {
     @BeforeEach
     void setup() {
         server = MockRestServiceServer.bindTo(new RestTemplate())
-                .build();
+                                      .build();
     }
 
     @ParameterizedTest
@@ -43,6 +45,7 @@ class LastFmRestClientTest {
     @DisplayName("LastFM JSON 결과 값 테스트")
     void search_lastfm_json_response(Path jsonPath, String requestURI, String artist, String title) throws IOException {
         // given
+        SearchSongParameters parameters = createSearchSongParametersOf(artist, title);
         String testJsonResponse = Files.readString(jsonPath);
 
         // when
@@ -52,7 +55,7 @@ class LastFmRestClientTest {
               .andExpect(method(HttpMethod.GET))
               .andRespond(withSuccess(testJsonResponse, MediaType.APPLICATION_JSON));
 
-        String jsonResponse = lastFmRestClient.searchLastFm(artist, title);
+        String jsonResponse = lastFmRestClient.searchLastFm(parameters);
 
         // then
         assertThat(jsonResponse).contains(artist);

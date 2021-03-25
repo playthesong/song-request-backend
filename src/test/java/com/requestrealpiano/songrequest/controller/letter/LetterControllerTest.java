@@ -2,7 +2,6 @@ package com.requestrealpiano.songrequest.controller.letter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.controller.LetterController;
-import com.requestrealpiano.songrequest.controller.MockMvcRequest;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.RequestFields;
@@ -116,7 +115,7 @@ class LetterControllerTest extends BaseControllerTest {
         String requestBody = objectMapper.writeValueAsString(newLetterRequest);
 
         // when
-        when(letterService.createNewLetter(any(NewLetterRequest.class))).thenReturn(response);
+        when(letterService.createLetter(any(NewLetterRequest.class))).thenReturn(response);
 
         ResultActions results = mockMvc.perform(post("/api/letters")
                                                 .withBody(requestBody)
