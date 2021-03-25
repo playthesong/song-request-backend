@@ -2,6 +2,8 @@ package com.requestrealpiano.songrequest.security.jwt;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.global.error.exception.JwtValidationException;
+import com.requestrealpiano.songrequest.global.error.exception.jwt.JwtExpirationException;
+import com.requestrealpiano.songrequest.global.error.exception.jwt.JwtInvalidTokenException;
 import com.requestrealpiano.songrequest.global.error.exception.jwt.JwtRequiredException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.jwt.claims.AccountClaims;
@@ -13,8 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
-import static com.requestrealpiano.songrequest.testobject.JwtFactory.createValidJwtProperties;
-import static com.requestrealpiano.songrequest.testobject.JwtFactory.createValidJwtTokenOf;
+import static com.requestrealpiano.songrequest.testobject.JwtFactory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
@@ -106,5 +107,58 @@ class JwtTokenProviderTest {
                 () -> assertThat(account.getEmail()).isEqualTo(accountClaims.getEmail()),
                 () -> assertThat(account.getAvatarUrl()).isEqualTo(accountClaims.getAvatarUrl())
         );
+    }
+
+    @Test
+    @DisplayName("Valid JWT Token - 유효한 토큰 Validation 테스트")
+    void valid_jwt_token_validation() {
+        // given
+        JwtProperties properties = createValidJwtProperties();
+        String validJwtToken = createValidJwtTokenOf(createMember());
+
+        // when
+        when(jwtProperties.getHeaderPrefix()).thenReturn(properties.getHeaderPrefix());
+        when(jwtProperties.getTokenSecret()).thenReturn(properties.getTokenSecret());
+
+        // then
+        assertThatCode(() -> jwtTokenProvider.validateJwtToken(validJwtToken)).doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("Invalid JWT Token - 유효하지 않은 Jwt Token Validation 테스트")
+    void invalid_jwt_token_validation() {
+        // given
+        JwtProperties properties = createValidJwtProperties();
+        String invalidJwtToken = createInvalidJwtTokenOf(createMember());
+        ErrorCode jwtInvalidError = ErrorCode.JWT_INVALID_ERROR;
+
+        // when
+        when(jwtProperties.getHeaderPrefix()).thenReturn(properties.getHeaderPrefix());
+        when(jwtProperties.getTokenSecret()).thenReturn(properties.getTokenSecret());
+
+        // then
+        assertThatThrownBy(() -> jwtTokenProvider.validateJwtToken(invalidJwtToken))
+                .isExactlyInstanceOf(JwtInvalidTokenException.class)
+                .isInstanceOf(JwtValidationException.class)
+                .hasMessage(jwtInvalidError.getMessage());
+    }
+
+    @Test
+    @DisplayName("Expired JWT Token - 만료된 토큰 Validation 테스트")
+    void expired_jwt_token_validation() {
+        // given
+        JwtProperties properties = createValidJwtProperties();
+        String expiredJwtToken = createExpiredJwtTokenOf(createMember());
+        ErrorCode jwtExpirationError = ErrorCode.JWT_EXPIRATION_ERROR;
+
+        // when
+        when(jwtProperties.getHeaderPrefix()).thenReturn(properties.getHeaderPrefix());
+        when(jwtProperties.getTokenSecret()).thenReturn(properties.getTokenSecret());
+
+        // then
+        assertThatThrownBy(() -> jwtTokenProvider.validateJwtToken(expiredJwtToken))
+                .isExactlyInstanceOf(JwtExpirationException.class)
+                .isInstanceOf(JwtValidationException.class)
+                .hasMessage(jwtExpirationError.getMessage());
     }
 }
