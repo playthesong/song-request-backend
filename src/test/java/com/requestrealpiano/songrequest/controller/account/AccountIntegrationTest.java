@@ -14,8 +14,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
-import static com.requestrealpiano.songrequest.testobject.JwtFactory.createExpiredGenerationKeyOf;
-import static com.requestrealpiano.songrequest.testobject.JwtFactory.createInvalidGenerationKeyOf;
+import static com.requestrealpiano.songrequest.testobject.JwtFactory.*;
 
 public class AccountIntegrationTest extends BaseIntegrationTest {
 
@@ -33,7 +32,7 @@ public class AccountIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Invalid JWT - Invalid GenerationKey 를 사용한 JWT 생성 요청 테스트")
+    @DisplayName("Invalid Generation Key - Invalid GenerationKey 를 사용한 JWT 생성 요청 테스트")
     void with_invalid_jwt_generate_token() throws Exception {
         // given
         String invalidGenerationKey = createInvalidGenerationKeyOf(account.getEmail());
@@ -49,7 +48,7 @@ public class AccountIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Expired JWT - 만료된 GenerationKey 를 사용한 JWT 생성 요청 테스트")
+    @DisplayName("Expired Generation Key - 만료된 GenerationKey 를 사용한 JWT 생성 요청 테스트")
     void with_expired_jwt_generate_token() throws Exception {
         // given
         String expiredGenerationKey = createExpiredGenerationKeyOf(account.getEmail());
@@ -58,6 +57,53 @@ public class AccountIntegrationTest extends BaseIntegrationTest {
         // when
         ResultActions results = mockMvc.perform(get("/api/accounts/auth")
                                                 .withToken(expiredGenerationKey)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.UNAUTHORIZED(results, jwtExpirationError);
+    }
+
+    @Test
+    @DisplayName("Valid JWT Token - 유효한 JWT Token을 사용한 Validation 요청 테스트")
+    void validate_with_valid_jwt() throws Exception {
+        // given
+        String validJwtToken = createValidJwtTokenOf(account);
+
+        // when
+        ResultActions results = mockMvc.perform(get("/api/accounts/auth/validation")
+                                                .withToken(validJwtToken)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.NO_CONTENT(results);
+    }
+
+    @Test
+    @DisplayName("Invalid JWT Token - 만료된 JWT Token을 사용한 Validation 요청 테스트")
+    void validate_with_invalid_jwt() throws Exception {
+        // given
+        String invalidJwtToken = createInvalidJwtTokenOf(account);
+        ErrorCode jwtInvalidError = ErrorCode.JWT_INVALID_ERROR;
+
+        // when
+        ResultActions results = mockMvc.perform(get("/api/accounts/validation")
+                                                .withToken(invalidJwtToken)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.BAD_REQUEST(results, jwtInvalidError);
+    }
+
+    @Test
+    @DisplayName("Expired JWT Token - 만료된 JWT Token을 사용한 Validation 요청 테스트")
+    void validate_with_expired_jwt() throws Exception {
+        // given
+        String expiredJwtToken = createExpiredJwtTokenOf(account);
+        ErrorCode jwtExpirationError = ErrorCode.JWT_EXPIRATION_ERROR;
+
+        // when
+        ResultActions results = mockMvc.perform(get("/api/accounts/validation")
+                                                .withToken(expiredJwtToken)
                                                 .doRequest());
 
         // then

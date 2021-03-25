@@ -21,4 +21,10 @@ public class AccountController {
         String jwtToken = accountService.generateJwtToken(httpHeaders.getFirst(HttpHeaders.AUTHORIZATION));
         response.addHeader(HttpHeaders.AUTHORIZATION, jwtToken);
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @GetMapping("/auth/validation")
+    public void validateToken(@RequestHeader HttpHeaders httpHeaders) {
+        accountService.validateJwtToken(httpHeaders.getFirst(HttpHeaders.AUTHORIZATION));
+    }
 }
