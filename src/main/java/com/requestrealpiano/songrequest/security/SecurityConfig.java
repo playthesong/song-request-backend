@@ -63,7 +63,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-//            .antMatchers("/**").permitAll()
             .antMatchers("/api/letters").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .antMatchers("/api/songs").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .anyRequest().authenticated();
