@@ -71,15 +71,12 @@ public class JwtTokenProvider {
         return jwtProperties.getHeaderPrefix() + jwtToken;
     }
 
-    public boolean validateJwtToken(String authorization) {
+    public void validateJwtToken(String authorization) {
         String jwtToken = extractToken(authorization);
         try {
-            Jws<Claims> claims = Jwts.parser()
-                                     .setSigningKey(jwtProperties.getTokenSecret())
-                                     .parseClaimsJws(jwtToken);
-            return claims.getBody()
-                         .getExpiration()
-                         .after(new Date());
+            Jwts.parser()
+                .setSigningKey(jwtProperties.getTokenSecret())
+                .parseClaimsJws(jwtToken);
         } catch (ExpiredJwtException exception) {
             throw new JwtExpirationException();
         } catch (JwtException exception) {

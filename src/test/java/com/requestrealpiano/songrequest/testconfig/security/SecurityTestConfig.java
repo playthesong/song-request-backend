@@ -33,6 +33,7 @@ public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 
         web.ignoring().antMatchers(HttpMethod.GET, "/api/accounts/auth")
+                      .antMatchers(HttpMethod.GET, "/api/accounts/auth/validation")
                       .antMatchers(HttpMethod.GET, "/api/letters/**")
         ;
     }
