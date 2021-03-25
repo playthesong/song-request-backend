@@ -25,6 +25,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
+        log.error("handleAuthenticationException", authException);
         ErrorCode unAuthenticationError = ErrorCode.UNAUTHENTICATED_ERROR;
         String errorResponse = objectMapper.writeValueAsString(ErrorResponse.from(unAuthenticationError));
         response.getWriter().print(errorResponse);
