@@ -20,10 +20,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
@@ -63,6 +65,29 @@ class LetterServiceTest {
 
         // then
         assertThat(letterResponses.size()).isEqualTo(letters.size());
+    }
+
+    @Test
+    @DisplayName("특정 RequestStatus의 Letter 리스트를 받아와서 LetterResponse 리스트로 반환하는 테스트")
+    void find_all_letters_by_request_status() {
+        // given
+        int first = 0;
+        List<Letter> waitingLetters = Collections.singletonList(createLetter());
+
+        // when
+        when(letterRepository.findAllByRequestStatus(eq(WAITING))).thenReturn(waitingLetters);
+        List<LetterResponse> waitingLetterResponses = letterService.findLettersByStatus(WAITING);
+
+        Letter waitingLetter = waitingLetters.get(first);
+        LetterResponse waitingLetterResponse = waitingLetterResponses.get(first);
+
+        // then
+        assertAll(
+                () -> assertThat(waitingLetterResponse.getRequestStatus()).isEqualTo(waitingLetter.getRequestStatus().getKey()),
+                () -> assertThat(waitingLetterResponse.getAccount().getAvatarUrl()).isEqualTo(waitingLetter.getAccount().getAvatarUrl()),
+                () -> assertThat(waitingLetterResponse.getSong().getTitle()).isEqualTo(waitingLetter.getSong().getSongTitle()),
+                () -> assertThat(waitingLetterResponse.getSongStory()).isEqualTo(waitingLetter.getSongStory())
+        );
     }
 
     @Test

@@ -4,16 +4,19 @@ import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
+import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,5 +50,12 @@ public class LetterService {
 
         Letter newLetter = letterRepository.save(Letter.of(songStory, account, song));
         return LetterResponse.from(newLetter);
+    }
+
+    public List<LetterResponse> findLettersByStatus(RequestStatus requestStatus) {
+        List<Letter> letters = letterRepository.findAllByRequestStatus(requestStatus);
+        return letters.stream()
+                      .map(LetterResponse::from)
+                      .collect(Collectors.toList());
     }
 }

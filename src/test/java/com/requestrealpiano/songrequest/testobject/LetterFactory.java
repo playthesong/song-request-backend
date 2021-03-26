@@ -40,6 +40,15 @@ public class LetterFactory {
                      .build();
     }
 
+    public static Letter createLetterOf(RequestStatus requestStatus) {
+        return Letter.builder()
+                     .songStory("Song story")
+                     .requestStatus(requestStatus)
+                     .song(SongFactory.createSong())
+                     .account(AccountFactory.createMember())
+                     .build();
+    }
+
     // Letters
     public static List<Letter> createLetters() {
         Letter firstLetter = Letter.builder()
