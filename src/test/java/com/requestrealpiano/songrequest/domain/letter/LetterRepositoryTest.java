@@ -21,22 +21,6 @@ class LetterRepositoryTest extends BaseRepositoryTest {
     LetterRepository letterRepository;
 
     @Test
-    @DisplayName("Letter 데이터를 DB에서 조회한다.")
-    void find_all_letters() {
-        // given
-        List<Letter> letters = createLetters();
-
-        // when
-        letterRepository.saveAll(letters);
-        List<Letter> savedLetters = letterRepository.findAll();
-
-        // then
-        assertThat(savedLetters).hasSize(letters.size());
-        assertThat(savedLetters.stream().filter(letter -> Optional.ofNullable(letter.getId()).isPresent())
-                               .count()).isEqualTo(letters.size());
-    }
-
-    @Test
     @DisplayName("RequestStatus를 기준으로 Letter 목록을 조회하는 테스트")
     void find_all_by_request_status() {
         // given
