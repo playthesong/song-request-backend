@@ -137,8 +137,8 @@ class LetterControllerTest extends BaseControllerTest {
         ;
     }
 
-    @Test
-    @WithGuest
+    @ParameterizedTest
+    @WithMember
     @MethodSource("invalidNewLetterRequestParameters")
     @DisplayName("BAD_REQUEST - 유효하지 않은 값으로 Letter 등록 요청 테스트")
     void invalid_new_letter_request(String title, String artist, String imageUrl, String songStory,
@@ -151,14 +151,14 @@ class LetterControllerTest extends BaseControllerTest {
 
         // when
         ResultActions results = mockMvc.perform(post("/api/letters")
-                .withBody(requestBody)
-                .doRequest());
+                                                .withBody(requestBody)
+                                                .doRequest());
 
         // then
         MockMvcResponse.BAD_REQUEST(results, invalidInputError)
-                .andDo(document("create-letter-invalid-parameters",
-                        responseFields(ResponseFields.error())
-                ))
+                       .andDo(document("create-letter-invalid-parameters",
+                               responseFields(ResponseFields.error())
+                       ))
         ;
     }
 
