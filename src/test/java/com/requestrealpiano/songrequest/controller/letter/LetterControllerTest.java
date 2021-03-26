@@ -7,8 +7,8 @@ import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.RequestFields;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
-import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
@@ -40,10 +40,11 @@ import java.util.stream.Stream;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
-import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
+import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -66,12 +67,15 @@ class LetterControllerTest extends BaseControllerTest {
     @DisplayName("OK - 전체 신청곡 목록 조회 API 테스트")
     void find_all_letters() throws Exception {
         // given
+        PaginationParameters parameters = createPaginationParameters();
         List<LetterResponse> letterResponses = createLetterResponses();
 
         // when
-        when(letterService.findAllLetters()).thenReturn(letterResponses);
+        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letterResponses);
 
         ResultActions results = mockMvc.perform(get("/api/letters")
+                                                .withParam("page", String.valueOf(parameters.getPage()))
+                                                .withParam("size", String.valueOf(parameters.getSize()))
                                                 .doRequest());
 
         // then

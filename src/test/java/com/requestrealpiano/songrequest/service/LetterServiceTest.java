@@ -5,6 +5,7 @@ import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
 import com.requestrealpiano.songrequest.domain.song.Song;
@@ -19,6 +20,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,8 +29,10 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
+import static com.requestrealpiano.songrequest.global.constant.SortProperties.CREATED_DATE_TIME;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
+import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequest;
 import static org.assertj.core.api.Assertions.*;
@@ -35,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @ExtendWith(MockitoExtension.class)
 class LetterServiceTest {
@@ -55,13 +61,14 @@ class LetterServiceTest {
     @DisplayName("저장 되어 있는 모든 Letters 로부터 LetterResponses 를 생성하는 테스트")
     void find_all_letters() {
         // given
+        PaginationParameters parameters = createPaginationParameters();
         Account account = createMember();
         Song song = createSong();
         List<Letter> letters = createLettersOf(account, song);
 
         // when
         when(letterRepository.findAll()).thenReturn(letters);
-        List<LetterResponse> letterResponses = letterService.findAllLetters();
+        List<LetterResponse> letterResponses = letterService.findAllLetters(parameters);
 
         // then
         assertThat(letterResponses.size()).isEqualTo(letters.size());
