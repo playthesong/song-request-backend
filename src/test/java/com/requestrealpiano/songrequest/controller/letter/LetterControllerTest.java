@@ -42,6 +42,7 @@ import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
+import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.refEq;
@@ -87,6 +88,26 @@ class LetterControllerTest extends BaseControllerTest {
                            responseFields(beneathPath("data[].account.").withSubsectionId("account"), ResponseFields.account())
                        ))
         ;
+    }
+
+    @ParameterizedTest
+    @MethodSource("paginationFindAllLettersParameters")
+    @DisplayName("OK - 전체 Letter 목록 페이징 경계 값 테스트")
+    void pagination_find_all_letters(Integer page, Integer size) throws Exception {
+        // given
+        PaginationParameters parameters = createPaginationParametersOf(page, size);
+        List<LetterResponse> letterResponses = createLetterResponses();
+
+        // when
+        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letterResponses);
+
+        ResultActions results = mockMvc.perform(get("/api/letters")
+                                                .withParam("page", String.valueOf(parameters.getPage()))
+                                                .withParam("size", String.valueOf(parameters.getSize()))
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.OK(results);
     }
 
     @Test
@@ -222,6 +243,19 @@ class LetterControllerTest extends BaseControllerTest {
 
         // then
         MockMvcResponse.BAD_REQUEST(results, invalidRequestError);
+    }
+
+    private static Stream<Arguments> paginationFindAllLettersParameters() {
+        int pageMin = 0;
+        int pageSizeMin = 10;
+        int pageSizeMax = 50;
+        return Stream.of(
+                Arguments.of(null, null),
+                Arguments.of(null, pageSizeMax + 1),
+                Arguments.of(pageMin - 1, null),
+                Arguments.of(pageMin - 1, pageSizeMin - 1),
+                Arguments.of(pageMin - 1, pageSizeMax + 1)
+        );
     }
 
     private static Stream<Arguments> invalidLetterStatusParameters() {

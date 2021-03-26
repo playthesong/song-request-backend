@@ -29,6 +29,13 @@ public class PaginationFactory {
         return parameters;
     }
 
+    public static PaginationParameters createPaginationParametersOf(Integer page, Integer size) {
+        PaginationParameters parameters = new PaginationParameters();
+        parameters.setPage(page);
+        parameters.setSize(size);
+        return parameters;
+    }
+
     // PageRequest
     public static PageRequest createPageRequest() {
         PaginationParameters parameters = createPaginationParameters();
