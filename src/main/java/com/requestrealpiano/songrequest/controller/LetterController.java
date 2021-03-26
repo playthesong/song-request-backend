@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.controller;
 
+import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
 import com.requestrealpiano.songrequest.global.response.ApiResponse;
@@ -29,6 +30,13 @@ public class LetterController {
         return SUCCESS(OK, letters);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
+    public ApiResponse<LetterResponse> create(@RequestBody @Valid NewLetterRequest newLetterRequest) {
+        LetterResponse newLetter = letterService.createLetter(newLetterRequest);
+        return SUCCESS(CREATED, newLetter);
+    }
+
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public ApiResponse<LetterResponse> findById(@PathVariable Long id) {
@@ -36,10 +44,9 @@ public class LetterController {
         return SUCCESS(OK, letter);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
-    public ApiResponse<LetterResponse> create(@RequestBody @Valid NewLetterRequest newLetterRequest) {
-        LetterResponse newLetter = letterService.createLetter(newLetterRequest);
-        return SUCCESS(CREATED, newLetter);
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/status/{requestStatus}")
+    public ApiResponse<List<LetterResponse>> findByStatus(@PathVariable RequestStatus requestStatus) {
+        return null;
     }
 }

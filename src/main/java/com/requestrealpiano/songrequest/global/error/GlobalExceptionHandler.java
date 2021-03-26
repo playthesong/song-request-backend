@@ -6,6 +6,7 @@ import com.requestrealpiano.songrequest.global.error.exception.ParsingFailedExce
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.error.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -13,6 +14,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.validation.ConstraintViolationException;
 
@@ -24,6 +26,20 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException exception) {
         log.error("handleConstraintViolationException", exception);
         ErrorResponse errorResponse = ErrorResponse.from(ErrorCode.INVALID_INPUT_VALUE);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConversionFailedException.class)
+    protected ResponseEntity<ErrorResponse> handleConversionFailedException(ConversionFailedException exception) {
+        log.error("handleConversionFailedException", exception);
+        ErrorResponse errorResponse = ErrorResponse.from(ErrorCode.INVALID_REQUEST_ERROR);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    protected ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException exception) {
+        log.error("handleMethodArgumentTypeMismatchException", exception);
+        ErrorResponse errorResponse = ErrorResponse.from(ErrorCode.INVALID_REQUEST_ERROR);
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 

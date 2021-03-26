@@ -181,6 +181,29 @@ class LetterControllerTest extends BaseControllerTest {
         ;
     }
 
+    @ParameterizedTest
+    @MethodSource("invalidLetterStatusParameters")
+    @WithGuest
+    @DisplayName("BAD_REQUEST - 유효하지 않은 Letter Status로 요청 했을 경우 예외가 발생하는 테스트")
+    void invalid_letter_status(String wrongStatus) throws Exception {
+        // given
+        ErrorCode invalidRequestError = ErrorCode.INVALID_REQUEST_ERROR;
+
+        // when
+        ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", wrongStatus).doRequest());
+
+        // then
+        MockMvcResponse.BAD_REQUEST(results, invalidRequestError);
+    }
+
+    private static Stream<Arguments> invalidLetterStatusParameters() {
+        return Stream.of(
+                Arguments.of("Something Wrong Variable"),
+                Arguments.of("12345"),
+                Arguments.of("Number Mixed - 12345")
+        );
+    }
+
     private static Stream<Arguments> accessDeniedUserCreateLetterParameters() {
         return Stream.of(
             Arguments.of("New Title", "New Artist", "http://imageUrl", "Song story", 1L)

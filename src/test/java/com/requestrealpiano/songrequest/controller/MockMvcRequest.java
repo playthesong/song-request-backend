@@ -19,7 +19,7 @@ public class MockMvcRequest {
         return request;
     }
 
-    public static MockMvcRequest get(String url, Long pathVariable) {
+    public static MockMvcRequest get(String url, Object pathVariable) {
         MockMvcRequest request = new MockMvcRequest();
         request.builder = RestDocumentationRequestBuilders.get(url, pathVariable)
                                                           .accept(MediaType.APPLICATION_JSON);
