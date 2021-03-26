@@ -6,6 +6,8 @@ import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.RequestFields;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
+import com.requestrealpiano.songrequest.domain.letter.Letter;
+import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
@@ -30,11 +32,15 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
 import static org.mockito.ArgumentMatchers.any;
@@ -131,8 +137,8 @@ class LetterControllerTest extends BaseControllerTest {
         ;
     }
 
-    @ParameterizedTest
-    @WithMember
+    @Test
+    @WithGuest
     @MethodSource("invalidNewLetterRequestParameters")
     @DisplayName("BAD_REQUEST - 유효하지 않은 값으로 Letter 등록 요청 테스트")
     void invalid_new_letter_request(String title, String artist, String imageUrl, String songStory,
@@ -145,14 +151,14 @@ class LetterControllerTest extends BaseControllerTest {
 
         // when
         ResultActions results = mockMvc.perform(post("/api/letters")
-                                                .withBody(requestBody)
-                                                .doRequest());
+                .withBody(requestBody)
+                .doRequest());
 
         // then
         MockMvcResponse.BAD_REQUEST(results, invalidInputError)
-                       .andDo(document("create-letter-invalid-parameters",
-                               responseFields(ResponseFields.error())
-                       ))
+                .andDo(document("create-letter-invalid-parameters",
+                        responseFields(ResponseFields.error())
+                ))
         ;
     }
 
@@ -179,6 +185,24 @@ class LetterControllerTest extends BaseControllerTest {
                                responseFields(ResponseFields.error())
                        ))
         ;
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("OK - 유효한 Letter Status 값으로 요청하는 테스트")
+    void valid_letter_status() throws Exception {
+        // given
+        List<Letter> letters = Arrays.asList(createLetterOf(DONE), createLetterOf(DONE), createLetterOf(DONE));
+        List<LetterResponse> letterResponses = letters.stream().map(LetterResponse::from).collect(Collectors.toList());
+
+        // when
+        when(letterService.findLettersByStatus(DONE)).thenReturn(letterResponses);
+
+        ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", "done")
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.OK(results);
     }
 
     @ParameterizedTest

@@ -47,6 +47,7 @@ public class LetterController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/status/{requestStatus}")
     public ApiResponse<List<LetterResponse>> findByStatus(@PathVariable RequestStatus requestStatus) {
-        return null;
+        List<LetterResponse> letters = letterService.findLettersByStatus(requestStatus);
+        return SUCCESS(OK, letters);
     }
 }
