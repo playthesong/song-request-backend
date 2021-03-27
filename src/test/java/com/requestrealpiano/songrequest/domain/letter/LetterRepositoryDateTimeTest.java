@@ -72,7 +72,6 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
 
         // then
         assertAll(
-                () -> assertThat(todayLetters.getContent().size()).isNotEqualTo(notFoundLetters.size()),
                 () -> assertThat(todayLetters.getContent().size()).isEqualTo(foundLetters.size()),
                 () -> assertThat(todayLetters.getContent().stream()
                         .allMatch(letter -> letter.getCreatedDateTime().isAfter(notFoundTime)))
