@@ -8,7 +8,7 @@ import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
-import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
@@ -37,37 +37,37 @@ public class LetterService {
     private final SongService songService;
     private final Scheduler scheduler;
 
-    public List<LetterResponse> findAllLetters(PaginationParameters parameters) {
+    public List<LetterDetails> findAllLetters(PaginationParameters parameters) {
         Sort sortByCreatedDateTime = Sort.by(Direction.DESC, CREATED_DATE_TIME.getFieldName());
         PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(), sortByCreatedDateTime);
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
         Page<Letter> letters = letterRepository.findAllTodayLetters(pageRequest, startDateTime, endDateTime);
         return letters.stream()
-                      .map(LetterResponse::from)
+                      .map(LetterDetails::from)
                       .collect(Collectors.toList());
     }
 
-    public LetterResponse findLetter(Long id) {
+    public LetterDetails findLetter(Long id) {
         Letter letter = letterRepository.findById(id).orElseThrow(LetterNotFoundException::new);
-        return LetterResponse.from(letter);
+        return LetterDetails.from(letter);
     }
 
     @Transactional
-    public LetterResponse createLetter(NewLetterRequest newLetterRequest) {
+    public LetterDetails createLetter(NewLetterRequest newLetterRequest) {
         SongRequest songRequest = newLetterRequest.getSongRequest();
         String songStory = newLetterRequest.getSongStory();
         Account account = accountRepository.findById(newLetterRequest.getAccountId()).orElseThrow(AccountNotFoundException::new);
         Song song = songService.updateRequestCountOrElseCreate(songRequest);
 
         Letter newLetter = letterRepository.save(Letter.of(songStory, account, song));
-        return LetterResponse.from(newLetter);
+        return LetterDetails.from(newLetter);
     }
 
-    public List<LetterResponse> findLettersByStatus(RequestStatus requestStatus) {
+    public List<LetterDetails> findLettersByStatus(RequestStatus requestStatus) {
         List<Letter> letters = letterRepository.findAllByRequestStatus(requestStatus);
         return letters.stream()
-                      .map(LetterResponse::from)
+                      .map(LetterDetails::from)
                       .collect(Collectors.toList());
     }
 }

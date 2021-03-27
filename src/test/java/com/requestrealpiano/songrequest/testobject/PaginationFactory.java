@@ -1,6 +1,9 @@
 package com.requestrealpiano.songrequest.testobject;
 
+import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
+import com.requestrealpiano.songrequest.global.pagination.response.PageDetails;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -41,5 +44,17 @@ public class PaginationFactory {
         PaginationParameters parameters = createPaginationParameters();
         Sort sortByCreatedDateTime = Sort.by(Sort.Direction.DESC, CREATED_DATE_TIME.getFieldName());
         return PageRequest.of(parameters.getPage(), parameters.getSize(), sortByCreatedDateTime);
+    }
+
+    // PageDetails
+    public static <T> PageDetails createPageDetailsOf(Page<T> pageData) {
+        return PageDetails.builder()
+                          .totalPages(pageData.getTotalPages())
+                          .currentPage(pageData.getNumber())
+                          .totalDataCount(pageData.getTotalElements())
+                          .currentCount(pageData.getNumberOfElements())
+                          .firstPage(pageData.isFirst())
+                          .lastPage(pageData.isLast())
+                          .build();
     }
 }

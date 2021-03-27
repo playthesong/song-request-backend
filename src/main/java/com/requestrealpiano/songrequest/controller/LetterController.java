@@ -3,7 +3,7 @@ package com.requestrealpiano.songrequest.controller;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
-import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.response.ApiResponse;
 import com.requestrealpiano.songrequest.service.LetterService;
 import lombok.RequiredArgsConstructor;
@@ -26,29 +26,29 @@ public class LetterController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public ApiResponse<List<LetterResponse>> findAll(@ModelAttribute @Valid PaginationParameters paginationParameters) {
-        List<LetterResponse> letters = letterService.findAllLetters(paginationParameters);
+    public ApiResponse<List<LetterDetails>> findAll(@ModelAttribute @Valid PaginationParameters paginationParameters) {
+        List<LetterDetails> letters = letterService.findAllLetters(paginationParameters);
         return SUCCESS(OK, letters);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public ApiResponse<LetterResponse> create(@RequestBody @Valid NewLetterRequest newLetterRequest) {
-        LetterResponse newLetter = letterService.createLetter(newLetterRequest);
+    public ApiResponse<LetterDetails> create(@RequestBody @Valid NewLetterRequest newLetterRequest) {
+        LetterDetails newLetter = letterService.createLetter(newLetterRequest);
         return SUCCESS(CREATED, newLetter);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
-    public ApiResponse<LetterResponse> findById(@PathVariable Long id) {
-        LetterResponse letter = letterService.findLetter(id);
+    public ApiResponse<LetterDetails> findById(@PathVariable Long id) {
+        LetterDetails letter = letterService.findLetter(id);
         return SUCCESS(OK, letter);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/status/{requestStatus}")
-    public ApiResponse<List<LetterResponse>> findByStatus(@PathVariable RequestStatus requestStatus) {
-        List<LetterResponse> letters = letterService.findLettersByStatus(requestStatus);
+    public ApiResponse<List<LetterDetails>> findByStatus(@PathVariable RequestStatus requestStatus) {
+        List<LetterDetails> letters = letterService.findLettersByStatus(requestStatus);
         return SUCCESS(OK, letters);
     }
 }

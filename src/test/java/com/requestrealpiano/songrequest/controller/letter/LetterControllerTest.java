@@ -11,7 +11,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
-import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.service.LetterService;
@@ -69,10 +69,10 @@ class LetterControllerTest extends BaseControllerTest {
     void find_all_letters() throws Exception {
         // given
         PaginationParameters parameters = createPaginationParameters();
-        List<LetterResponse> letterResponses = createLetterResponses();
+        List<LetterDetails> letterRespons = createLetterDetailsList();
 
         // when
-        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letterResponses);
+        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letterRespons);
 
         ResultActions results = mockMvc.perform(get("/api/letters")
                                                 .withParam("page", String.valueOf(parameters.getPage()))
@@ -96,10 +96,10 @@ class LetterControllerTest extends BaseControllerTest {
     void pagination_find_all_letters(Integer page, Integer size) throws Exception {
         // given
         PaginationParameters parameters = createPaginationParametersOf(page, size);
-        List<LetterResponse> letterResponses = createLetterResponses();
+        List<LetterDetails> letterRespons = createLetterDetailsList();
 
         // when
-        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letterResponses);
+        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letterRespons);
 
         ResultActions results = mockMvc.perform(get("/api/letters")
                                                 .withParam("page", String.valueOf(parameters.getPage()))
@@ -114,11 +114,11 @@ class LetterControllerTest extends BaseControllerTest {
     @DisplayName("OK - 유효한 ID 로부터 Letter 상세정보를 조회하는 API 테스트")
     void find_letter_by_valid_id() throws Exception {
         // given
-        LetterResponse letterResponse = createLetterResponse();
-        Long letterId = letterResponse.getId();
+        LetterDetails letterDetails = createLetterDetails();
+        Long letterId = letterDetails.getId();
 
         // when
-        when(letterService.findLetter(letterId)).thenReturn(letterResponse);
+        when(letterService.findLetter(letterId)).thenReturn(letterDetails);
 
         ResultActions results = mockMvc.perform(get("/api/letters/{id}", letterId)
                                                 .doRequest());
@@ -142,7 +142,7 @@ class LetterControllerTest extends BaseControllerTest {
     void create_new_Letter(String songStory, SongRequest songRequest, Long accountId) throws Exception {
         // given
         NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
-        LetterResponse response = createLetterResponse();
+        LetterDetails response = createLetterDetails();
         String requestBody = objectMapper.writeValueAsString(newLetterRequest);
 
         // when
@@ -218,10 +218,10 @@ class LetterControllerTest extends BaseControllerTest {
     void valid_letter_status() throws Exception {
         // given
         List<Letter> letters = Arrays.asList(createLetterOf(DONE), createLetterOf(DONE), createLetterOf(DONE));
-        List<LetterResponse> letterResponses = letters.stream().map(LetterResponse::from).collect(Collectors.toList());
+        List<LetterDetails> letterRespons = letters.stream().map(LetterDetails::from).collect(Collectors.toList());
 
         // when
-        when(letterService.findLettersByStatus(DONE)).thenReturn(letterResponses);
+        when(letterService.findLettersByStatus(DONE)).thenReturn(letterRespons);
 
         ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", "done")
                                                 .doRequest());
