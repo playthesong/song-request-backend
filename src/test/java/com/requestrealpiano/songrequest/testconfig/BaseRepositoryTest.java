@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.auditing.AuditingHandler;
 import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.event.annotation.BeforeTestMethod;
 
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
@@ -22,15 +23,4 @@ public class BaseRepositoryTest {
 
     @Autowired
     protected Scheduler scheduler;
-
-    @MockBean
-    protected DateTimeProvider dateTimeProvider;
-
-    @SpyBean
-    protected AuditingHandler auditingHandler;
-
-    @BeforeEach
-    void setup() {
-        auditingHandler.setDateTimeProvider(dateTimeProvider);
-    }
 }
