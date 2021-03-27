@@ -3,6 +3,7 @@ package com.requestrealpiano.songrequest.controller;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
+import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.response.ApiResponse;
 import com.requestrealpiano.songrequest.service.LetterService;
@@ -26,8 +27,8 @@ public class LetterController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
-    public ApiResponse<List<LetterDetails>> findAll(@ModelAttribute @Valid PaginationParameters paginationParameters) {
-        List<LetterDetails> letters = letterService.findAllLetters(paginationParameters);
+    public ApiResponse<LettersResponse> findAll(@ModelAttribute @Valid PaginationParameters paginationParameters) {
+        LettersResponse letters = letterService.findAllLetters(paginationParameters);
         return SUCCESS(OK, letters);
     }
 

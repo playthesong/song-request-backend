@@ -8,6 +8,7 @@ import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
@@ -37,15 +38,13 @@ public class LetterService {
     private final SongService songService;
     private final Scheduler scheduler;
 
-    public List<LetterDetails> findAllLetters(PaginationParameters parameters) {
+    public LettersResponse findAllLetters(PaginationParameters parameters) {
         Sort sortByCreatedDateTime = Sort.by(Direction.DESC, CREATED_DATE_TIME.getFieldName());
         PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(), sortByCreatedDateTime);
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
         Page<Letter> letters = letterRepository.findAllTodayLetters(pageRequest, startDateTime, endDateTime);
-        return letters.stream()
-                      .map(LetterDetails::from)
-                      .collect(Collectors.toList());
+        return LettersResponse.from(letters);
     }
 
     public LetterDetails findLetter(Long id) {

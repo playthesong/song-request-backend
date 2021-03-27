@@ -11,6 +11,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
+import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
@@ -69,10 +70,10 @@ class LetterControllerTest extends BaseControllerTest {
     void find_all_letters() throws Exception {
         // given
         PaginationParameters parameters = createPaginationParameters();
-        List<LetterDetails> letterRespons = createLetterDetailsList();
+        LettersResponse letters = createLettersResponse();
 
         // when
-        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letterRespons);
+        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letters);
 
         ResultActions results = mockMvc.perform(get("/api/letters")
                                                 .withParam("page", String.valueOf(parameters.getPage()))
@@ -80,14 +81,7 @@ class LetterControllerTest extends BaseControllerTest {
                                                 .doRequest());
 
         // then
-        MockMvcResponse.OK(results)
-                       .andDo(document("find-letters",
-                           responseFields(ResponseFields.common())
-                                   .andWithPrefix("data[].", ResponseFields.letter()),
-                           responseFields(beneathPath("data[].song.").withSubsectionId("song"), ResponseFields.song()),
-                           responseFields(beneathPath("data[].account.").withSubsectionId("account"), ResponseFields.account())
-                       ))
-        ;
+        MockMvcResponse.OK(results);
     }
 
     @ParameterizedTest
@@ -96,10 +90,10 @@ class LetterControllerTest extends BaseControllerTest {
     void pagination_find_all_letters(Integer page, Integer size) throws Exception {
         // given
         PaginationParameters parameters = createPaginationParametersOf(page, size);
-        List<LetterDetails> letterRespons = createLetterDetailsList();
+        LettersResponse letters = createLettersResponse();
 
         // when
-        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letterRespons);
+        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letters);
 
         ResultActions results = mockMvc.perform(get("/api/letters")
                                                 .withParam("page", String.valueOf(parameters.getPage()))

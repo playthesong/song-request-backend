@@ -7,6 +7,7 @@ import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
+import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
@@ -71,13 +72,15 @@ class LetterServiceTest {
         List<Letter> letters = createLettersOf(account, song);
 
         // when
-        when(scheduler.now()).thenReturn(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        when(scheduler.now()).thenReturn(now);
+        when(scheduler.defaultStartDateTimeFrom((any(LocalDateTime.class)))).thenReturn(now.minusDays(1));
         when(letterRepository.findAllTodayLetters(refEq(pageRequest), any(LocalDateTime.class), any(LocalDateTime.class)))
                 .thenReturn(new PageImpl<>(letters));
-        List<LetterDetails> letterRespons = letterService.findAllLetters(parameters);
+        LettersResponse lettersResponse = letterService.findAllLetters(parameters);
 
         // then
-        assertThat(letterRespons.size()).isEqualTo(letters.size());
+        assertThat(lettersResponse.getLetters().size()).isEqualTo(letters.size());
     }
 
     @Test
