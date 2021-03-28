@@ -3,6 +3,7 @@ package com.requestrealpiano.songrequest.service.searchapi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbClientResponse;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTranslator;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,8 @@ public class ManiaDbApiService implements SearchApiService {
     private final XmlTranslator xmlTranslator;
 
     @Override
-    public SearchApiResponse requestSearchApiResponse(String artist, String title) {
-        String rawXml = maniaDbRestClient.searchManiaDb(artist, title);
+    public SearchApiResponse requestSearchApiResponse(SearchSongParameters parameters) {
+        String rawXml = maniaDbRestClient.searchManiaDb(parameters);
         ManiaDbClientResponse maniaDbData = xmlTranslator.mapToManiaDbData(rawXml);
         return SearchApiResponse.from(maniaDbData);
     }

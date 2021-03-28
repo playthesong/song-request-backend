@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.service;
 
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.XmlTranslator;
@@ -21,6 +22,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSearchSongParametersOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
@@ -42,11 +44,12 @@ public class ManiaDbApiServiceTest {
     @DisplayName("ManiaDB 검색 결과 반환 테스트")
     void search_maniaDb_response(Path xmlPath, String artist, String title, int first, int totalCount) throws IOException {
         // given
+        SearchSongParameters parameters = createSearchSongParametersOf(artist, title);
         String testXmlResponse = Files.readString(xmlPath);
 
         // when
-        when(maniaDbRestClient.searchManiaDb(artist, title)).thenReturn(testXmlResponse);
-        SearchApiResponse response = maniaDbApiService.requestSearchApiResponse(artist, title);
+        when(maniaDbRestClient.searchManiaDb(parameters)).thenReturn(testXmlResponse);
+        SearchApiResponse response = maniaDbApiService.requestSearchApiResponse(parameters);
         List<Track> tracks = response.getTracks();
         Track track = tracks.get(first);
 

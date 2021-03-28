@@ -1,11 +1,11 @@
 package com.requestrealpiano.songrequest.controller.song;
 
-import com.requestrealpiano.songrequest.controller.MockMvcRequest;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.SongController;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
@@ -26,7 +26,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,12 +33,15 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSearchSongParametersOf;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = SongController.class,
             excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = SecurityConfig.class))
@@ -60,7 +62,7 @@ class SongControllerTest extends BaseControllerTest {
         SearchApiResponse maniaDbResponse = createMockManiaDbResponse();
 
         // when
-        when(songService.searchSong(artist, title)).thenReturn(maniaDbResponse);
+        when(songService.searchSong(any(SearchSongParameters.class))).thenReturn(maniaDbResponse);
 
         ResultActions results = mockMvc.perform(get("/api/songs")
                                                 .withParam("artist", artist)
@@ -115,12 +117,34 @@ class SongControllerTest extends BaseControllerTest {
         SearchApiResponse response = SearchApiResponse.from(tracks);
 
         // when
-        when(songService.searchSong(artist, title)).thenReturn(response);
+        when(songService.searchSong(any(SearchSongParameters.class))).thenReturn(response);
 
         ResultActions results = mockMvc.perform(get("/api/songs")
                                                 .withParam("artist", artist)
                                                 .withParam("title", title)
                                                 .doRequest());
+
+        // then
+        MockMvcResponse.OK(results);
+    }
+
+    @ParameterizedTest
+    @MethodSource("searchWithNotNeededParams")
+    @WithMember
+    @DisplayName("OK - 기대하지 않은 파라미터 key - value가 들어왔을 때도 기본 값 처리가 성공하는 테스트")
+    void search_with_not_needed_params(String firstWrongKey, String firstWrongValue,
+                                       String secondWrongKey, String secondWrongValue) throws Exception {
+        // given
+        SearchApiResponse maniaDbResponse = createMockManiaDbResponse();
+
+        // when
+        when(songService.searchSong(any(SearchSongParameters.class))).thenReturn(maniaDbResponse);
+
+        ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withParam(firstWrongKey, firstWrongValue)
+                                                .withParam(secondWrongKey, secondWrongValue)
+                                                .doRequest());
+
 
         // then
         MockMvcResponse.OK(results);
@@ -153,6 +177,12 @@ class SongControllerTest extends BaseControllerTest {
                Arguments.of(StringUtils.repeat("Artist length is more than 30", 5), "Title"),
                Arguments.of("Artist", StringUtils.repeat("Title length is more than 30", 5))
        );
+    }
+
+    private static Stream<Arguments> searchWithNotNeededParams() {
+        return Stream.of(
+                Arguments.of("FirstWrongKey", "First Wrong Value", "Second Wrong Key", "Second Wrong Value")
+        );
     }
 
     private static Stream<Arguments> searchManiaDbParameters() {

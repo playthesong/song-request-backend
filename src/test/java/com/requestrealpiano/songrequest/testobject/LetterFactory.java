@@ -6,14 +6,20 @@ import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
-import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.AccountSummary;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.SongSummary;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
 
 public class LetterFactory {
 
@@ -35,8 +41,17 @@ public class LetterFactory {
         return Letter.builder()
                      .songStory("Song story")
                      .requestStatus(RequestStatus.WAITING)
-                     .song(SongFactory.createSong())
-                     .account(AccountFactory.createMember())
+                     .song(createSong())
+                     .account(createMember())
+                     .build();
+    }
+
+    public static Letter createLetterOf(RequestStatus requestStatus) {
+        return Letter.builder()
+                     .songStory("Song story")
+                     .requestStatus(requestStatus)
+                     .song(createSong())
+                     .account(createMember())
                      .build();
     }
 
@@ -79,9 +94,13 @@ public class LetterFactory {
         return Arrays.asList(firstLetter, secondLetter, thirdLetter);
     }
 
-    // LetterResponse
-    public static LetterResponse createLetterResponse() {
-        return LetterResponse.builder()
+    public static Page<Letter> createLettersPage() {
+        return new PageImpl<>(createLettersOf(createMember(), createSong()));
+    }
+
+    // LetterDetails
+    public static LetterDetails createLetterDetails() {
+        return LetterDetails.builder()
                              .id(1L)
                              .songStory("Song Story")
                              .requestStatus(RequestStatus.WAITING.getKey())
@@ -100,9 +119,9 @@ public class LetterFactory {
                              .build();
     }
 
-    // LetterResponses
-    public static List<LetterResponse> createLetterResponses() {
-        LetterResponse firstLetterResponse = LetterResponse.builder()
+    // LetterDetailsList
+    public static List<LetterDetails> createLetterDetailsList() {
+        LetterDetails firstLetterDetails = LetterDetails.builder()
                                                             .id(1L)
                                                             .songStory("Song Story 1")
                                                             .requestStatus(RequestStatus.WAITING.getKey())
@@ -120,7 +139,7 @@ public class LetterFactory {
                                                                                     .build())
                                                             .build();
 
-        LetterResponse secondLetterResponse = LetterResponse.builder()
+        LetterDetails secondLetterDetails = LetterDetails.builder()
                                                             .id(2L)
                                                             .songStory("Song Story 2")
                                                             .requestStatus(RequestStatus.WAITING.getKey())
@@ -138,7 +157,7 @@ public class LetterFactory {
                                                                                     .build())
                                                             .build();
 
-        LetterResponse thirdLetterResponse = LetterResponse.builder()
+        LetterDetails thirdLetterDetails = LetterDetails.builder()
                                                            .id(3L)
                                                            .songStory("Song Story 3")
                                                            .requestStatus(RequestStatus.WAITING.getKey())
@@ -155,7 +174,12 @@ public class LetterFactory {
                                                                                    .imageUrl("http://imageUrl_3")
                                                                                    .build())
                                                            .build();
-        return Arrays.asList(firstLetterResponse, secondLetterResponse, thirdLetterResponse);
+        return Arrays.asList(firstLetterDetails, secondLetterDetails, thirdLetterDetails);
+    }
+
+    // LettersResponse
+    public static LettersResponse createLettersResponse() {
+        return LettersResponse.from(createLettersPage());
     }
 
     // NewLetterRequest

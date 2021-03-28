@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public class ValueError {
+
     private final String value;
     private final String reason;
 

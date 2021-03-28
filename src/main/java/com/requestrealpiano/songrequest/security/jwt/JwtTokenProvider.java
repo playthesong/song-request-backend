@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @RequiredArgsConstructor
@@ -25,11 +26,13 @@ public class JwtTokenProvider {
     private final String ROLE = "role";
 
     public String createGenerationKey(String email) {
-        Date now = new Date();
+        long period = Long.parseLong(jwtProperties.getGenerationKeyExpiration());
+        ZonedDateTime now = ZonedDateTime.now();
+
         return Jwts.builder()
                    .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                   .setIssuedAt(now)
-                   .setExpiration(new Date(now.getTime() + Long.parseLong(jwtProperties.getGenerationKeyExpiration())))
+                   .setIssuedAt(Date.from(now.toInstant()))
+                   .setExpiration(Date.from(now.toInstant().plusMillis(period)))
                    .claim(EMAIL, email)
                    .signWith(SignatureAlgorithm.HS256, jwtProperties.getGenerationKeySecret())
                    .compact();
@@ -39,8 +42,8 @@ public class JwtTokenProvider {
         String generationKey = extractToken(authorization);
         try {
             Jws<Claims> claims = Jwts.parser()
-                    .setSigningKey(jwtProperties.getGenerationKeySecret())
-                    .parseClaimsJws(generationKey);
+                                     .setSigningKey(jwtProperties.getGenerationKeySecret())
+                                     .parseClaimsJws(generationKey);
             return claims.getBody()
                          .get(EMAIL, String.class);
         } catch (ExpiredJwtException exception) {
@@ -51,11 +54,13 @@ public class JwtTokenProvider {
     }
 
     public String createJwtToken(Account account) {
-        Date now = new Date();
+        long period = Long.parseLong(jwtProperties.getTokenExpiration());
+        ZonedDateTime now = ZonedDateTime.now();
+
         String jwtToken = Jwts.builder()
                               .setHeaderParam(Header.TYPE, Header.JWT_TYPE)
-                              .setIssuedAt(now)
-                              .setExpiration(new Date(now.getTime() + Long.parseLong(jwtProperties.getTokenExpiration())))
+                              .setIssuedAt(Date.from(now.toInstant()))
+                              .setExpiration(Date.from(now.toInstant().plusMillis(period)))
                               .claim(ID, account.getId())
                               .claim(EMAIL, account.getEmail())
                               .claim(NAME, account.getName())
@@ -66,15 +71,12 @@ public class JwtTokenProvider {
         return jwtProperties.getHeaderPrefix() + jwtToken;
     }
 
-    public boolean validateJwtToken(String authorization) {
+    public void validateJwtToken(String authorization) {
         String jwtToken = extractToken(authorization);
         try {
-            Jws<Claims> claims = Jwts.parser()
-                                     .setSigningKey(jwtProperties.getTokenSecret())
-                                     .parseClaimsJws(jwtToken);
-            return claims.getBody()
-                         .getExpiration()
-                         .after(new Date());
+            Jwts.parser()
+                .setSigningKey(jwtProperties.getTokenSecret())
+                .parseClaimsJws(jwtToken);
         } catch (ExpiredJwtException exception) {
             throw new JwtExpirationException();
         } catch (JwtException exception) {

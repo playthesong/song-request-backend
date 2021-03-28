@@ -4,8 +4,10 @@ import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.testconfig.BaseIntegrationTest;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,8 @@ import java.nio.file.Path;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.JwtFactory.*;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSearchSongParametersOf;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class SongIntegrationTest extends BaseIntegrationTest {
@@ -49,7 +53,7 @@ public class SongIntegrationTest extends BaseIntegrationTest {
         String jwtToken = createValidJwtTokenOf(account);
 
         // when
-        when(maniaDbRestClient.searchManiaDb(artist, title)).thenReturn(testXmlResponse);
+        when(maniaDbRestClient.searchManiaDb(any(SearchSongParameters.class))).thenReturn(testXmlResponse);
 
         ResultActions results = mockMvc.perform(get("/api/songs")
                                                 .withParam("artist", artist)

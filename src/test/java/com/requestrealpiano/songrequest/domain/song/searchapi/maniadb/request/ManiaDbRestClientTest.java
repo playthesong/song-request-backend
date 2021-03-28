@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.request;
 
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSearchSongParametersOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -44,6 +46,7 @@ class ManiaDbRestClientTest {
     @DisplayName("ManiaDb XML 결과 값 테스트")
     void search_maniadb_xml_response(Path xmlPath, String requestURI, String artist, String title) throws IOException {
         // given
+        SearchSongParameters parameters = createSearchSongParametersOf(artist, title);
         String testXmlResponse = Files.readString(xmlPath);
 
         // when
@@ -53,7 +56,7 @@ class ManiaDbRestClientTest {
               .andExpect(method(HttpMethod.GET))
               .andRespond(withSuccess(testXmlResponse, MediaType.APPLICATION_XML));
 
-        String xmlResponse = maniaDbRestClient.searchManiaDb(artist, title);
+        String xmlResponse = maniaDbRestClient.searchManiaDb(parameters);
 
         // then
         assertThat(xmlResponse).contains(artist);

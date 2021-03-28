@@ -19,4 +19,8 @@ public class AccountService {
         Account account = accountRepository.findByEmail(email).orElseThrow(AccountNotFoundException::new);
         return jwtTokenProvider.createJwtToken(account);
     }
+
+    public void validateJwtToken(String jwtToken) {
+        jwtTokenProvider.validateJwtToken(jwtToken);
+    }
 }

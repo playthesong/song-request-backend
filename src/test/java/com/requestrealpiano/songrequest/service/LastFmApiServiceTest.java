@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.service;
 
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
+import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.domain.song.searchapi.translator.JsonTranslator;
@@ -35,6 +36,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.testobject.SongFactory.createSearchSongParametersOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
@@ -58,11 +60,12 @@ public class LastFmApiServiceTest {
     @DisplayName("LastFM 검색 결과 반환 테스트")
     void search_lastfm_response(Path jsonPath, String artist, String title, int totalCount) throws IOException {
         // given
+        SearchSongParameters parameters = createSearchSongParametersOf(artist, title);
         String testJsonResponse = Files.readString(jsonPath);
 
         // when
-        when(lastFmRestClient.searchLastFm(artist, title)).thenReturn(testJsonResponse);
-        SearchApiResponse response = lastFmApiService.requestSearchApiResponse(artist, title);
+        when(lastFmRestClient.searchLastFm(parameters)).thenReturn(testJsonResponse);
+        SearchApiResponse response = lastFmApiService.requestSearchApiResponse(parameters);
         List<Track> tracks = response.getTracks();
 
         // then
