@@ -1,11 +1,10 @@
 package com.requestrealpiano.songrequest.controller.letter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.requestrealpiano.songrequest.controller.MockMvcRequest;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
-import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.testconfig.BaseIntegrationTest;
@@ -13,9 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
@@ -30,15 +27,15 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
 
     private Account account;
     private SongRequest songRequest;
-    private NewLetterRequest newLetterRequest;
+    private LetterRequest letterRequest;
     private String requestBody;
 
     @BeforeEach
     void setup() throws JsonProcessingException {
         account = accountRepository.save(createMember());
         songRequest = createSongRequest();
-        newLetterRequest = createNewLetterRequestOf("Song Story", songRequest, account.getId());
-        requestBody = objectMapper.writeValueAsString(newLetterRequest);
+        letterRequest = createNewLetterRequestOf("Song Story", songRequest);
+        requestBody = objectMapper.writeValueAsString(letterRequest);
     }
 
     @Test

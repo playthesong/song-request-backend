@@ -4,18 +4,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.controller.LetterController;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
-import com.requestrealpiano.songrequest.controller.restdocs.RequestFields;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
-import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
-import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import com.requestrealpiano.songrequest.service.LetterService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
 import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithGuest;
@@ -35,14 +34,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
+import static com.requestrealpiano.songrequest.domain.account.Role.GUEST;
+import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createOAuthAccountOf;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
@@ -136,25 +135,20 @@ class LetterControllerTest extends BaseControllerTest {
     @DisplayName("OK - 새로운 Letter 등록 API 테스트")
     void create_new_Letter(String songStory, SongRequest songRequest, Long accountId) throws Exception {
         // given
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
+        LetterRequest letterRequest = createNewLetterRequestOf(songStory, songRequest);
         LetterDetails response = createLetterDetails();
-        String requestBody = objectMapper.writeValueAsString(newLetterRequest);
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
 
         // when
-        when(letterService.createLetter(any(NewLetterRequest.class))).thenReturn(response);
-
+        when(letterService.createLetter(any(OAuthAccount.class), any(LetterRequest.class))).thenReturn(response);
         ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withPrincipal(loginAccount)
                                                 .withBody(requestBody)
                                                 .doRequest());
 
         // then
-        MockMvcResponse.CREATED(results)
-                       .andDo(document("create-letter",
-                               requestFields(RequestFields.createLetter()),
-                               responseFields(ResponseFields.common())
-                                   .andWithPrefix("data.", ResponseFields.letter())
-                       ))
-        ;
+        MockMvcResponse.CREATED(results);
     }
 
     @ParameterizedTest
@@ -164,13 +158,15 @@ class LetterControllerTest extends BaseControllerTest {
     void invalid_new_letter_request(String title, String artist, String imageUrl, String songStory,
                                     Long accountId) throws Exception {
         // given
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
         SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
-        String requestBody = objectMapper.writeValueAsString(newLetterRequest);
+        LetterRequest letterRequest = createNewLetterRequestOf(songStory, songRequest);
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
         ErrorCode invalidInputError = ErrorCode.INVALID_INPUT_VALUE;
 
         // when
         ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withPrincipal(loginAccount)
                                                 .withBody(requestBody)
                                                 .doRequest());
 
@@ -189,13 +185,15 @@ class LetterControllerTest extends BaseControllerTest {
     void access_denied_user_create_letter(String title, String artist, String imageUrl, String songStory,
                                          Long accountId) throws Exception {
         // given
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, GUEST);
         SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
+        LetterRequest letterRequest = createNewLetterRequestOf(songStory, songRequest);
         ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
-        String requestBody = objectMapper.writeValueAsString(newLetterRequest);
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
 
         // when
         ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withPrincipal(loginAccount)
                                                 .withBody(requestBody)
                                                 .doRequest());
 

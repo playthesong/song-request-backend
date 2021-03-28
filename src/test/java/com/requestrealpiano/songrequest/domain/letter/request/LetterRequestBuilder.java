@@ -2,7 +2,7 @@ package com.requestrealpiano.songrequest.domain.letter.request;
 
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 
-public class NewLetterRequestBuilder {
+public class LetterRequestBuilder {
 
     public static Builder newBuilder() {
         return new Builder();
@@ -11,7 +11,6 @@ public class NewLetterRequestBuilder {
     public static class Builder {
         private String songStory;
         private SongRequest songRequest;
-        private Long accountId;
 
         public Builder songStory(String songStory) {
             this.songStory = songStory;
@@ -23,13 +22,8 @@ public class NewLetterRequestBuilder {
             return this;
         }
 
-        public Builder accountId(Long accountId) {
-            this.accountId = accountId;
-            return this;
-        }
-
-        public NewLetterRequest build() {
-            return new NewLetterRequest(songStory, songRequest, accountId);
+        public LetterRequest build() {
+            return new LetterRequest(songStory, songRequest);
         }
     }
 }

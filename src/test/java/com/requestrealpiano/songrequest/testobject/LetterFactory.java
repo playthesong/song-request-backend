@@ -3,8 +3,8 @@ package com.requestrealpiano.songrequest.testobject;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
-import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
-import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequestBuilder;
+import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.LetterRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
@@ -182,12 +182,11 @@ public class LetterFactory {
         return LettersResponse.from(createLettersPage());
     }
 
-    // NewLetterRequest
-    public static NewLetterRequest createNewLetterRequestOf(String songStory, SongRequest songRequest, Long accountId) {
-        return NewLetterRequestBuilder.newBuilder()
-                                      .songStory(songStory)
-                                      .songRequest(songRequest)
-                                      .accountId(accountId)
-                                      .build();
+    // LetterRequest
+    public static LetterRequest createNewLetterRequestOf(String songStory, SongRequest songRequest) {
+        return LetterRequestBuilder.newBuilder()
+                                   .songStory(songStory)
+                                   .songRequest(songRequest)
+                                   .build();
     }
 }

@@ -2,9 +2,10 @@ package com.requestrealpiano.songrequest.service;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
+import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
-import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
@@ -13,6 +14,7 @@ import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +33,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createOAuthAccountOf;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPageRequest;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
@@ -149,16 +153,16 @@ class LetterServiceTest {
     @DisplayName("새로운 Letter를 생성하는 테스트")
     void create_new_letter(String songStory, SongRequest songRequest, Long accountId) {
         // given
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
-
+        LetterRequest letterRequest = createNewLetterRequestOf(songStory, songRequest);
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
         Account account = createMember();
         Song song = createSong();
         Letter newLetter = Letter.of(songStory, account, song);
 
         // when
-        when(accountRepository.findById(eq(newLetterRequest.getAccountId()))).thenReturn(Optional.of(account));
+        when(accountRepository.findById(eq(loginAccount.getId()))).thenReturn(Optional.of(account));
         when(letterRepository.save(any(Letter.class))).thenReturn(newLetter);
-        LetterDetails letterDetails = letterService.createLetter(newLetterRequest);
+        LetterDetails letterDetails = letterService.createLetter(loginAccount, letterRequest);
 
         // then
         assertAll(

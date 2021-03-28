@@ -4,12 +4,14 @@ import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.SongController;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
+import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.response.inner.LastFmTrack;
 import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.SearchApiResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.response.inner.Track;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import com.requestrealpiano.songrequest.service.SongService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
 import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithGuest;
@@ -33,6 +35,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
+import static com.requestrealpiano.songrequest.domain.account.Role.GUEST;
+import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createOAuthAccountOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSearchSongParametersOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -59,12 +64,14 @@ class SongControllerTest extends BaseControllerTest {
     @DisplayName("OK - ManiaDB 검색 결과 반환 API 테스트")
     void search_mania_db(String artist, String title) throws Exception {
         // given
+        OAuthAccount loginAccount = createOAuthAccountOf(MEMBER);
         SearchApiResponse maniaDbResponse = createMockManiaDbResponse();
 
         // when
         when(songService.searchSong(any(SearchSongParameters.class))).thenReturn(maniaDbResponse);
 
         ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withPrincipal(loginAccount)
                                                 .withParam("artist", artist)
                                                 .withParam("title", title)
                                                 .doRequest());
@@ -85,10 +92,12 @@ class SongControllerTest extends BaseControllerTest {
     @DisplayName("BAD_REQUEST - 유효하지 않은 제목, 아티스트로 요청 테스트")
     void search_by_invalid_params(String artist, String title) throws Exception {
         // given
+        OAuthAccount loginAccount = createOAuthAccountOf(MEMBER);
         ErrorCode invalidInputValueError = ErrorCode.INVALID_INPUT_VALUE;
 
         // when
         ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withPrincipal(loginAccount)
                                                 .withParam("artist", artist)
                                                 .withParam("title", title)
                                                 .doRequest());
@@ -108,6 +117,7 @@ class SongControllerTest extends BaseControllerTest {
     @DisplayName("OK - LastFM 검색 결과 반환 API 테스트")
     void search_lastfm_api(String artist, String title, String imageUrl) throws Exception {
         // given
+        OAuthAccount loginAccount = createOAuthAccountOf(MEMBER);
         LastFmTrack track = LastFmTrack.builder()
                                        .artist(artist)
                                        .title(title)
@@ -120,6 +130,7 @@ class SongControllerTest extends BaseControllerTest {
         when(songService.searchSong(any(SearchSongParameters.class))).thenReturn(response);
 
         ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withPrincipal(loginAccount)
                                                 .withParam("artist", artist)
                                                 .withParam("title", title)
                                                 .doRequest());
@@ -135,12 +146,14 @@ class SongControllerTest extends BaseControllerTest {
     void search_with_not_needed_params(String firstWrongKey, String firstWrongValue,
                                        String secondWrongKey, String secondWrongValue) throws Exception {
         // given
+        OAuthAccount loginAccount = createOAuthAccountOf(MEMBER);
         SearchApiResponse maniaDbResponse = createMockManiaDbResponse();
 
         // when
         when(songService.searchSong(any(SearchSongParameters.class))).thenReturn(maniaDbResponse);
 
         ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withPrincipal(loginAccount)
                                                 .withParam(firstWrongKey, firstWrongValue)
                                                 .withParam(secondWrongKey, secondWrongValue)
                                                 .doRequest());
@@ -156,10 +169,12 @@ class SongControllerTest extends BaseControllerTest {
     @DisplayName("FORBIDDEN - 권한이 없는 사용자가 신청곡 검색을 요청하는 테스트")
     void access_denied_user_search_song(String artist, String title) throws Exception {
         // given
+        OAuthAccount guestAccount = createOAuthAccountOf(GUEST);
         ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
 
         // when
         ResultActions results = mockMvc.perform(get("/api/songs")
+                                                .withPrincipal(guestAccount)
                                                 .withParam("artist", artist)
                                                 .withParam("title", title)
                                                 .doRequest());

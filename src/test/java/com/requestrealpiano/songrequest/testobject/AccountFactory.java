@@ -2,7 +2,11 @@ package com.requestrealpiano.songrequest.testobject;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.Role;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAttributes;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.Collections;
 
 public class AccountFactory {
 
@@ -32,6 +36,21 @@ public class AccountFactory {
 
     public static Account createMemberOf(OAuthAttributes oAuthAttributes) {
         return Account.from(oAuthAttributes);
+    }
+
+    // OAuthAccount
+    public static OAuthAccount createOAuthAccountOf(Role role) {
+        return OAuthAccount.builder()
+                           .id(1L)
+                           .authorities(Collections.singleton(new SimpleGrantedAuthority(role.getValue())))
+                           .build();
+    }
+
+    public static OAuthAccount createOAuthAccountOf(Long id, Role role) {
+        return OAuthAccount.builder()
+                           .id(id)
+                           .authorities(Collections.singleton(new SimpleGrantedAuthority(role.getValue())))
+                           .build();
     }
 
     // OAuthAttributes
