@@ -5,11 +5,14 @@ import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
-import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
-import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
+import com.requestrealpiano.songrequest.global.time.Scheduler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +22,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,12 +34,13 @@ import java.util.stream.Stream;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
+import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPageRequest;
+import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequest;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,20 +58,29 @@ class LetterServiceTest {
     @Mock
     SongService songService;
 
+    @Mock
+    Scheduler scheduler;
+
     @Test
     @DisplayName("저장 되어 있는 모든 Letters 로부터 LetterResponses 를 생성하는 테스트")
     void find_all_letters() {
         // given
+        PaginationParameters parameters = createPaginationParameters();
+        PageRequest pageRequest = createPageRequest();
         Account account = createMember();
         Song song = createSong();
         List<Letter> letters = createLettersOf(account, song);
 
         // when
-        when(letterRepository.findAll()).thenReturn(letters);
-        List<LetterResponse> letterResponses = letterService.findAllLetters();
+        LocalDateTime now = LocalDateTime.now();
+        when(scheduler.now()).thenReturn(now);
+        when(scheduler.defaultStartDateTimeFrom((any(LocalDateTime.class)))).thenReturn(now.minusDays(1));
+        when(letterRepository.findAllTodayLetters(refEq(pageRequest), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenReturn(new PageImpl<>(letters));
+        LettersResponse lettersResponse = letterService.findAllLetters(parameters);
 
         // then
-        assertThat(letterResponses.size()).isEqualTo(letters.size());
+        assertThat(lettersResponse.getLetters().size()).isEqualTo(letters.size());
     }
 
     @Test
@@ -72,21 +88,28 @@ class LetterServiceTest {
     void find_all_letters_by_request_status() {
         // given
         int first = 0;
+        PaginationParameters paginationParameters = createPaginationParameters();
+        PageRequest pageRequest = createPageRequest();
         List<Letter> waitingLetters = Collections.singletonList(createLetter());
 
         // when
-        when(letterRepository.findAllByRequestStatus(eq(WAITING))).thenReturn(waitingLetters);
-        List<LetterResponse> waitingLetterResponses = letterService.findLettersByStatus(WAITING);
+        LocalDateTime now = LocalDateTime.now();
+        when(scheduler.now()).thenReturn(now);
+        when(scheduler.defaultStartDateTimeFrom((any(LocalDateTime.class)))).thenReturn(now.minusDays(1));
+        when(letterRepository.findAllTodayLettersByRequestStatus(refEq(pageRequest), eq(WAITING),
+                                                                 any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenReturn(new PageImpl<>(waitingLetters));
+        LettersResponse waitingLettersResponse = letterService.findLettersByStatus(WAITING, paginationParameters);
 
         Letter waitingLetter = waitingLetters.get(first);
-        LetterResponse waitingLetterResponse = waitingLetterResponses.get(first);
+        LetterDetails waitingLetterDetails = waitingLettersResponse.getLetters().get(first);
 
         // then
         assertAll(
-                () -> assertThat(waitingLetterResponse.getRequestStatus()).isEqualTo(waitingLetter.getRequestStatus().getKey()),
-                () -> assertThat(waitingLetterResponse.getAccount().getAvatarUrl()).isEqualTo(waitingLetter.getAccount().getAvatarUrl()),
-                () -> assertThat(waitingLetterResponse.getSong().getTitle()).isEqualTo(waitingLetter.getSong().getSongTitle()),
-                () -> assertThat(waitingLetterResponse.getSongStory()).isEqualTo(waitingLetter.getSongStory())
+                () -> assertThat(waitingLetterDetails.getRequestStatus()).isEqualTo(waitingLetter.getRequestStatus().getKey()),
+                () -> assertThat(waitingLetterDetails.getAccount().getAvatarUrl()).isEqualTo(waitingLetter.getAccount().getAvatarUrl()),
+                () -> assertThat(waitingLetterDetails.getSong().getTitle()).isEqualTo(waitingLetter.getSong().getSongTitle()),
+                () -> assertThat(waitingLetterDetails.getSongStory()).isEqualTo(waitingLetter.getSongStory())
         );
     }
 
@@ -96,14 +119,14 @@ class LetterServiceTest {
         // given
         Long validId = 1L;
         Letter letter = createLetter();
-        LetterResponse testResponse = LetterResponse.from(letter);
+        LetterDetails testResponse = LetterDetails.from(letter);
 
         // when
         when(letterRepository.findById(validId)).thenReturn(Optional.of(letter));
-        LetterResponse letterResponse = letterService.findLetter(validId);
+        LetterDetails letterDetails = letterService.findLetter(validId);
 
         // then
-        assertThat(letterResponse.getSongStory()).isEqualTo(testResponse.getSongStory());
+        assertThat(letterDetails.getSongStory()).isEqualTo(testResponse.getSongStory());
         assertThatCode(() -> letterService.findLetter(validId)).doesNotThrowAnyException();
     }
 
@@ -135,15 +158,15 @@ class LetterServiceTest {
         // when
         when(accountRepository.findById(eq(newLetterRequest.getAccountId()))).thenReturn(Optional.of(account));
         when(letterRepository.save(any(Letter.class))).thenReturn(newLetter);
-        LetterResponse letterResponse = letterService.createLetter(newLetterRequest);
+        LetterDetails letterDetails = letterService.createLetter(newLetterRequest);
 
         // then
         assertAll(
-                () -> assertThat(letterResponse.getSongStory()).isEqualTo(newLetter.getSongStory()),
-                () -> assertThat(letterResponse.getRequestStatus()).isEqualTo(newLetter.getRequestStatus().getKey()),
-                () -> assertThat(letterResponse.getSong().getTitle()).isEqualTo(newLetter.getSong().getSongTitle()),
-                () -> assertThat(letterResponse.getAccount().getName()).isEqualTo(newLetter.getAccount().getName()),
-                () -> assertThat(letterResponse.getAccount().getAvatarUrl()).isEqualTo(newLetter.getAccount().getAvatarUrl())
+                () -> assertThat(letterDetails.getSongStory()).isEqualTo(newLetter.getSongStory()),
+                () -> assertThat(letterDetails.getRequestStatus()).isEqualTo(newLetter.getRequestStatus().getKey()),
+                () -> assertThat(letterDetails.getSong().getTitle()).isEqualTo(newLetter.getSong().getSongTitle()),
+                () -> assertThat(letterDetails.getAccount().getName()).isEqualTo(newLetter.getAccount().getName()),
+                () -> assertThat(letterDetails.getAccount().getAvatarUrl()).isEqualTo(newLetter.getAccount().getAvatarUrl())
         );
     }
 

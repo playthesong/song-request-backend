@@ -7,12 +7,14 @@ import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.RequestFields;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
-import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
-import com.requestrealpiano.songrequest.domain.letter.response.LetterResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
+import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
+import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.service.LetterService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
@@ -29,6 +31,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -40,10 +43,11 @@ import java.util.stream.Stream;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
-import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
+import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
+import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -66,34 +70,50 @@ class LetterControllerTest extends BaseControllerTest {
     @DisplayName("OK - 전체 신청곡 목록 조회 API 테스트")
     void find_all_letters() throws Exception {
         // given
-        List<LetterResponse> letterResponses = createLetterResponses();
+        PaginationParameters parameters = createPaginationParameters();
+        LettersResponse letters = createLettersResponse();
 
         // when
-        when(letterService.findAllLetters()).thenReturn(letterResponses);
+        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letters);
 
         ResultActions results = mockMvc.perform(get("/api/letters")
+                                                .withParam("page", String.valueOf(parameters.getPage()))
+                                                .withParam("size", String.valueOf(parameters.getSize()))
                                                 .doRequest());
 
         // then
-        MockMvcResponse.OK(results)
-                       .andDo(document("find-letters",
-                           responseFields(ResponseFields.common())
-                                   .andWithPrefix("data[].", ResponseFields.letter()),
-                           responseFields(beneathPath("data[].song.").withSubsectionId("song"), ResponseFields.song()),
-                           responseFields(beneathPath("data[].account.").withSubsectionId("account"), ResponseFields.account())
-                       ))
-        ;
+        MockMvcResponse.OK(results);
+    }
+
+    @ParameterizedTest
+    @MethodSource("paginationFindAllLettersParameters")
+    @DisplayName("OK - 전체 Letter 목록 페이징 경계 값 테스트")
+    void pagination_find_all_letters(Integer page, Integer size) throws Exception {
+        // given
+        PaginationParameters parameters = createPaginationParametersOf(page, size);
+        LettersResponse letters = createLettersResponse();
+
+        // when
+        when(letterService.findAllLetters(refEq(parameters))).thenReturn(letters);
+
+        ResultActions results = mockMvc.perform(get("/api/letters")
+                                                .withParam("page", String.valueOf(parameters.getPage()))
+                                                .withParam("size", String.valueOf(parameters.getSize()))
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.OK(results);
     }
 
     @Test
     @DisplayName("OK - 유효한 ID 로부터 Letter 상세정보를 조회하는 API 테스트")
     void find_letter_by_valid_id() throws Exception {
         // given
-        LetterResponse letterResponse = createLetterResponse();
-        Long letterId = letterResponse.getId();
+        LetterDetails letterDetails = createLetterDetails();
+        Long letterId = letterDetails.getId();
 
         // when
-        when(letterService.findLetter(letterId)).thenReturn(letterResponse);
+        when(letterService.findLetter(letterId)).thenReturn(letterDetails);
 
         ResultActions results = mockMvc.perform(get("/api/letters/{id}", letterId)
                                                 .doRequest());
@@ -117,7 +137,7 @@ class LetterControllerTest extends BaseControllerTest {
     void create_new_Letter(String songStory, SongRequest songRequest, Long accountId) throws Exception {
         // given
         NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
-        LetterResponse response = createLetterResponse();
+        LetterDetails response = createLetterDetails();
         String requestBody = objectMapper.writeValueAsString(newLetterRequest);
 
         // when
@@ -192,13 +212,16 @@ class LetterControllerTest extends BaseControllerTest {
     @DisplayName("OK - 유효한 Letter Status 값으로 요청하는 테스트")
     void valid_letter_status() throws Exception {
         // given
-        List<Letter> letters = Arrays.asList(createLetterOf(DONE), createLetterOf(DONE), createLetterOf(DONE));
-        List<LetterResponse> letterResponses = letters.stream().map(LetterResponse::from).collect(Collectors.toList());
+        PaginationParameters parameters = createPaginationParameters();
+        Page<Letter> lettersPage = createLettersPage();
+        LettersResponse lettersResponse = LettersResponse.from(lettersPage);
 
         // when
-        when(letterService.findLettersByStatus(DONE)).thenReturn(letterResponses);
+        when(letterService.findLettersByStatus(eq(DONE), refEq(parameters))).thenReturn(lettersResponse);
 
         ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", "done")
+                                                .withParam("page", String.valueOf(parameters.getPage()))
+                                                .withParam("size", String.valueOf(parameters.getSize()))
                                                 .doRequest());
 
         // then
@@ -218,6 +241,19 @@ class LetterControllerTest extends BaseControllerTest {
 
         // then
         MockMvcResponse.BAD_REQUEST(results, invalidRequestError);
+    }
+
+    private static Stream<Arguments> paginationFindAllLettersParameters() {
+        int pageMin = 0;
+        int pageSizeMin = 10;
+        int pageSizeMax = 50;
+        return Stream.of(
+                Arguments.of(null, null),
+                Arguments.of(null, pageSizeMax + 1),
+                Arguments.of(pageMin - 1, null),
+                Arguments.of(pageMin - 1, pageSizeMin - 1),
+                Arguments.of(pageMin - 1, pageSizeMax + 1)
+        );
     }
 
     private static Stream<Arguments> invalidLetterStatusParameters() {
