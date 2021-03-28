@@ -47,7 +47,7 @@ class SchedulerTest {
     private static Stream<Arguments> defaultStartDateTimeParameters() {
         return Stream.of(
                 Arguments.of(2021, 4, 1, 14, 10, 11,
-                             2021, 3, 31, 12, 0, 0)
+                             2021, 3, 31, 19, 0, 0)
         );
     }
 }

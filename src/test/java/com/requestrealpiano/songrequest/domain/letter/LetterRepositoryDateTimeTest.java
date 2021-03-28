@@ -53,8 +53,8 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
         PaginationParameters parameters = createPaginationParametersOf(page, pageSize);
         PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(),  Sort.by(Sort.Direction.DESC, CREATED_DATE_TIME.getFieldName()));
 
-        LocalDateTime foundTime = LocalDateTime.of(2021, 3, 26, 12, 0, 0);
-        LocalDateTime notFoundTime = LocalDateTime.of(2021, 3, 26, 11, 59, 59);
+        LocalDateTime foundTime = LocalDateTime.of(2021, 3, 26, 19, 0, 0);
+        LocalDateTime notFoundTime = LocalDateTime.of(2021, 3, 26, 18, 59, 59);
         LocalDateTime now = LocalDateTime.of(2021, 3, 27, 23, 45, 0);
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(now);
 

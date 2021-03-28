@@ -10,7 +10,7 @@ import java.time.LocalTime;
 @Component
 public class Scheduler {
 
-    private final int DEFAULT_HOUR = 12;
+    private final int DEFAULT_HOUR = 19;
     private final int DEFAULT_MINUTE = 0;
     private final int DEFAULT_SECOND = 0;
 
