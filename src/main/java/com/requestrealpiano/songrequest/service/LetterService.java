@@ -39,10 +39,10 @@ public class LetterService {
     private final Scheduler scheduler;
 
     public LettersResponse findAllLetters(PaginationParameters parameters) {
-        PageRequest letterPageRequest = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
+        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
-        Page<Letter> letters = letterRepository.findAllTodayLetters(letterPageRequest, startDateTime, endDateTime);
+        Page<Letter> letters = letterRepository.findAllTodayLetters(letterPage, startDateTime, endDateTime);
         return LettersResponse.from(letters);
     }
 
@@ -62,10 +62,11 @@ public class LetterService {
         return LetterDetails.from(newLetter);
     }
 
-    public List<LetterDetails> findLettersByStatus(RequestStatus requestStatus) {
-        List<Letter> letters = letterRepository.findAllByRequestStatus(requestStatus);
-        return letters.stream()
-                      .map(LetterDetails::from)
-                      .collect(Collectors.toList());
+    public LettersResponse findLettersByStatus(RequestStatus requestStatus, PaginationParameters parameters) {
+        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
+        LocalDateTime endDateTime = scheduler.now();
+        LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
+        Page<Letter> letters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, requestStatus, startDateTime, endDateTime);
+        return LettersResponse.from(letters);
     }
 }

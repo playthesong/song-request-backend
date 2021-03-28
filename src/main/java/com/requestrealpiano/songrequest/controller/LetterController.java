@@ -48,8 +48,9 @@ public class LetterController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/status/{requestStatus}")
-    public ApiResponse<List<LetterDetails>> findByStatus(@PathVariable RequestStatus requestStatus) {
-        List<LetterDetails> letters = letterService.findLettersByStatus(requestStatus);
+    public ApiResponse<LettersResponse> findByStatus(@PathVariable RequestStatus requestStatus,
+                                                     @ModelAttribute @Valid PaginationParameters paginationParameters) {
+        LettersResponse letters = letterService.findLettersByStatus(requestStatus, paginationParameters);
         return SUCCESS(OK, letters);
     }
 }

@@ -13,7 +13,11 @@ public interface LetterRepository extends JpaRepository<Letter, Long>  {
 
     @Query("SELECT l FROM Letter l WHERE l.createdDateTime BETWEEN :startDateTime AND :endDateTime")
     Page<Letter> findAllTodayLetters(Pageable pageable, @Param("startDateTime") LocalDateTime startDateTime,
-                                     @Param("endDateTime") LocalDateTime endDateTime);
+                                                        @Param("endDateTime") LocalDateTime endDateTime);
 
-    List<Letter> findAllByRequestStatus(RequestStatus requestStatus);
+    @Query("SELECT l FROM Letter l WHERE l.requestStatus = :requestStatus " +
+                                    "AND l.createdDateTime BETWEEN :startDateTime AND :endDateTime")
+    Page<Letter> findAllTodayLettersByRequestStatus(Pageable pageable, @Param("requestStatus")RequestStatus requestStatus,
+                                                    @Param("startDateTime")LocalDateTime startDateTime,
+                                                    @Param("endDateTime")LocalDateTime endDateTime);
 }

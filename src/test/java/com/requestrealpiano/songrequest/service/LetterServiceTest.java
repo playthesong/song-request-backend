@@ -88,14 +88,21 @@ class LetterServiceTest {
     void find_all_letters_by_request_status() {
         // given
         int first = 0;
+        PaginationParameters paginationParameters = createPaginationParameters();
+        PageRequest pageRequest = createPageRequest();
         List<Letter> waitingLetters = Collections.singletonList(createLetter());
 
         // when
-        when(letterRepository.findAllByRequestStatus(eq(WAITING))).thenReturn(waitingLetters);
-        List<LetterDetails> waitingLetterRespons = letterService.findLettersByStatus(WAITING);
+        LocalDateTime now = LocalDateTime.now();
+        when(scheduler.now()).thenReturn(now);
+        when(scheduler.defaultStartDateTimeFrom((any(LocalDateTime.class)))).thenReturn(now.minusDays(1));
+        when(letterRepository.findAllTodayLettersByRequestStatus(refEq(pageRequest), eq(WAITING),
+                                                                 any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenReturn(new PageImpl<>(waitingLetters));
+        LettersResponse waitingLettersResponse = letterService.findLettersByStatus(WAITING, paginationParameters);
 
         Letter waitingLetter = waitingLetters.get(first);
-        LetterDetails waitingLetterDetails = waitingLetterRespons.get(first);
+        LetterDetails waitingLetterDetails = waitingLettersResponse.getLetters().get(first);
 
         // then
         assertAll(

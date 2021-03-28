@@ -22,6 +22,7 @@ import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.*;
 import static com.requestrealpiano.songrequest.global.constant.SortProperties.CREATED_DATE_TIME;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetter;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetters;
+import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPageRequest;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -52,13 +53,16 @@ class LetterRepositoryTest extends BaseRepositoryTest {
     @DisplayName("RequestStatus를 기준으로 Letter 목록을 조회하는 테스트")
     void find_all_by_request_status() {
         // given
+        PageRequest letterPage = createPageRequest();
         List<Letter> letters = createLetters();
+        LocalDateTime endDateTime = scheduler.now();
+        LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
 
         // when
         letterRepository.saveAll(letters);
-        List<Letter> waitingLetters = letterRepository.findAllByRequestStatus(WAITING);
-        List<Letter> pendingLetters = letterRepository.findAllByRequestStatus(PENDING);
-        List<Letter> doneLetters = letterRepository.findAllByRequestStatus(DONE);
+        Page<Letter> waitingLetters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, WAITING, startDateTime, endDateTime);
+        Page<Letter> pendingLetters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, PENDING, startDateTime, endDateTime);
+        Page<Letter> doneLetters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, DONE, startDateTime, endDateTime);
 
         // then
         assertAll(

@@ -14,6 +14,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestB
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
+import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.service.LetterService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
@@ -30,6 +31,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -45,8 +47,7 @@ import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -211,13 +212,16 @@ class LetterControllerTest extends BaseControllerTest {
     @DisplayName("OK - 유효한 Letter Status 값으로 요청하는 테스트")
     void valid_letter_status() throws Exception {
         // given
-        List<Letter> letters = Arrays.asList(createLetterOf(DONE), createLetterOf(DONE), createLetterOf(DONE));
-        List<LetterDetails> letterRespons = letters.stream().map(LetterDetails::from).collect(Collectors.toList());
+        PaginationParameters parameters = createPaginationParameters();
+        Page<Letter> lettersPage = createLettersPage();
+        LettersResponse lettersResponse = LettersResponse.from(lettersPage);
 
         // when
-        when(letterService.findLettersByStatus(DONE)).thenReturn(letterRespons);
+        when(letterService.findLettersByStatus(eq(DONE), refEq(parameters))).thenReturn(lettersResponse);
 
         ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", "done")
+                                                .withParam("page", String.valueOf(parameters.getPage()))
+                                                .withParam("size", String.valueOf(parameters.getSize()))
                                                 .doRequest());
 
         // then
