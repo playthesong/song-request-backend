@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.global.constant.SortProperties.CREATED_DATE_TIME;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
@@ -46,8 +47,8 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
     }
 
     @ParameterizedTest
-    @MethodSource("datetimeFindAllLettersParameters")
-    @DisplayName("설정된 시간에 해당 되는 Letter 목록을 가져오는 테스트")
+    @MethodSource("findLettersByDateTimeParameters")
+    @DisplayName("ALL - 설정된 시간에 해당 되는 Letter 목록을 가져오는 테스트")
     void datetime_find_all_letters(List<Letter> foundLetters, List<Letter> notFoundLetters, Integer page, Integer pageSize) {
         // given
         PaginationParameters parameters = createPaginationParametersOf(page, pageSize);
@@ -83,7 +84,45 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
         );
     }
 
-    private static Stream<Arguments> datetimeFindAllLettersParameters() {
+    @ParameterizedTest
+    @MethodSource("findLettersByDateTimeParameters")
+    @DisplayName("By RequestStatus - 설정된 시간에 해당 되는 Letter 목록을 가져오는 테스트")
+    void datetime_find_letters_by_status(List<Letter> foundLetters, List<Letter> notFoundLetters, Integer page, Integer pageSize) {
+        // given
+        PaginationParameters parameters = createPaginationParametersOf(page, pageSize);
+        PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(),  Sort.by(Sort.Direction.DESC, CREATED_DATE_TIME.getFieldName()));
+
+        LocalDateTime foundTime = LocalDateTime.of(2021, 3, 27, 19, 0, 0);
+        LocalDateTime notFoundTime = LocalDateTime.of(2021, 3, 27, 18, 59, 59);
+        LocalDateTime now = LocalDateTime.of(2021, 3, 28, 23, 45, 0);
+        LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(now);
+
+        // when
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(notFoundTime));
+        letterRepository.saveAll(notFoundLetters);
+
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(foundTime));
+        letterRepository.saveAll(foundLetters);
+
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(now));
+        Page<Letter> waitingLetters = letterRepository.findAllTodayLettersByRequestStatus(pageRequest, WAITING, startDateTime, now);
+
+        // then
+        assertAll(
+                () -> assertThat(waitingLetters.getContent().size())
+                        .isEqualTo(foundLetters.stream()
+                                               .filter(letter -> letter.getRequestStatus().equals(WAITING))
+                                               .count()),
+                () -> assertThat(waitingLetters.getContent().stream()
+                        .allMatch(letter -> letter.getCreatedDateTime().isAfter(notFoundTime)))
+                        .isTrue(),
+                () -> assertThat(waitingLetters.getContent().stream()
+                        .allMatch(letter -> letter.getCreatedDateTime().isBefore(now)))
+                        .isTrue()
+        );
+    }
+
+    private static Stream<Arguments> findLettersByDateTimeParameters() {
         Integer page = 1;
         Integer size = 20;
 
