@@ -13,7 +13,7 @@ import static com.requestrealpiano.songrequest.global.constant.ValidationConditi
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class NewLetterRequest {
+public class LetterRequest {
 
     @Size(max = SONG_STORY_MAX, message = SONG_STORY_MESSAGE)
     private String songStory;
@@ -22,11 +22,8 @@ public class NewLetterRequest {
     @JsonProperty("song")
     private SongRequest songRequest;
 
-    private Long accountId;
-
-    NewLetterRequest(String songStory, SongRequest songRequest, Long accountId) {
+    LetterRequest(String songStory, SongRequest songRequest) {
         this.songStory = songStory;
         this.songRequest = songRequest;
-        this.accountId = accountId;
     }
 }
