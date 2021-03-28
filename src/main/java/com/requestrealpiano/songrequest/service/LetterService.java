@@ -13,11 +13,11 @@ import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetai
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.pagination.Pagination;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,11 +39,10 @@ public class LetterService {
     private final Scheduler scheduler;
 
     public LettersResponse findAllLetters(PaginationParameters parameters) {
-        Sort sortByCreatedDateTime = Sort.by(Direction.DESC, CREATED_DATE_TIME.getFieldName());
-        PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(), sortByCreatedDateTime);
+        PageRequest letterPageRequest = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
-        Page<Letter> letters = letterRepository.findAllTodayLetters(pageRequest, startDateTime, endDateTime);
+        Page<Letter> letters = letterRepository.findAllTodayLetters(letterPageRequest, startDateTime, endDateTime);
         return LettersResponse.from(letters);
     }
 
