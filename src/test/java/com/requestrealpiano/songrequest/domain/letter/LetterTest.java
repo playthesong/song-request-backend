@@ -45,9 +45,25 @@ class LetterTest {
     }
 
     @ParameterizedTest
+    @MethodSource("hasSameAccountParameters")
+    @DisplayName("일치 - Letter의 Account와 LoginAccount 일치여부 확인 테스트")
+    void same_has_different_account(Long letterAccountId, Long loginAccountId) {
+        // given
+        Account letterAccount = createMemberOf(letterAccountId);
+        OAuthAccount loginAccount = createOAuthAccountOf(loginAccountId, MEMBER);
+        Letter letter = createLetterOf(letterAccount, createSong());
+
+        // when
+        boolean different = letter.hasDifferentAccount(loginAccount);
+
+        // then
+        assertThat(different).isFalse();
+    }
+
+    @ParameterizedTest
     @MethodSource("hasDifferentAccountParameters")
-    @DisplayName("Letter의 Account와 LoginAccount 일치여부 확인 테스트")
-    void has_different_account(Long letterAccountId, Long loginAccountId) {
+    @DisplayName("불일치 - Letter의 Account와 LoginAccount 일치여부 확인 테스트")
+    void not_same_has_different_account(Long letterAccountId, Long loginAccountId) {
         // given
         Account letterAccount = createMemberOf(letterAccountId);
         OAuthAccount loginAccount = createOAuthAccountOf(loginAccountId, MEMBER);
@@ -62,7 +78,7 @@ class LetterTest {
 
     @ParameterizedTest
     @MethodSource("hasSameSongParameters")
-    @DisplayName("Letter의 Song과 SongRequest 일치여부 확인 테스트")
+    @DisplayName("일치 - Letter의 Song과 SongRequest 일치여부 확인 테스트")
     void has_same_song(String letterArtist, String requestArtist, String letterTitle, String requestTitle,
                        String imageUrl) {
         // given
@@ -77,9 +93,40 @@ class LetterTest {
         assertThat(same).isTrue();
     }
 
+    @ParameterizedTest
+    @MethodSource("hasNotSameSongParameters")
+    @DisplayName("불일치 - Letter의 Song과 SongRequest 일치여부 확인 테스트")
+    void has_not_same_song(String letterArtist, String requestArtist, String letterTitle, String requestTitle,
+                       String imageUrl) {
+        // given
+        Song song = createSongOf(letterTitle, letterArtist, imageUrl);
+        Letter letter = createLetterOf(createMember(), song);
+        SongRequest songRequest = createSongRequestOf(requestTitle, requestArtist, imageUrl);
+
+        // when
+        boolean same = letter.hasSameSong(songRequest);
+
+        // then
+        assertThat(same).isFalse();
+    }
+
     private static Stream<Arguments> hasSameSongParameters() {
         return Stream.of(
                 Arguments.of("SameArtist", "SameArtist", "SameTitle", "SameTitle", "http://imageUrl")
+        );
+    }
+
+    private static Stream<Arguments> hasNotSameSongParameters() {
+        return Stream.of(
+                Arguments.of("NotSameArtist", "NotSame Artist", "SameTitle", "SameTitle", "http://imageUrl"),
+                Arguments.of("SameArtist", "SameArtist", "NotSameTitle", "NotSame Title", "http://imageUrl"),
+                Arguments.of("NotSameArtist", "NotSame Artist", "NotSame Title", "NotSameTitle", "http://imageUrl")
+        );
+    }
+
+    private static Stream<Arguments> hasSameAccountParameters() {
+        return Stream.of(
+                Arguments.of(1L, 1L)
         );
     }
 
