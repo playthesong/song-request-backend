@@ -1,7 +1,9 @@
 package com.requestrealpiano.songrequest.controller.letter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.controller.LetterController;
+import com.requestrealpiano.songrequest.controller.MockMvcRequest;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
@@ -36,16 +38,16 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.stream.Stream;
 
-import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
-import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.*;
 import static com.requestrealpiano.songrequest.domain.account.Role.GUEST;
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMemberOf;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createOAuthAccountOf;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
-import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -235,10 +237,38 @@ class LetterControllerTest extends BaseControllerTest {
         ErrorCode invalidRequestError = ErrorCode.INVALID_REQUEST_ERROR;
 
         // when
-        ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", wrongStatus).doRequest());
+        ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", wrongStatus)
+                                                .doRequest());
 
         // then
         MockMvcResponse.BAD_REQUEST(results, invalidRequestError);
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("OK - Letter 수정 API 테스트")
+    void update_letter() throws Exception {
+        // given
+        Long accountId = 1L;
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
+
+        LetterRequest letterRequest = createLetterRequestOf("NewSongStory", createSongRequest());
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
+
+        Letter letter = createLetterOf(createMemberOf(loginAccount.getId()), createSong());
+        LetterDetails letterDetails = LetterDetails.from(letter);
+
+        // when
+        when(letterService.updateLetter(any(OAuthAccount.class), eq(letter.getId()), any(LetterRequest.class)))
+                .thenReturn(letterDetails);
+
+        ResultActions results = mockMvc.perform(put("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(loginAccount)
+                                                .withBody(requestBody)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.OK(results);
     }
 
     private static Stream<Arguments> paginationFindAllLettersParameters() {

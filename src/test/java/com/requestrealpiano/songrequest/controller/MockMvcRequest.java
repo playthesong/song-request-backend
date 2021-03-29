@@ -1,6 +1,5 @@
 package com.requestrealpiano.songrequest.controller;
 
-import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -32,6 +31,13 @@ public class MockMvcRequest {
     public static MockMvcRequest post(String url) {
         MockMvcRequest request = new MockMvcRequest();
         request.builder = MockMvcRequestBuilders.post(url)
+                                                .accept(APPLICATION_JSON);
+        return request;
+    }
+
+    public static MockMvcRequest put(String url, Object pathVariable) {
+        MockMvcRequest request = new MockMvcRequest();
+        request.builder = MockMvcRequestBuilders.put(url, pathVariable)
                                                 .accept(APPLICATION_JSON);
         return request;
     }
