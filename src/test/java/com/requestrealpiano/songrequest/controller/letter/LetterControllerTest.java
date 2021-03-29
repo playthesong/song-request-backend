@@ -12,7 +12,6 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
-import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
@@ -42,8 +41,7 @@ import static com.requestrealpiano.songrequest.controller.MockMvcRequest.*;
 import static com.requestrealpiano.songrequest.domain.account.Role.GUEST;
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
-import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMemberOf;
-import static com.requestrealpiano.songrequest.testobject.AccountFactory.createOAuthAccountOf;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
@@ -298,6 +296,30 @@ class LetterControllerTest extends BaseControllerTest {
 
         // then
         MockMvcResponse.BAD_REQUEST(results, accountMismatchError);
+    }
+
+    @Test
+    @WithGuest
+    @DisplayName("FORBIDDEN - 권한이 없는 (변경 된) 사용자가 Letter 수정을 요청하는 테스트")
+    void forbidden_update_letter() throws Exception {
+        // given
+        Long loginId = 1L;
+        OAuthAccount guestAccount = createOAuthAccountOf(loginId, GUEST);
+
+        LetterRequest letterRequest = createLetterRequestOf("NewSongStory", createSongRequest());
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
+
+        Letter letter = createLetterOf(createGuestOf(guestAccount.getId()), createSong());
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+
+        // when
+        ResultActions results = mockMvc.perform(put("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(guestAccount)
+                                                .withBody(requestBody)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError);
     }
 
     private static Stream<Arguments> paginationFindAllLettersParameters() {
