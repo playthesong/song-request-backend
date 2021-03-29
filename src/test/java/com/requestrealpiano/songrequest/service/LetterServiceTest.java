@@ -10,6 +10,8 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
+import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
@@ -229,6 +231,32 @@ class LetterServiceTest {
                 () -> assertThat(updatedLetter.getSong().getTitle()).isEqualTo(newSong.getSongTitle()),
                 () -> assertThat(updatedLetter.getSong().getArtist()).isEqualTo(newSong.getArtist()),
                 () -> assertThat(updatedLetter.getSongStory()).isEqualTo(newSongStory)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("accountMismatchUpdateLetterParameters")
+    @DisplayName("Account Mismatch - Login Account가 일치하지 않을 때 예외가 발생하는 테스트")
+    void account_mismatch_update_letter(Long letterAccountId, Long differentId, String songStory) {
+        // given
+        ErrorCode accountMismatchError = ErrorCode.ACCOUNT_MISMATCH_ERROR;
+        LetterRequest letterRequest = createLetterRequestOf(songStory, createSongRequest());
+        Letter letter = createLetterOf(createMemberOf(letterAccountId), createSong());
+        OAuthAccount loginAccount = createOAuthAccountOf(differentId, MEMBER);
+
+        // when
+        when(letterRepository.findById(eq(letter.getId()))).thenReturn(Optional.of(letter));
+
+        // then
+        assertThatThrownBy(() -> letterService.updateLetter(loginAccount, letter.getId(), letterRequest))
+                .isExactlyInstanceOf(AccountMismatchException.class)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(accountMismatchError.getMessage());
+    }
+
+    private static Stream<Arguments> accountMismatchUpdateLetterParameters() {
+        return Stream.of(
+                Arguments.of(1L, 3L, "SongStory")
         );
     }
 
