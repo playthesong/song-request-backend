@@ -46,8 +46,9 @@ public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-            .antMatchers("/api/letters").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers("/api/songs").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.POST, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.PUT, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.DELETE, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .anyRequest().authenticated();
 
         http.addFilterBefore(characterEncodingFilter(), CsrfFilter.class)
