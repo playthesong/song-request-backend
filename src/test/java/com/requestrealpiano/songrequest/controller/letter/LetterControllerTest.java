@@ -274,8 +274,8 @@ class LetterControllerTest extends BaseControllerTest {
 
     @Test
     @WithMember
-    @DisplayName("FORBIDDEN - 일치하지 않는 사용자가 Letter 수정을 요청하는 테스트")
-    void forbidden_update_letter() throws Exception {
+    @DisplayName("BAD_REQUEST - 일치하지 않는 사용자가 Letter 수정을 요청하는 테스트")
+    void bad_request_update_letter() throws Exception {
         // given
         Long loginId = 1L;
         Long letterAccountId = 2L;
@@ -297,7 +297,7 @@ class LetterControllerTest extends BaseControllerTest {
                                                 .doRequest());
 
         // then
-        MockMvcResponse.FORBIDDEN(results, accountMismatchError);
+        MockMvcResponse.BAD_REQUEST(results, accountMismatchError);
     }
 
     private static Stream<Arguments> paginationFindAllLettersParameters() {
