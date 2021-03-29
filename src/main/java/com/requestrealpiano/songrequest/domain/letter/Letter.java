@@ -2,12 +2,14 @@ package com.requestrealpiano.songrequest.domain.letter;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.base.BaseTimeEntity;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 
@@ -47,6 +49,12 @@ public class Letter extends BaseTimeEntity {
     public boolean hasDifferentAccount(OAuthAccount loginAccount) {
         Long loginId = loginAccount.getId();
         return !loginId.equals(this.getAccount().getId());
+    }
+
+    public boolean hasSameSong(SongRequest songRequest) {
+        boolean sameArtist = songRequest.getArtist().equals(song.getArtist());
+        boolean sameTitle = songRequest.getTitle().equals(song.getSongTitle());
+        return sameArtist && sameTitle;
     }
 
     public static Letter of(String songStory, Account account, Song song) {

@@ -76,6 +76,10 @@ public class LetterService {
         if (letter.hasDifferentAccount(loginAccount)) {
             throw new LetterMismatchException();
         }
+
+        if (letter.hasSameSong(letterRequest.getSongRequest())) {
+
+        }
         return null;
     }
 }

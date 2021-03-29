@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.domain.letter;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.Role;
+import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import com.requestrealpiano.songrequest.testobject.AccountFactory;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetterOf;
-import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,6 +58,29 @@ class LetterTest {
 
         // then
         assertThat(different).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("hasSameSongParameters")
+    @DisplayName("Letter의 Song과 SongRequest 일치여부 확인 테스트")
+    void has_same_song(String letterArtist, String requestArtist, String letterTitle, String requestTitle,
+                       String imageUrl) {
+        // given
+        Song song = createSongOf(letterTitle, letterArtist, imageUrl);
+        Letter letter = createLetterOf(createMember(), song);
+        SongRequest songRequest = createSongRequestOf(requestTitle, requestArtist, imageUrl);
+
+        // when
+        boolean same = letter.hasSameSong(songRequest);
+
+        // then
+        assertThat(same).isTrue();
+    }
+
+    private static Stream<Arguments> hasSameSongParameters() {
+        return Stream.of(
+                Arguments.of("SameArtist", "SameArtist", "SameTitle", "SameTitle", "http://imageUrl")
+        );
     }
 
     private static Stream<Arguments> hasDifferentAccountParameters() {

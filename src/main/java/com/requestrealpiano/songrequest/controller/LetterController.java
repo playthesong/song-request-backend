@@ -48,13 +48,13 @@ public class LetterController {
         return SUCCESS(OK, letter);
     }
 
-    /* CREATE 로직 수정 이후 다시 개발 */
-//    @ResponseStatus(HttpStatus.OK)
-//    @PutMapping("/{id}")
-//    public ApiResponse<LetterDetails> updateById(@PathVariable Long id) {
-//        LetterDetails letter = letterService.updateLetter(id);
-//        return SUCCESS(OK, letter);
-//    }
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}")
+    public ApiResponse<LetterDetails> updateById(@LoginAccount OAuthAccount loginAccount,
+                                                 @PathVariable Long id, @RequestBody @Valid LetterRequest letterRequest) {
+        LetterDetails letter = letterService.updateLetter(loginAccount, id, letterRequest);
+        return SUCCESS(OK, letter);
+    }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/status/{requestStatus}")
