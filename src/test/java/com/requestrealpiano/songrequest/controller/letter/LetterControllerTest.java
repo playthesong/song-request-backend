@@ -136,7 +136,7 @@ class LetterControllerTest extends BaseControllerTest {
     void create_new_Letter(String songStory, SongRequest songRequest, Long accountId) throws Exception {
         // given
         OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
-        LetterRequest letterRequest = createNewLetterRequestOf(songStory, songRequest);
+        LetterRequest letterRequest = createLetterRequestOf(songStory, songRequest);
         LetterDetails response = createLetterDetails();
         String requestBody = objectMapper.writeValueAsString(letterRequest);
 
@@ -160,7 +160,7 @@ class LetterControllerTest extends BaseControllerTest {
         // given
         OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
         SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
-        LetterRequest letterRequest = createNewLetterRequestOf(songStory, songRequest);
+        LetterRequest letterRequest = createLetterRequestOf(songStory, songRequest);
         String requestBody = objectMapper.writeValueAsString(letterRequest);
         ErrorCode invalidInputError = ErrorCode.INVALID_INPUT_VALUE;
 
@@ -187,7 +187,7 @@ class LetterControllerTest extends BaseControllerTest {
         // given
         OAuthAccount loginAccount = createOAuthAccountOf(accountId, GUEST);
         SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
-        LetterRequest letterRequest = createNewLetterRequestOf(songStory, songRequest);
+        LetterRequest letterRequest = createLetterRequestOf(songStory, songRequest);
         ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
         String requestBody = objectMapper.writeValueAsString(letterRequest);
 

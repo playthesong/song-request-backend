@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.JwtFactory.*;
-import static com.requestrealpiano.songrequest.testobject.LetterFactory.createNewLetterRequestOf;
+import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetterRequestOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequest;
 
 public class LetterIntegrationTest extends BaseIntegrationTest {
@@ -34,7 +34,7 @@ public class LetterIntegrationTest extends BaseIntegrationTest {
     void setup() throws JsonProcessingException {
         account = accountRepository.save(createMember());
         songRequest = createSongRequest();
-        letterRequest = createNewLetterRequestOf("Song Story", songRequest);
+        letterRequest = createLetterRequestOf("Song Story", songRequest);
         requestBody = objectMapper.writeValueAsString(letterRequest);
     }
 

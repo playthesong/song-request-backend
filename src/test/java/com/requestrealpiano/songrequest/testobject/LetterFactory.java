@@ -47,16 +47,6 @@ public class LetterFactory {
                      .build();
     }
 
-    public static Letter createLetterOf(RequestStatus requestStatus) {
-        return Letter.builder()
-                     .id(1L)
-                     .songStory("Song story")
-                     .requestStatus(requestStatus)
-                     .song(createSong())
-                     .account(createMember())
-                     .build();
-    }
-
     public static Letter createLetterOf(Account account, Song song) {
         return Letter.builder()
                      .id(1L)
@@ -201,7 +191,7 @@ public class LetterFactory {
     }
 
     // LetterRequest
-    public static LetterRequest createNewLetterRequestOf(String songStory, SongRequest songRequest) {
+    public static LetterRequest createLetterRequestOf(String songStory, SongRequest songRequest) {
         return LetterRequestBuilder.newBuilder()
                                    .songStory(songStory)
                                    .songRequest(songRequest)

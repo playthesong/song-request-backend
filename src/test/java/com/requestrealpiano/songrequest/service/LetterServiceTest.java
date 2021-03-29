@@ -2,7 +2,6 @@ package com.requestrealpiano.songrequest.service;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
-import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
@@ -35,13 +34,11 @@ import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
-import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
-import static com.requestrealpiano.songrequest.testobject.AccountFactory.createOAuthAccountOf;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPageRequest;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
-import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
-import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequest;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.*;
@@ -153,7 +150,7 @@ class LetterServiceTest {
     @DisplayName("새로운 Letter를 생성하는 테스트")
     void create_new_letter(String songStory, SongRequest songRequest, Long accountId) {
         // given
-        LetterRequest letterRequest = createNewLetterRequestOf(songStory, songRequest);
+        LetterRequest letterRequest = createLetterRequestOf(songStory, songRequest);
         OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
         Account account = createMember();
         Song song = createSong();
@@ -171,6 +168,40 @@ class LetterServiceTest {
                 () -> assertThat(letterDetails.getSong().getTitle()).isEqualTo(newLetter.getSong().getSongTitle()),
                 () -> assertThat(letterDetails.getAccount().getName()).isEqualTo(newLetter.getAccount().getName()),
                 () -> assertThat(letterDetails.getAccount().getAvatarUrl()).isEqualTo(newLetter.getAccount().getAvatarUrl())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sameSongUpdateLetterParameters")
+    @DisplayName("Same Song - Song이 같을 때 update 테스트")
+    void same_song_update_letter(Long songId, Long accountId, String artist, String title, String newSongStory) {
+        // given
+        Song song = createSongOf(songId, artist, title);
+        SongRequest songRequest = createSongRequestOf(song.getSongTitle(), song.getArtist(), song.getImageUrl());
+
+        Letter letter = createLetterOf(createMemberOf(accountId), song);
+        Account account = letter.getAccount();
+
+        OAuthAccount loginAccount = createOAuthAccountOf(account.getId(), account.getRole());
+        LetterRequest letterRequest = createLetterRequestOf(newSongStory, songRequest);
+
+        // when
+        when(letterRepository.findById(eq(letter.getId()))).thenReturn(Optional.of(letter));
+
+        LetterDetails updatedLetter = letterService.updateLetter(loginAccount, letter.getId(), letterRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(updatedLetter.getId()).isEqualTo(letter.getId()),
+                () -> assertThat(updatedLetter.getAccount().getId()).isEqualTo(loginAccount.getId()),
+                () -> assertThat(updatedLetter.getSong().getId()).isEqualTo(song.getId()),
+                () -> assertThat(updatedLetter.getSongStory()).isEqualTo(letterRequest.getSongStory())
+        );
+    }
+
+    private static Stream<Arguments> sameSongUpdateLetterParameters() {
+        return Stream.of(
+                Arguments.of(3L, 5L, "SameArtist", "SameTitle", "NewSongStory")
         );
     }
 
