@@ -11,7 +11,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
-import com.requestrealpiano.songrequest.global.error.exception.business.LetterMismatchException;
+import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
 import com.requestrealpiano.songrequest.global.pagination.Pagination;
@@ -74,7 +74,7 @@ public class LetterService {
     public LetterDetails updateLetter(OAuthAccount loginAccount, Long letterId, LetterRequest letterRequest) {
         Letter letter = letterRepository.findById(letterId).orElseThrow(LetterNotFoundException::new);
         if (letter.hasDifferentAccount(loginAccount)) {
-            throw new LetterMismatchException();
+            throw new AccountMismatchException();
         }
 
         if (letter.hasSameSong(letterRequest.getSongRequest())) {

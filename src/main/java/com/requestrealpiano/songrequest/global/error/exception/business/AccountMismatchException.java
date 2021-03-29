@@ -3,7 +3,7 @@ package com.requestrealpiano.songrequest.global.error.exception.business;
 import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 
-public class LetterMismatchException extends BusinessException {
+public class AccountMismatchException extends BusinessException {
 
-    public LetterMismatchException() { super(ErrorCode.ACCOUNT_MISMATCH_ERROR); }
+    public AccountMismatchException() { super(ErrorCode.ACCOUNT_MISMATCH_ERROR); }
 }
