@@ -1,9 +1,7 @@
 package com.requestrealpiano.songrequest.controller.letter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.controller.LetterController;
-import com.requestrealpiano.songrequest.controller.MockMvcRequest;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
@@ -14,6 +12,8 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
+import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
+import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
@@ -51,7 +51,8 @@ import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.beneathPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 
 @WebMvcTest(controllers = LetterController.class,
@@ -269,6 +270,34 @@ class LetterControllerTest extends BaseControllerTest {
 
         // then
         MockMvcResponse.OK(results);
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("FORBIDDEN - 일치하지 않는 사용자가 Letter 수정을 요청하는 테스트")
+    void forbidden_update_letter() throws Exception {
+        // given
+        Long loginId = 1L;
+        Long letterAccountId = 2L;
+        OAuthAccount loginAccount = createOAuthAccountOf(loginId, MEMBER);
+
+        LetterRequest letterRequest = createLetterRequestOf("NewSongStory", createSongRequest());
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
+
+        Letter letter = createLetterOf(createMemberOf(letterAccountId), createSong());
+        ErrorCode accountMismatchError = ErrorCode.ACCOUNT_MISMATCH_ERROR;
+
+        // when
+        when(letterService.updateLetter(any(OAuthAccount.class), eq(letter.getId()), any(LetterRequest.class)))
+                .thenThrow(new AccountMismatchException());
+
+        ResultActions results = mockMvc.perform(put("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(loginAccount)
+                                                .withBody(requestBody)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accountMismatchError);
     }
 
     private static Stream<Arguments> paginationFindAllLettersParameters() {
