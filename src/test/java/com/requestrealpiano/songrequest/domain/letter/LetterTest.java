@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
+import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetter;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetterOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -108,6 +109,26 @@ class LetterTest {
 
         // then
         assertThat(same).isFalse();
+    }
+
+    @ParameterizedTest
+    @MethodSource("changeSongStoryParameters")
+    @DisplayName("songStory change 메서드 테스트")
+    void change_song_story(String changedSongStory) {
+        // given
+        Letter letter = createLetter();
+
+        // when
+        Letter updatedLetter = letter.changeSongStory(changedSongStory);
+
+        // then
+        assertThat(updatedLetter.getSongStory()).isEqualTo(changedSongStory);
+    }
+
+    private static Stream<Arguments> changeSongStoryParameters() {
+        return Stream.of(
+                Arguments.of("Changed Song Story")
+        );
     }
 
     private static Stream<Arguments> hasSameSongParameters() {

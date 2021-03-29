@@ -57,6 +57,11 @@ public class Letter extends BaseTimeEntity {
         return sameArtist && sameTitle;
     }
 
+    public Letter changeSongStory(String songStory) {
+        this.songStory = songStory;
+        return this;
+    }
+
     public static Letter of(String songStory, Account account, Song song) {
         return Letter.builder()
                      .songStory(songStory)
