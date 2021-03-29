@@ -42,7 +42,9 @@ public class Account extends BaseTimeEntity {
     private List<Letter> letters = new ArrayList<>();
 
     @Builder
-    private Account(String googleOauthId, String name, String email, Role role, String avatarUrl, Integer requestCount) {
+    private Account(Long id, String googleOauthId, String name, String email, Role role, String avatarUrl,
+                    Integer requestCount) {
+        this.id = id;
         this.googleOauthId = googleOauthId;
         this.name = name;
         this.email = email;

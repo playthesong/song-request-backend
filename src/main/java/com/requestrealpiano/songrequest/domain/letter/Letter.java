@@ -3,6 +3,7 @@ package com.requestrealpiano.songrequest.domain.letter;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.base.BaseTimeEntity;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,6 +42,11 @@ public class Letter extends BaseTimeEntity {
         this.requestStatus = requestStatus;
         this.account = account;
         this.song = song;
+    }
+
+    public boolean hasDifferentAccount(OAuthAccount loginAccount) {
+        Long loginId = loginAccount.getId();
+        return !loginId.equals(this.getAccount().getId());
     }
 
     public static Letter of(String songStory, Account account, Song song) {

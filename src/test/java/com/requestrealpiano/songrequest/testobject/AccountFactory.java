@@ -34,6 +34,17 @@ public class AccountFactory {
                       .build();
     }
 
+    public static Account createMemberOf(Long id) {
+        return Account.builder()
+                      .id(id)
+                      .googleOauthId("771713471123")
+                      .name("Username")
+                      .email("User email")
+                      .role(Role.MEMBER)
+                      .avatarUrl("http://avatarUrl")
+                      .build();
+    }
+
     public static Account createMemberOf(OAuthAttributes oAuthAttributes) {
         return Account.from(oAuthAttributes);
     }

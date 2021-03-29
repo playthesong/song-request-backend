@@ -55,6 +55,15 @@ public class LetterFactory {
                      .build();
     }
 
+    public static Letter createLetterOf(Account account, Song song) {
+        return Letter.builder()
+                     .songStory("Song story")
+                     .requestStatus(RequestStatus.WAITING)
+                     .song(song)
+                     .account(account)
+                     .build();
+    }
+
     // Letters
     public static List<Letter> createLetters() {
         Letter firstLetter = Letter.builder()
