@@ -13,12 +13,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
-import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetter;
-import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetterOf;
+import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -129,6 +130,29 @@ class LetterTest {
         return Stream.of(
                 Arguments.of("Changed Song Story")
         );
+    }
+
+    @Test
+    @DisplayName("Song Change 메서드 테스트")
+    void change_song() {
+        // given
+        int first = 0;
+
+        Song song = createSong();
+        List<Letter> letters = createLettersOf(createMember(), song);
+        song.getLetters().addAll(letters);
+
+        Letter updateLetter = letters.get(first);
+
+        // when
+        Song newSong = createSong();
+        updateLetter.changeSong(newSong);
+
+        // then
+        assertThat(song.getLetters()
+                        .stream()
+                        .filter(letter -> letter.getId().equals(updateLetter.getId()))
+                        .count()).isEqualTo(0);
     }
 
     private static Stream<Arguments> hasSameSongParameters() {

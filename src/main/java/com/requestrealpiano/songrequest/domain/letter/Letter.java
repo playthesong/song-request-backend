@@ -39,7 +39,8 @@ public class Letter extends BaseTimeEntity {
     private Song song;
 
     @Builder
-    private Letter(String songStory, RequestStatus requestStatus, Account account, Song song) {
+    private Letter(Long id, String songStory, RequestStatus requestStatus, Account account, Song song) {
+        this.id = id;
         this.songStory = songStory;
         this.requestStatus = requestStatus;
         this.account = account;
@@ -60,6 +61,15 @@ public class Letter extends BaseTimeEntity {
     public Letter changeSongStory(String songStory) {
         this.songStory = songStory;
         return this;
+    }
+
+    public void changeSong(Song song) {
+        this.song.getLetters().removeIf(letter -> letter.getId().equals(id));
+        this.song = song;
+    }
+
+    public Letter update(String songStory, Song song) {
+        return null;
     }
 
     public static Letter of(String songStory, Account account, Song song) {

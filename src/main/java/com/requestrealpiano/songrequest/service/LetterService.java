@@ -81,6 +81,9 @@ public class LetterService {
             Letter updatedLetter = letter.changeSongStory(letterRequest.getSongStory());
             return LetterDetails.from(updatedLetter);
         }
-        return null;
+
+        Song song = songService.updateRequestCountOrElseCreate(letterRequest.getSongRequest());
+        Letter updatedLetter = letter.update(letter.getSongStory(), song);
+        return LetterDetails.from(updatedLetter);
     }
 }

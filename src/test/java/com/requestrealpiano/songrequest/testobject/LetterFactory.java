@@ -39,6 +39,7 @@ public class LetterFactory {
     // Letter
     public static Letter createLetter() {
         return Letter.builder()
+                     .id(1L)
                      .songStory("Song story")
                      .requestStatus(RequestStatus.WAITING)
                      .song(createSong())
@@ -48,6 +49,7 @@ public class LetterFactory {
 
     public static Letter createLetterOf(RequestStatus requestStatus) {
         return Letter.builder()
+                     .id(1L)
                      .songStory("Song story")
                      .requestStatus(requestStatus)
                      .song(createSong())
@@ -57,6 +59,7 @@ public class LetterFactory {
 
     public static Letter createLetterOf(Account account, Song song) {
         return Letter.builder()
+                     .id(1L)
                      .songStory("Song story")
                      .requestStatus(RequestStatus.WAITING)
                      .song(song)
@@ -67,14 +70,17 @@ public class LetterFactory {
     // Letters
     public static List<Letter> createLetters() {
         Letter firstLetter = Letter.builder()
+                                   .id(1L)
                                    .songStory("Song Story 1")
                                    .requestStatus(RequestStatus.WAITING)
                                    .build();
         Letter secondLetter = Letter.builder()
+                                   .id(2L)
                                     .songStory("Song Story 2")
                                     .requestStatus(RequestStatus.DONE)
                                     .build();
         Letter thirdLetter = Letter.builder()
+                                   .id(3L)
                                    .songStory("Song Story 3")
                                    .requestStatus(RequestStatus.PENDING)
                                    .build();
@@ -83,18 +89,21 @@ public class LetterFactory {
 
     public static List<Letter> createLettersOf(Account account, Song song) {
         Letter firstLetter = Letter.builder()
+                                   .id(1L)
                                    .songStory("Song Story 1")
                                    .requestStatus(RequestStatus.WAITING)
                                    .account(account)
                                    .song(song)
                                    .build();
         Letter secondLetter = Letter.builder()
+                                   .id(2L)
                                     .songStory("Song Story 2")
                                     .requestStatus(RequestStatus.DONE)
                                     .account(account)
                                     .song(song)
                                     .build();
         Letter thirdLetter = Letter.builder()
+                                   .id(3L)
                                    .songStory("Song Story 3")
                                    .requestStatus(RequestStatus.PENDING)
                                    .account(account)
