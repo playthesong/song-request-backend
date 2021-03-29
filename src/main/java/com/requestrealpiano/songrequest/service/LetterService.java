@@ -11,6 +11,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterMismatchException;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
 import com.requestrealpiano.songrequest.global.pagination.Pagination;
@@ -50,6 +51,14 @@ public class LetterService {
         return LetterDetails.from(letter);
     }
 
+    public LettersResponse findLettersByStatus(RequestStatus requestStatus, PaginationParameters parameters) {
+        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
+        LocalDateTime endDateTime = scheduler.now();
+        LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
+        Page<Letter> letters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, requestStatus, startDateTime, endDateTime);
+        return LettersResponse.from(letters);
+    }
+
     @Transactional
     public LetterDetails createLetter(OAuthAccount loginAccount, LetterRequest letterRequest) {
         SongRequest songRequest = letterRequest.getSongRequest();
@@ -61,11 +70,12 @@ public class LetterService {
         return LetterDetails.from(newLetter);
     }
 
-    public LettersResponse findLettersByStatus(RequestStatus requestStatus, PaginationParameters parameters) {
-        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
-        LocalDateTime endDateTime = scheduler.now();
-        LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
-        Page<Letter> letters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, requestStatus, startDateTime, endDateTime);
-        return LettersResponse.from(letters);
+    @Transactional
+    public LetterDetails updateLetter(OAuthAccount loginAccount, Long letterId, LetterRequest letterRequest) {
+        Letter letter = letterRepository.findById(letterId).orElseThrow(LetterNotFoundException::new);
+        if (letter.hasDifferentAccount(loginAccount)) {
+            throw new LetterMismatchException();
+        }
+        return null;
     }
 }
