@@ -155,6 +155,32 @@ class LetterTest {
                         .count()).isEqualTo(0);
     }
 
+    @ParameterizedTest
+    @MethodSource("updateLetterParameters")
+    @DisplayName("Letter Update 메서드 테스트")
+    void update_letter(Long songId, Long newSongId, String newSongStory) {
+        // given
+        Song song = createSongOf(songId);
+        Letter letter = createLetterOf(createMember(), song);
+
+        // when
+        Song newSong = createSongOf(newSongId);
+        Letter updatedLetter = letter.update(newSongStory, newSong);
+
+        // then
+        assertAll(
+                () -> assertThat(updatedLetter.getSongStory()).isEqualTo(newSongStory),
+                () -> assertThat(updatedLetter.getSong().getId()).isNotEqualTo(songId),
+                () -> assertThat(updatedLetter.getSong().getId()).isEqualTo(newSongId)
+        );
+    }
+
+    private static Stream<Arguments> updateLetterParameters() {
+        return Stream.of(
+                Arguments.of(1L, 2L, "New Song Story")
+        );
+    }
+
     private static Stream<Arguments> hasSameSongParameters() {
         return Stream.of(
                 Arguments.of("SameArtist", "SameArtist", "SameTitle", "SameTitle", "http://imageUrl")

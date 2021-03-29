@@ -34,6 +34,18 @@ public class SongFactory {
 
     }
 
+    public static Song createSongOf(Long id) {
+        return Song.builder()
+                   .id(id)
+                   .songTitle("Song title")
+                   .albumTitle("Album title")
+                   .artist("Artist")
+                   .imageUrl("http://imageUrl")
+                   .requestCount(1)
+                   .build();
+
+    }
+
     public static Song createSongOf(String songTitle, String artist, String imageUrl) {
         return Song.builder()
                    .songTitle(songTitle)

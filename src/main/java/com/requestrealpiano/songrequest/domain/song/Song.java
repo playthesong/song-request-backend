@@ -43,7 +43,8 @@ public class Song {
     private List<YoutubeContent> youtubeContent = new ArrayList<>();
 
     @Builder
-    private Song(String songTitle, String albumTitle, String artist, String imageUrl, Integer requestCount) {
+    private Song(Long id, String songTitle, String albumTitle, String artist, String imageUrl, Integer requestCount) {
+        this.id = id;
         this.songTitle = songTitle;
         this.albumTitle = albumTitle;
         this.artist = artist;

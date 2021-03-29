@@ -69,7 +69,9 @@ public class Letter extends BaseTimeEntity {
     }
 
     public Letter update(String songStory, Song song) {
-        return null;
+        changeSongStory(songStory);
+        changeSong(song);
+        return this;
     }
 
     public static Letter of(String songStory, Account account, Song song) {
