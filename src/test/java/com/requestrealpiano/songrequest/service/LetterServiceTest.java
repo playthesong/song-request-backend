@@ -174,7 +174,7 @@ class LetterServiceTest {
     @ParameterizedTest
     @MethodSource("sameSongUpdateLetterParameters")
     @DisplayName("Same Song - Song이 같을 때 update 테스트")
-    void same_song_update_letter(Long songId, Long accountId, String artist, String title, String newSongStory) {
+    void same_song_update_letter(Long accountId, Long songId, String artist, String title, String newSongStory) {
         // given
         Song song = createSongOf(songId, artist, title);
         SongRequest songRequest = createSongRequestOf(song.getSongTitle(), song.getArtist(), song.getImageUrl());
@@ -195,13 +195,53 @@ class LetterServiceTest {
                 () -> assertThat(updatedLetter.getId()).isEqualTo(letter.getId()),
                 () -> assertThat(updatedLetter.getAccount().getId()).isEqualTo(loginAccount.getId()),
                 () -> assertThat(updatedLetter.getSong().getId()).isEqualTo(song.getId()),
-                () -> assertThat(updatedLetter.getSongStory()).isEqualTo(letterRequest.getSongStory())
+                () -> assertThat(updatedLetter.getSongStory()).isEqualTo(newSongStory)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("notSameSongUpdateLetterParameters")
+    @DisplayName("Not Same - Song이 다를 때 update 테스트")
+    void not_same_song_update_letter(Long accountId, Long songId, Long newSongId, String artist, String title,
+                                     String newArtist, String newTitle, String newSongStory) {
+        // given
+        Song oldSong = createSongOf(songId, artist, title);
+        Letter letter = createLetterOf(createMemberOf(accountId), oldSong);
+
+        Account account = letter.getAccount();
+        OAuthAccount loginAccount = createOAuthAccountOf(account.getId(), account.getRole());
+
+        Song newSong = createSongOf(newSongId, newTitle, newArtist);
+        SongRequest songRequest = createSongRequestOf(newSong.getSongTitle(), newSong.getArtist(), newSong.getImageUrl());
+        LetterRequest letterRequest = createLetterRequestOf(newSongStory, songRequest);
+
+        // when
+        when(letterRepository.findById(eq(letter.getId()))).thenReturn(Optional.of(letter));
+        when(songService.updateRequestCountOrElseCreate(refEq(letterRequest.getSongRequest()))).thenReturn(newSong);
+        LetterDetails updatedLetter = letterService.updateLetter(loginAccount, letter.getId(), letterRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(updatedLetter.getId()).isEqualTo(letter.getId()),
+                () -> assertThat(updatedLetter.getAccount().getId()).isEqualTo(loginAccount.getId()),
+                () -> assertThat(updatedLetter.getSong().getId()).isNotEqualTo(oldSong.getId()),
+                () -> assertThat(updatedLetter.getSong().getId()).isEqualTo(newSong.getId()),
+                () -> assertThat(updatedLetter.getSong().getTitle()).isEqualTo(newSong.getSongTitle()),
+                () -> assertThat(updatedLetter.getSong().getArtist()).isEqualTo(newSong.getArtist()),
+                () -> assertThat(updatedLetter.getSongStory()).isEqualTo(newSongStory)
+        );
+    }
+
+    private static Stream<Arguments> notSameSongUpdateLetterParameters() {
+        return Stream.of(
+                Arguments.of(5L, 3L, 10L, "Original Artist", "Original Title",
+                            "New Artist", "New Title", "NewSongStory")
         );
     }
 
     private static Stream<Arguments> sameSongUpdateLetterParameters() {
         return Stream.of(
-                Arguments.of(3L, 5L, "SameArtist", "SameTitle", "NewSongStory")
+                Arguments.of(5L, 3L, "SameArtist", "SameTitle", "NewSongStory")
         );
     }
 

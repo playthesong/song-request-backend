@@ -39,7 +39,6 @@ public class LetterFactory {
     // Letter
     public static Letter createLetter() {
         return Letter.builder()
-                     .id(1L)
                      .songStory("Song story")
                      .requestStatus(RequestStatus.WAITING)
                      .song(createSong())
@@ -60,17 +59,14 @@ public class LetterFactory {
     // Letters
     public static List<Letter> createLetters() {
         Letter firstLetter = Letter.builder()
-                                   .id(1L)
                                    .songStory("Song Story 1")
                                    .requestStatus(RequestStatus.WAITING)
                                    .build();
         Letter secondLetter = Letter.builder()
-                                   .id(2L)
                                     .songStory("Song Story 2")
                                     .requestStatus(RequestStatus.DONE)
                                     .build();
         Letter thirdLetter = Letter.builder()
-                                   .id(3L)
                                    .songStory("Song Story 3")
                                    .requestStatus(RequestStatus.PENDING)
                                    .build();

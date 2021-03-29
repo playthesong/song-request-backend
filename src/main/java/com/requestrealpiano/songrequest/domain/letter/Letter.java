@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.domain.letter;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.base.BaseTimeEntity;
+import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
@@ -68,8 +69,8 @@ public class Letter extends BaseTimeEntity {
         this.song = song;
     }
 
-    public Letter update(String songStory, Song song) {
-        changeSongStory(songStory);
+    public Letter update(LetterRequest letterRequest, Song song) {
+        changeSongStory(letterRequest.getSongStory());
         changeSong(song);
         return this;
     }

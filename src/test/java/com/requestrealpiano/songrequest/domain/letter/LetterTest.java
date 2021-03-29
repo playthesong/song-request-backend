@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.domain.letter;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.Role;
+import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
@@ -162,10 +163,12 @@ class LetterTest {
         // given
         Song song = createSongOf(songId);
         Letter letter = createLetterOf(createMember(), song);
+        SongRequest songRequest = createSongRequestOf(song.getSongTitle(), song.getArtist(), song.getImageUrl());
+        LetterRequest letterRequest = createLetterRequestOf(newSongStory, songRequest);
 
         // when
         Song newSong = createSongOf(newSongId);
-        Letter updatedLetter = letter.update(newSongStory, newSong);
+        Letter updatedLetter = letter.update(letterRequest, newSong);
 
         // then
         assertAll(
