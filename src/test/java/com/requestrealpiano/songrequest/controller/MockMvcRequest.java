@@ -1,8 +1,10 @@
 package com.requestrealpiano.songrequest.controller;
 
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -33,6 +35,13 @@ public class MockMvcRequest {
         return request;
     }
 
+    public static MockMvcRequest put(String url, Object pathVariable) {
+        MockMvcRequest request = new MockMvcRequest();
+        request.builder = MockMvcRequestBuilders.put(url, pathVariable)
+                                                .accept(APPLICATION_JSON);
+        return request;
+    }
+
     public MockMvcRequest withParam(String name, String value) {
         this.builder.param(name, value);
         return this;
@@ -46,6 +55,12 @@ public class MockMvcRequest {
 
     public MockMvcRequest withToken(String jwtToken) {
         this.builder.header(HttpHeaders.AUTHORIZATION, jwtToken);
+        return this;
+    }
+
+    public MockMvcRequest withPrincipal(OAuthAccount loginAccount) {
+        this.builder.principal(new UsernamePasswordAuthenticationToken(loginAccount, null,
+                                                                       loginAccount.getAuthorities()));
         return this;
     }
 

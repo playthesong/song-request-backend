@@ -4,15 +4,18 @@ import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
-import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
+import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,13 +34,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
-import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPageRequest;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
-import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
-import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequest;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.*;
@@ -149,16 +152,16 @@ class LetterServiceTest {
     @DisplayName("새로운 Letter를 생성하는 테스트")
     void create_new_letter(String songStory, SongRequest songRequest, Long accountId) {
         // given
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
-
+        LetterRequest letterRequest = createLetterRequestOf(songStory, songRequest);
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
         Account account = createMember();
         Song song = createSong();
         Letter newLetter = Letter.of(songStory, account, song);
 
         // when
-        when(accountRepository.findById(eq(newLetterRequest.getAccountId()))).thenReturn(Optional.of(account));
+        when(accountRepository.findById(eq(loginAccount.getId()))).thenReturn(Optional.of(account));
         when(letterRepository.save(any(Letter.class))).thenReturn(newLetter);
-        LetterDetails letterDetails = letterService.createLetter(newLetterRequest);
+        LetterDetails letterDetails = letterService.createLetter(loginAccount, letterRequest);
 
         // then
         assertAll(
@@ -167,6 +170,106 @@ class LetterServiceTest {
                 () -> assertThat(letterDetails.getSong().getTitle()).isEqualTo(newLetter.getSong().getSongTitle()),
                 () -> assertThat(letterDetails.getAccount().getName()).isEqualTo(newLetter.getAccount().getName()),
                 () -> assertThat(letterDetails.getAccount().getAvatarUrl()).isEqualTo(newLetter.getAccount().getAvatarUrl())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sameSongUpdateLetterParameters")
+    @DisplayName("Same Song - Song이 같을 때 update 테스트")
+    void same_song_update_letter(Long accountId, Long songId, String artist, String title, String newSongStory) {
+        // given
+        Song song = createSongOf(songId, artist, title);
+        SongRequest songRequest = createSongRequestOf(song.getSongTitle(), song.getArtist(), song.getImageUrl());
+
+        Letter letter = createLetterOf(createMemberOf(accountId), song);
+        Account account = letter.getAccount();
+
+        OAuthAccount loginAccount = createOAuthAccountOf(account.getId(), account.getRole());
+        LetterRequest letterRequest = createLetterRequestOf(newSongStory, songRequest);
+
+        // when
+        when(letterRepository.findById(eq(letter.getId()))).thenReturn(Optional.of(letter));
+
+        LetterDetails updatedLetter = letterService.updateLetter(loginAccount, letter.getId(), letterRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(updatedLetter.getId()).isEqualTo(letter.getId()),
+                () -> assertThat(updatedLetter.getAccount().getId()).isEqualTo(loginAccount.getId()),
+                () -> assertThat(updatedLetter.getSong().getId()).isEqualTo(song.getId()),
+                () -> assertThat(updatedLetter.getSongStory()).isEqualTo(newSongStory)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("notSameSongUpdateLetterParameters")
+    @DisplayName("Not Same - Song이 다를 때 update 테스트")
+    void not_same_song_update_letter(Long accountId, Long songId, Long newSongId, String artist, String title,
+                                     String newArtist, String newTitle, String newSongStory) {
+        // given
+        Song oldSong = createSongOf(songId, artist, title);
+        Letter letter = createLetterOf(createMemberOf(accountId), oldSong);
+
+        Account account = letter.getAccount();
+        OAuthAccount loginAccount = createOAuthAccountOf(account.getId(), account.getRole());
+
+        Song newSong = createSongOf(newSongId, newTitle, newArtist);
+        SongRequest songRequest = createSongRequestOf(newSong.getSongTitle(), newSong.getArtist(), newSong.getImageUrl());
+        LetterRequest letterRequest = createLetterRequestOf(newSongStory, songRequest);
+
+        // when
+        when(letterRepository.findById(eq(letter.getId()))).thenReturn(Optional.of(letter));
+        when(songService.updateRequestCountOrElseCreate(refEq(letterRequest.getSongRequest()))).thenReturn(newSong);
+        LetterDetails updatedLetter = letterService.updateLetter(loginAccount, letter.getId(), letterRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(updatedLetter.getId()).isEqualTo(letter.getId()),
+                () -> assertThat(updatedLetter.getAccount().getId()).isEqualTo(loginAccount.getId()),
+                () -> assertThat(updatedLetter.getSong().getId()).isNotEqualTo(oldSong.getId()),
+                () -> assertThat(updatedLetter.getSong().getId()).isEqualTo(newSong.getId()),
+                () -> assertThat(updatedLetter.getSong().getTitle()).isEqualTo(newSong.getSongTitle()),
+                () -> assertThat(updatedLetter.getSong().getArtist()).isEqualTo(newSong.getArtist()),
+                () -> assertThat(updatedLetter.getSongStory()).isEqualTo(newSongStory)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("accountMismatchUpdateLetterParameters")
+    @DisplayName("Account Mismatch - Login Account가 일치하지 않을 때 예외가 발생하는 테스트")
+    void account_mismatch_update_letter(Long letterAccountId, Long differentId, String songStory) {
+        // given
+        ErrorCode accountMismatchError = ErrorCode.ACCOUNT_MISMATCH_ERROR;
+        LetterRequest letterRequest = createLetterRequestOf(songStory, createSongRequest());
+        Letter letter = createLetterOf(createMemberOf(letterAccountId), createSong());
+        OAuthAccount loginAccount = createOAuthAccountOf(differentId, MEMBER);
+
+        // when
+        when(letterRepository.findById(eq(letter.getId()))).thenReturn(Optional.of(letter));
+
+        // then
+        assertThatThrownBy(() -> letterService.updateLetter(loginAccount, letter.getId(), letterRequest))
+                .isExactlyInstanceOf(AccountMismatchException.class)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(accountMismatchError.getMessage());
+    }
+
+    private static Stream<Arguments> accountMismatchUpdateLetterParameters() {
+        return Stream.of(
+                Arguments.of(1L, 3L, "SongStory")
+        );
+    }
+
+    private static Stream<Arguments> notSameSongUpdateLetterParameters() {
+        return Stream.of(
+                Arguments.of(5L, 3L, 10L, "Original Artist", "Original Title",
+                            "New Artist", "New Title", "NewSongStory")
+        );
+    }
+
+    private static Stream<Arguments> sameSongUpdateLetterParameters() {
+        return Stream.of(
+                Arguments.of(5L, 3L, "SameArtist", "SameTitle", "NewSongStory")
         );
     }
 

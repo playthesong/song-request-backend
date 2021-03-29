@@ -4,18 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.controller.LetterController;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
-import com.requestrealpiano.songrequest.controller.restdocs.RequestFields;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
-import com.requestrealpiano.songrequest.domain.letter.request.NewLetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
+import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
-import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import com.requestrealpiano.songrequest.service.LetterService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
 import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithGuest;
@@ -35,22 +35,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
-import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.*;
+import static com.requestrealpiano.songrequest.domain.account.Role.GUEST;
+import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
-import static com.requestrealpiano.songrequest.testobject.SongFactory.createSongRequestOf;
+import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.beneathPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 
 @WebMvcTest(controllers = LetterController.class,
@@ -136,25 +136,20 @@ class LetterControllerTest extends BaseControllerTest {
     @DisplayName("OK - 새로운 Letter 등록 API 테스트")
     void create_new_Letter(String songStory, SongRequest songRequest, Long accountId) throws Exception {
         // given
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
+        LetterRequest letterRequest = createLetterRequestOf(songStory, songRequest);
         LetterDetails response = createLetterDetails();
-        String requestBody = objectMapper.writeValueAsString(newLetterRequest);
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
 
         // when
-        when(letterService.createLetter(any(NewLetterRequest.class))).thenReturn(response);
-
+        when(letterService.createLetter(any(OAuthAccount.class), any(LetterRequest.class))).thenReturn(response);
         ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withPrincipal(loginAccount)
                                                 .withBody(requestBody)
                                                 .doRequest());
 
         // then
-        MockMvcResponse.CREATED(results)
-                       .andDo(document("create-letter",
-                               requestFields(RequestFields.createLetter()),
-                               responseFields(ResponseFields.common())
-                                   .andWithPrefix("data.", ResponseFields.letter())
-                       ))
-        ;
+        MockMvcResponse.CREATED(results);
     }
 
     @ParameterizedTest
@@ -164,13 +159,15 @@ class LetterControllerTest extends BaseControllerTest {
     void invalid_new_letter_request(String title, String artist, String imageUrl, String songStory,
                                     Long accountId) throws Exception {
         // given
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
         SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
-        String requestBody = objectMapper.writeValueAsString(newLetterRequest);
+        LetterRequest letterRequest = createLetterRequestOf(songStory, songRequest);
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
         ErrorCode invalidInputError = ErrorCode.INVALID_INPUT_VALUE;
 
         // when
         ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withPrincipal(loginAccount)
                                                 .withBody(requestBody)
                                                 .doRequest());
 
@@ -189,13 +186,15 @@ class LetterControllerTest extends BaseControllerTest {
     void access_denied_user_create_letter(String title, String artist, String imageUrl, String songStory,
                                          Long accountId) throws Exception {
         // given
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, GUEST);
         SongRequest songRequest = createSongRequestOf(title, artist, imageUrl);
-        NewLetterRequest newLetterRequest = createNewLetterRequestOf(songStory, songRequest, accountId);
+        LetterRequest letterRequest = createLetterRequestOf(songStory, songRequest);
         ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
-        String requestBody = objectMapper.writeValueAsString(newLetterRequest);
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
 
         // when
         ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withPrincipal(loginAccount)
                                                 .withBody(requestBody)
                                                 .doRequest());
 
@@ -237,10 +236,90 @@ class LetterControllerTest extends BaseControllerTest {
         ErrorCode invalidRequestError = ErrorCode.INVALID_REQUEST_ERROR;
 
         // when
-        ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", wrongStatus).doRequest());
+        ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", wrongStatus)
+                                                .doRequest());
 
         // then
         MockMvcResponse.BAD_REQUEST(results, invalidRequestError);
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("OK - Letter 수정 API 테스트")
+    void update_letter() throws Exception {
+        // given
+        Long accountId = 1L;
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
+
+        LetterRequest letterRequest = createLetterRequestOf("NewSongStory", createSongRequest());
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
+
+        Letter letter = createLetterOf(createMemberOf(loginAccount.getId()), createSong());
+        LetterDetails letterDetails = LetterDetails.from(letter);
+
+        // when
+        when(letterService.updateLetter(any(OAuthAccount.class), eq(letter.getId()), any(LetterRequest.class)))
+                .thenReturn(letterDetails);
+
+        ResultActions results = mockMvc.perform(put("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(loginAccount)
+                                                .withBody(requestBody)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.OK(results);
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("BAD_REQUEST - 일치하지 않는 사용자가 Letter 수정을 요청하는 테스트")
+    void bad_request_update_letter() throws Exception {
+        // given
+        Long loginId = 1L;
+        Long letterAccountId = 2L;
+        OAuthAccount loginAccount = createOAuthAccountOf(loginId, MEMBER);
+
+        LetterRequest letterRequest = createLetterRequestOf("NewSongStory", createSongRequest());
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
+
+        Letter letter = createLetterOf(createMemberOf(letterAccountId), createSong());
+        ErrorCode accountMismatchError = ErrorCode.ACCOUNT_MISMATCH_ERROR;
+
+        // when
+        when(letterService.updateLetter(any(OAuthAccount.class), eq(letter.getId()), any(LetterRequest.class)))
+                .thenThrow(new AccountMismatchException());
+
+        ResultActions results = mockMvc.perform(put("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(loginAccount)
+                                                .withBody(requestBody)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.BAD_REQUEST(results, accountMismatchError);
+    }
+
+    @Test
+    @WithGuest
+    @DisplayName("FORBIDDEN - 권한이 없는 (변경 된) 사용자가 Letter 수정을 요청하는 테스트")
+    void forbidden_update_letter() throws Exception {
+        // given
+        Long loginId = 1L;
+        OAuthAccount guestAccount = createOAuthAccountOf(loginId, GUEST);
+
+        LetterRequest letterRequest = createLetterRequestOf("NewSongStory", createSongRequest());
+        String requestBody = objectMapper.writeValueAsString(letterRequest);
+
+        Letter letter = createLetterOf(createGuestOf(guestAccount.getId()), createSong());
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+
+        // when
+        ResultActions results = mockMvc.perform(put("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(guestAccount)
+                                                .withBody(requestBody)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError);
     }
 
     private static Stream<Arguments> paginationFindAllLettersParameters() {

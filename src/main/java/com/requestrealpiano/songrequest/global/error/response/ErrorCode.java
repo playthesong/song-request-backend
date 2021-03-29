@@ -19,6 +19,7 @@ public enum ErrorCode {
     ACCESS_DENIED_ERROR(403, "해당 요청에 대한 접근 권한이 없습니다."),
 
     // Account
+    ACCOUNT_MISMATCH_ERROR(400, "등록된 정보와 요청한 계정 정보와 일치하지 않습니다."),
     ACCOUNT_NOT_FOUND(404, "해당 계정이 존재하지 않습니다."),
 
     // Letter

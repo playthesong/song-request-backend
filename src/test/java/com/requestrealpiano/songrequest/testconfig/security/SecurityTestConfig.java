@@ -3,6 +3,7 @@ package com.requestrealpiano.songrequest.testconfig.security;
 import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.security.oauth.CustomAccessDeniedHandler;
 import com.requestrealpiano.songrequest.security.oauth.CustomAuthenticationEntryPoint;
+import com.requestrealpiano.songrequest.testconfig.security.filter.MockAuthenticationFilter;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Import;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
@@ -44,11 +46,14 @@ public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-            .antMatchers("/api/letters").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers("/api/songs").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.POST, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.PUT, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.DELETE, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.GET, "/api/songs/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .anyRequest().authenticated();
 
-        http.addFilterBefore(characterEncodingFilter(), CsrfFilter.class);
+        http.addFilterBefore(characterEncodingFilter(), CsrfFilter.class)
+            .addFilterBefore(new MockAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         http.exceptionHandling()
             .authenticationEntryPoint(customAuthenticationEntryPoint)
