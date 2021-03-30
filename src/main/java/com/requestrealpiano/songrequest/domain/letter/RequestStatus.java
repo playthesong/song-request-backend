@@ -20,6 +20,6 @@ public enum RequestStatus {
         return Stream.of(values())
                      .filter(status -> status.getKey().equalsIgnoreCase(requestStatus))
                      .findFirst()
-                     .orElseThrow(LetterStatusException::new);
+                     .orElse(null);
     }
 }

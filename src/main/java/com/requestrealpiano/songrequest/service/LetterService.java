@@ -15,6 +15,7 @@ import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
 import com.requestrealpiano.songrequest.global.pagination.Pagination;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
@@ -91,6 +92,9 @@ public class LetterService {
     @Transactional
     public LetterDetails changeStatus(Long letterId, StatusChangeRequest statusChangeRequest) {
         Letter letter = letterRepository.findById(letterId).orElseThrow(LetterNotFoundException::new);
+        if (statusChangeRequest.getRequestStatus() == null) {
+            throw new LetterStatusException();
+        }
         Letter updatedLetter = letter.changeStatus(statusChangeRequest);
         return LetterDetails.from(updatedLetter);
     }
