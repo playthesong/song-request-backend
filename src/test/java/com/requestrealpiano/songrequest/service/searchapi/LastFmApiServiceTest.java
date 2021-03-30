@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.service;
+package com.requestrealpiano.songrequest.service.searchapi;
 
 import com.requestrealpiano.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
 import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;

@@ -56,6 +56,12 @@ public class LetterController {
         return SUCCESS(OK, letter);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    public void deleteById(@LoginAccount OAuthAccount loginAccount, @PathVariable Long id) {
+        letterService.deleteLetter(loginAccount, id);
+    }
+
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/status/{requestStatus}")
     public ApiResponse<LettersResponse> findByStatus(@PathVariable RequestStatus requestStatus,

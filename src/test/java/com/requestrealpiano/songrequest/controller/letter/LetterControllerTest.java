@@ -5,6 +5,7 @@ import com.requestrealpiano.songrequest.controller.LetterController;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
 import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
+import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
@@ -18,6 +19,7 @@ import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import com.requestrealpiano.songrequest.service.LetterService;
 import com.requestrealpiano.songrequest.testconfig.BaseControllerTest;
+import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithAdmin;
 import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithGuest;
 import com.requestrealpiano.songrequest.testconfig.security.mockuser.WithMember;
 import org.apache.commons.lang3.StringUtils;
@@ -38,8 +40,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.*;
-import static com.requestrealpiano.songrequest.domain.account.Role.GUEST;
-import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
+import static com.requestrealpiano.songrequest.domain.account.Role.*;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
@@ -316,6 +317,65 @@ class LetterControllerTest extends BaseControllerTest {
         ResultActions results = mockMvc.perform(put("/api/letters/{id}", letter.getId())
                                                 .withPrincipal(guestAccount)
                                                 .withBody(requestBody)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError);
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("NO_CONTENT - Letter 삭제 API 테스트")
+    void delete_letter() throws Exception {
+        // given
+        Long accountId = 1L;
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
+
+        Letter letter = createLetterOf(createMemberOf(loginAccount.getId()), createSong());
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(loginAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.NO_CONTENT(results);
+    }
+
+    @Test
+    @WithAdmin
+    @DisplayName("NO_CONTENT - 작성자와 일치하지 않지만 권한이 Admin인 사용자가 Letter 삭제를 요청하는 테스트")
+    void admin_delete_letter() throws Exception {
+        // given
+        Long adminId = 1L;
+        Long letterAccountId = 2L;
+        OAuthAccount adminAccount = createOAuthAccountOf(adminId, ADMIN);
+
+        Letter letter = createLetterOf(createMemberOf(letterAccountId), createSong());
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(adminAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.NO_CONTENT(results);
+    }
+
+    @Test
+    @WithGuest
+    @DisplayName("FORBIDDEN - 권한이 없는 (변경 된) 사용자가 Letter 삭제 API 요청 테스트")
+    void forbidden_delete_letter() throws Exception {
+        // given
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+        Long accountId = 1L;
+        OAuthAccount guestAccount = createOAuthAccountOf(accountId, GUEST);
+
+        Letter letter = createLetterOf(createMemberOf(guestAccount.getId()), createSong());
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(guestAccount)
                                                 .doRequest());
 
         // then

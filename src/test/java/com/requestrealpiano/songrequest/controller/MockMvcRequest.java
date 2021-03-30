@@ -42,6 +42,13 @@ public class MockMvcRequest {
         return request;
     }
 
+    public static MockMvcRequest delete(String url, Object pathVariable) {
+        MockMvcRequest request = new MockMvcRequest();
+        request.builder = MockMvcRequestBuilders.delete(url, pathVariable)
+                                                .accept(APPLICATION_JSON);
+        return request;
+    }
+
     public MockMvcRequest withParam(String name, String value) {
         this.builder.param(name, value);
         return this;
