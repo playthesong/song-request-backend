@@ -5,6 +5,8 @@ import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequestBuilder;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
 
@@ -201,5 +204,12 @@ public class LetterFactory {
                                    .songStory(songStory)
                                    .songRequest(songRequest)
                                    .build();
+    }
+
+    // StatusChangeRequest
+    public static StatusChangeRequest createStatusChangeRequestOf(RequestStatus requestStatus) {
+        return StatusChangeRequestBuilder.newBuilder()
+                                         .requestStatus(requestStatus)
+                                         .build();
     }
 }

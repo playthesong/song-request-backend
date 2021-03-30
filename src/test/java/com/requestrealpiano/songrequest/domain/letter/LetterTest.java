@@ -192,9 +192,9 @@ class LetterTest {
     }
 
     private static Stream<Arguments> changeRequestStatusParameters() {
-        StatusChangeRequest changeToWaiting = StatusChangeRequestBuilder.newBuilder().requestStatus(WAITING).build();
-        StatusChangeRequest changeToPending = StatusChangeRequestBuilder.newBuilder().requestStatus(PENDING).build();
-        StatusChangeRequest changeToDone = StatusChangeRequestBuilder.newBuilder().requestStatus(DONE).build();
+        StatusChangeRequest changeToWaiting = createStatusChangeRequestOf(WAITING);
+        StatusChangeRequest changeToPending = createStatusChangeRequestOf(PENDING);
+        StatusChangeRequest changeToDone = createStatusChangeRequestOf(DONE);
         return Stream.of(
                 Arguments.of(WAITING, changeToDone), Arguments.of(PENDING, changeToWaiting),
                 Arguments.of(WAITING, changeToPending), Arguments.of(PENDING, changeToDone),

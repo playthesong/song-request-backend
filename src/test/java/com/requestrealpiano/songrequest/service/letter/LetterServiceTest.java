@@ -4,8 +4,10 @@ import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
+import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
@@ -37,6 +39,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
@@ -254,6 +257,23 @@ class LetterServiceTest {
                 .isExactlyInstanceOf(AccountMismatchException.class)
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(accountMismatchError.getMessage());
+    }
+
+    @Test
+    @DisplayName("Letter Status 변경 메서드 테스트")
+    void change_status() {
+        // given
+        Letter waitingLetter = createLetterOf(WAITING, createMember(), createSong());
+
+        StatusChangeRequest request = createStatusChangeRequestOf(DONE);
+        Letter doneLetter = createLetterOf(DONE, createMember(), createSong());
+
+        // when
+        when(letterRepository.findById(eq(waitingLetter.getId()))).thenReturn(Optional.of(doneLetter));
+        LetterDetails letter = letterService.changeStatus(waitingLetter.getId(), request);
+
+        // then
+        assertThat(letter.getRequestStatus()).isEqualTo(request.getRequestStatus().getKey());
     }
 
     private static Stream<Arguments> accountMismatchUpdateLetterParameters() {

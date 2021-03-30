@@ -7,6 +7,7 @@ import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
@@ -84,6 +85,13 @@ public class LetterService {
 
         Song song = songService.updateRequestCountOrElseCreate(letterRequest.getSongRequest());
         Letter updatedLetter = letter.update(letterRequest, song);
+        return LetterDetails.from(updatedLetter);
+    }
+
+    @Transactional
+    public LetterDetails changeStatus(Long letterId, StatusChangeRequest statusChangeRequest) {
+        Letter letter = letterRepository.findById(letterId).orElseThrow(LetterNotFoundException::new);
+        Letter updatedLetter = letter.changeStatus(statusChangeRequest);
         return LetterDetails.from(updatedLetter);
     }
 
