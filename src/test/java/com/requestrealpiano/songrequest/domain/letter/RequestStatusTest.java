@@ -29,21 +29,14 @@ class RequestStatusTest {
     @ParameterizedTest
     @MethodSource("invalidRequestStatusParameters")
     void invalid_request_status(String invalidStatus) {
-        // given
-        ErrorCode invalidLetterStatus = ErrorCode.INVALID_LETTER_STATUS;
 
         // then
-        assertThatThrownBy(() -> RequestStatus.createJson(invalidStatus))
-                .isExactlyInstanceOf(LetterStatusException.class)
-                .isInstanceOf(BusinessException.class)
-                .hasMessage(invalidLetterStatus.getMessage());
+        assertThat(RequestStatus.createJson(invalidStatus)).isNull();
     }
 
     private static Stream<Arguments> invalidRequestStatusParameters() {
         return Stream.of(
-            Arguments.of("notStatus"),
-            Arguments.of("1234567"),
-            Arguments.of("Mixed - 1")
+            Arguments.of("notStatus"), Arguments.of("1234567"), Arguments.of("Mixed - 1")
         );
     }
 
