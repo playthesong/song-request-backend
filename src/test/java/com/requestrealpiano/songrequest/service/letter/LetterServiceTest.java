@@ -15,6 +15,7 @@ import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
@@ -264,16 +265,32 @@ class LetterServiceTest {
     void change_status() {
         // given
         Letter waitingLetter = createLetterOf(WAITING, createMember(), createSong());
-
-        StatusChangeRequest request = createStatusChangeRequestOf(DONE);
-        Letter doneLetter = createLetterOf(DONE, createMember(), createSong());
+        StatusChangeRequest doneRequest = createStatusChangeRequestOf(DONE);
 
         // when
-        when(letterRepository.findById(eq(waitingLetter.getId()))).thenReturn(Optional.of(doneLetter));
-        LetterDetails letter = letterService.changeStatus(waitingLetter.getId(), request);
+        when(letterRepository.findById(eq(waitingLetter.getId()))).thenReturn(Optional.of(waitingLetter));
+        LetterDetails updatedLetter = letterService.changeStatus(waitingLetter.getId(), doneRequest);
 
         // then
-        assertThat(letter.getRequestStatus()).isEqualTo(request.getRequestStatus().getKey());
+        assertThat(updatedLetter.getRequestStatus()).isEqualTo(doneRequest.getRequestStatus().getKey());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 Status 값이 들어 왔을 때 예외가 발생하는 테스트")
+    void invalid_change_status() {
+        // given
+        ErrorCode invalidLetterStatus = ErrorCode.INVALID_LETTER_STATUS;
+        StatusChangeRequest request = createStatusChangeRequestOf(null);
+        Letter waitingLetter = createLetterOf(WAITING, createMember(), createSong());
+
+        // when
+        when(letterRepository.findById(eq(waitingLetter.getId()))).thenReturn(Optional.of(waitingLetter));
+
+        // then
+        assertThatThrownBy(() -> letterService.changeStatus(waitingLetter.getId(), request))
+                .isExactlyInstanceOf(LetterStatusException.class)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(invalidLetterStatus.getMessage());
     }
 
     private static Stream<Arguments> accountMismatchUpdateLetterParameters() {

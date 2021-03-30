@@ -1,8 +1,5 @@
 package com.requestrealpiano.songrequest.domain.letter;
 
-import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
-import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
-import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -10,7 +7,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class RequestStatusTest {
 
