@@ -322,6 +322,25 @@ class LetterControllerTest extends BaseControllerTest {
         MockMvcResponse.FORBIDDEN(results, accessDeniedError);
     }
 
+    @Test
+    @WithMember
+    @DisplayName("NO_CONTENT - Letter 삭제 API 테스트")
+    void delete_letter() throws Exception {
+        // given
+        Long accountId = 1L;
+        OAuthAccount loginAccount = createOAuthAccountOf(accountId, MEMBER);
+
+        Letter letter = createLetterOf(createMemberOf(loginAccount.getId()), createSong());
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(loginAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.NO_CONTENT(results);
+    }
+
     private static Stream<Arguments> paginationFindAllLettersParameters() {
         int pageMin = 0;
         int pageSizeMin = 10;
