@@ -341,6 +341,26 @@ class LetterControllerTest extends BaseControllerTest {
         MockMvcResponse.NO_CONTENT(results);
     }
 
+    @Test
+    @WithGuest
+    @DisplayName("FORBIDDEN - 권한이 없는 (변경 된) 사용자가 Letter 삭제 API 요청 테스트")
+    void forbidden_delete_letter() throws Exception {
+        // given
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+        Long accountId = 1L;
+        OAuthAccount guestAccount = createOAuthAccountOf(accountId, GUEST);
+
+        Letter letter = createLetterOf(createMemberOf(guestAccount.getId()), createSong());
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/letters/{id}", letter.getId())
+                                                .withPrincipal(guestAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError);
+    }
+
     private static Stream<Arguments> paginationFindAllLettersParameters() {
         int pageMin = 0;
         int pageSizeMin = 10;
