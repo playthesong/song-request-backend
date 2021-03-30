@@ -1,14 +1,13 @@
 package com.requestrealpiano.songrequest.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.requestrealpiano.songrequest.domain.account.Role;
+import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.security.filter.JwtAuthorizationFilter;
 import com.requestrealpiano.songrequest.security.jwt.JwtTokenProvider;
 import com.requestrealpiano.songrequest.security.oauth.CustomAccessDeniedHandler;
 import com.requestrealpiano.songrequest.security.oauth.CustomAuthenticationEntryPoint;
 import com.requestrealpiano.songrequest.security.oauth.CustomAuthenticationSuccessHandler;
 import com.requestrealpiano.songrequest.security.oauth.CustomOAuth2UserService;
-import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -65,6 +64,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
             .antMatchers(HttpMethod.POST, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.PUT, "/api/letters/{id}/status").hasRole(ADMIN.getKey())
             .antMatchers(HttpMethod.PUT, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .antMatchers(HttpMethod.DELETE, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .antMatchers(HttpMethod.GET, "/api/songs/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())

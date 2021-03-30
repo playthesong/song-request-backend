@@ -4,8 +4,10 @@ import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
+import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
@@ -13,6 +15,7 @@ import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
@@ -37,6 +40,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
@@ -254,6 +258,39 @@ class LetterServiceTest {
                 .isExactlyInstanceOf(AccountMismatchException.class)
                 .isInstanceOf(BusinessException.class)
                 .hasMessage(accountMismatchError.getMessage());
+    }
+
+    @Test
+    @DisplayName("Letter Status 변경 메서드 테스트")
+    void change_status() {
+        // given
+        Letter waitingLetter = createLetterOf(WAITING, createMember(), createSong());
+        StatusChangeRequest doneRequest = createStatusChangeRequestOf(DONE);
+
+        // when
+        when(letterRepository.findById(eq(waitingLetter.getId()))).thenReturn(Optional.of(waitingLetter));
+        LetterDetails updatedLetter = letterService.changeStatus(waitingLetter.getId(), doneRequest);
+
+        // then
+        assertThat(updatedLetter.getRequestStatus()).isEqualTo(doneRequest.getRequestStatus().getKey());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 Status 값이 들어 왔을 때 예외가 발생하는 테스트")
+    void invalid_change_status() {
+        // given
+        ErrorCode invalidLetterStatus = ErrorCode.INVALID_LETTER_STATUS;
+        StatusChangeRequest request = createStatusChangeRequestOf(null);
+        Letter waitingLetter = createLetterOf(WAITING, createMember(), createSong());
+
+        // when
+        when(letterRepository.findById(eq(waitingLetter.getId()))).thenReturn(Optional.of(waitingLetter));
+
+        // then
+        assertThatThrownBy(() -> letterService.changeStatus(waitingLetter.getId(), request))
+                .isExactlyInstanceOf(LetterStatusException.class)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(invalidLetterStatus.getMessage());
     }
 
     private static Stream<Arguments> accountMismatchUpdateLetterParameters() {

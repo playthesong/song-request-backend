@@ -5,6 +5,8 @@ import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequestBuilder;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
 
@@ -51,6 +54,25 @@ public class LetterFactory {
                      .id(1L)
                      .songStory("Song story")
                      .requestStatus(RequestStatus.WAITING)
+                     .song(song)
+                     .account(account)
+                     .build();
+    }
+
+    public static Letter createLetterOf(Long id, RequestStatus requestStatus, Account account, Song song) {
+        return Letter.builder()
+                     .id(id)
+                     .songStory("Song story")
+                     .requestStatus(requestStatus)
+                     .song(song)
+                     .account(account)
+                     .build();
+    }
+
+    public static Letter createLetterOf(RequestStatus requestStatus, Account account, Song song) {
+        return Letter.builder()
+                     .songStory("Song story")
+                     .requestStatus(requestStatus)
                      .song(song)
                      .account(account)
                      .build();
@@ -192,5 +214,12 @@ public class LetterFactory {
                                    .songStory(songStory)
                                    .songRequest(songRequest)
                                    .build();
+    }
+
+    // StatusChangeRequest
+    public static StatusChangeRequest createStatusChangeRequestOf(RequestStatus requestStatus) {
+        return StatusChangeRequestBuilder.newBuilder()
+                                         .requestStatus(requestStatus)
+                                         .build();
     }
 }

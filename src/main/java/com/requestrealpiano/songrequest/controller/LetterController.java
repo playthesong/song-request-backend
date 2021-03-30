@@ -3,6 +3,7 @@ package com.requestrealpiano.songrequest.controller;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.response.ApiResponse;
@@ -60,6 +61,14 @@ public class LetterController {
     @DeleteMapping("/{id}")
     public void deleteById(@LoginAccount OAuthAccount loginAccount, @PathVariable Long id) {
         letterService.deleteLetter(loginAccount, id);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{id}/status")
+    public ApiResponse<LetterDetails> changeStatus(@PathVariable Long id,
+                                                   @RequestBody @Valid StatusChangeRequest statusChangeRequest) {
+        LetterDetails letter = letterService.changeStatus(id, statusChangeRequest);
+        return SUCCESS(OK, letter);
     }
 
     @ResponseStatus(HttpStatus.OK)

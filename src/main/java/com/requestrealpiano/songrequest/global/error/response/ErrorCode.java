@@ -23,6 +23,7 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND(404, "해당 계정이 존재하지 않습니다."),
 
     // Letter
+    INVALID_LETTER_STATUS(400, "요청한 신청곡 상태 변경 정보가 유효하지 않습니다."),
     LETTER_NOT_FOUND(404, "해당 신청곡 및 사연이 존재하지 않습니다."),
 
     // Song
