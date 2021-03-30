@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.controller.letter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.controller.LetterController;
 import com.requestrealpiano.songrequest.controller.MockMvcResponse;
@@ -9,6 +10,7 @@ import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
@@ -41,7 +43,7 @@ import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.*;
 import static com.requestrealpiano.songrequest.domain.account.Role.*;
-import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.DONE;
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.*;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
@@ -380,6 +382,30 @@ class LetterControllerTest extends BaseControllerTest {
 
         // then
         MockMvcResponse.FORBIDDEN(results, accessDeniedError);
+    }
+
+    @Test
+    @WithAdmin
+    @DisplayName("OK - Letter Status 수정 API 테스트")
+    void change_status() throws Exception {
+        // given
+        OAuthAccount adminAccount = createOAuthAccountOf(ADMIN);
+        Long letterId = 1L;
+        Letter doneLetter = createLetterOf(letterId, DONE, createMember(), createSong());
+
+        StatusChangeRequest request = createStatusChangeRequestOf(DONE);
+        LetterDetails updatedLetter = LetterDetails.from(doneLetter);
+        String requestBody = objectMapper.writeValueAsString(request);
+
+        // when
+        when(letterService.changeStatus(eq(doneLetter.getId()), refEq(request))).thenReturn(updatedLetter);
+        ResultActions results = mockMvc.perform(put("/api/letters/{id}/status", letterId)
+                                                .withPrincipal(adminAccount)
+                                                .withBody(requestBody)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.OK(results);
     }
 
     private static Stream<Arguments> paginationFindAllLettersParameters() {

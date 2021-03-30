@@ -59,6 +59,16 @@ public class LetterFactory {
                      .build();
     }
 
+    public static Letter createLetterOf(Long id, RequestStatus requestStatus, Account account, Song song) {
+        return Letter.builder()
+                     .id(id)
+                     .songStory("Song story")
+                     .requestStatus(requestStatus)
+                     .song(song)
+                     .account(account)
+                     .build();
+    }
+
     public static Letter createLetterOf(RequestStatus requestStatus, Account account, Song song) {
         return Letter.builder()
                      .songStory("Song story")
