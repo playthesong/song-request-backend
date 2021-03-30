@@ -1,6 +1,5 @@
 package com.requestrealpiano.songrequest.testconfig.security;
 
-import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.security.oauth.CustomAccessDeniedHandler;
 import com.requestrealpiano.songrequest.security.oauth.CustomAuthenticationEntryPoint;
 import com.requestrealpiano.songrequest.testconfig.security.filter.MockAuthenticationFilter;
@@ -47,6 +46,7 @@ public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
             .antMatchers(HttpMethod.POST, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.PUT, "/api/letters/{id}/status").hasRole(ADMIN.getKey())
             .antMatchers(HttpMethod.PUT, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .antMatchers(HttpMethod.DELETE, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .antMatchers(HttpMethod.GET, "/api/songs/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())

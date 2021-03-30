@@ -408,6 +408,25 @@ class LetterControllerTest extends BaseControllerTest {
         MockMvcResponse.OK(results);
     }
 
+    @Test
+    @WithMember
+    @DisplayName("FORBIDDEN - ADMIN 권한을 가지지 않은 사용자가 요청 했을 경우 요청이 실패하는 테스트")
+    void forbidden_change_status() throws Exception {
+        // given
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+        OAuthAccount memberAccount = createOAuthAccountOf(MEMBER);
+        Long letterId = 1L;
+        Letter letter = createLetterOf(1L, WAITING, createMember(), createSong());
+
+        // when
+        ResultActions results = mockMvc.perform(put("/api/letters/{id}/status", letterId)
+                                                .withPrincipal(memberAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError);
+    }
+
     private static Stream<Arguments> paginationFindAllLettersParameters() {
         int pageMin = 0;
         int pageSizeMin = 10;
