@@ -45,6 +45,18 @@ public class AccountFactory {
                       .build();
     }
 
+    // Role - ADMIN
+    public static Account createAdmin() {
+        return Account.builder()
+                      .googleOauthId("771713471123")
+                      .name("Username")
+                      .email("User email")
+                      .role(Role.ADMIN)
+                      .avatarUrl("http://avatarUrl")
+                      .build();
+    }
+
+    // Role - GUEST
     public static Account createGuestOf(Long id) {
         return Account.builder()
                       .id(id)

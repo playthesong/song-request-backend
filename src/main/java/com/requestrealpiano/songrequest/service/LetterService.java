@@ -87,9 +87,10 @@ public class LetterService {
         return LetterDetails.from(updatedLetter);
     }
 
+    @Transactional
     public void deleteLetter(OAuthAccount loginAccount, Long letterId) {
         Letter letter = letterRepository.findById(letterId).orElseThrow(LetterNotFoundException::new);
-        if (letter.hasDifferentAccount(loginAccount)) {
+        if (letter.hasDifferentAccount(loginAccount) && loginAccount.isNotAdmin()) {
             throw new AccountMismatchException();
         }
         letterRepository.delete(letter);

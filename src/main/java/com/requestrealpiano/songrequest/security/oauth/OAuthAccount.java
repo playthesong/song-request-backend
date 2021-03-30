@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import static com.requestrealpiano.songrequest.domain.account.Role.ADMIN;
+
 @Getter
 public class OAuthAccount implements OAuth2User {
 
@@ -33,6 +35,10 @@ public class OAuthAccount implements OAuth2User {
         this.email = email;
         this.avatarUrl = avatarUrl;
         this.requestCount = requestCount;
+    }
+
+    public boolean isNotAdmin() {
+        return !authorities.contains(new SimpleGrantedAuthority(ADMIN.getValue()));
     }
 
     public static OAuthAccount from(Account account) {

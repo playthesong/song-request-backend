@@ -21,10 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.requestrealpiano.songrequest.testobject.AccountFactory.createAdmin;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 public class LetterServiceJpaTest extends BaseIntegrationTest {
 
@@ -67,6 +67,29 @@ public class LetterServiceJpaTest extends BaseIntegrationTest {
         // when
         long beforeCount = createdLetters.size();
         letterService.deleteLetter(loginAccount, deleteLetterId);
+        long afterCount = letterRepository.count();
+
+        // then
+        assertThat(afterCount).isEqualTo(beforeCount - 1);
+    }
+
+    @Test
+    @DisplayName("SUCCESS - ID는 다르지만 권한이 ADMIN인 경우 성공하는 테스트")
+    void admin_delete() {
+        // given
+        String songStory = "Song Story";
+
+        Account letterAccount = accountRepository.save(createMember());
+        Account adminAccount = accountRepository.save(createAdmin());
+        Song createdSong = songRepository.save(createSong());
+        Letter letter = Letter.of(songStory, letterAccount, createdSong);
+        Letter createdLetter = letterRepository.save(letter);
+
+        OAuthAccount admin = OAuthAccount.from(adminAccount);
+
+        // when
+        long beforeCount = letterRepository.count();
+        letterService.deleteLetter(admin, createdLetter.getId());
         long afterCount = letterRepository.count();
 
         // then
