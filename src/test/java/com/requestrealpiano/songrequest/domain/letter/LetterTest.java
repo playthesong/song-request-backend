@@ -1,29 +1,28 @@
 package com.requestrealpiano.songrequest.domain.letter;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
-import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
+import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequestBuilder;
 import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
-import com.requestrealpiano.songrequest.testobject.AccountFactory;
-import com.requestrealpiano.songrequest.testobject.SongFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
+import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.*;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class LetterTest {
 
@@ -178,6 +177,32 @@ class LetterTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("changeRequestStatusParameters")
+    @DisplayName("Letter 상태 변경 메서드 테스트")
+    void change_request_status(RequestStatus letterStatus, StatusChangeRequest statusChangeRequest) {
+        // given
+        Letter letter = createLetterOf(letterStatus, createMember(), createSong());
+
+        // when
+        Letter updatedLetter = letter.changeStatus(statusChangeRequest);
+
+        // then
+        assertThat(updatedLetter.getRequestStatus()).isEqualTo(statusChangeRequest.getRequestStatus());
+    }
+
+    private static Stream<Arguments> changeRequestStatusParameters() {
+        StatusChangeRequest changeToWaiting = StatusChangeRequestBuilder.newBuilder().requestStatus(WAITING).build();
+        StatusChangeRequest changeToPending = StatusChangeRequestBuilder.newBuilder().requestStatus(PENDING).build();
+        StatusChangeRequest changeToDone = StatusChangeRequestBuilder.newBuilder().requestStatus(DONE).build();
+        return Stream.of(
+                Arguments.of(WAITING, changeToDone), Arguments.of(PENDING, changeToWaiting),
+                Arguments.of(WAITING, changeToPending), Arguments.of(PENDING, changeToDone),
+                Arguments.of(DONE, changeToWaiting),
+                Arguments.of(DONE, changeToPending)
+        );
+    }
+
     private static Stream<Arguments> updateLetterParameters() {
         return Stream.of(
                 Arguments.of(1L, 2L, "New Song Story")
@@ -214,7 +239,7 @@ class LetterTest {
 
     private static Stream<Arguments> createNewLetterByOfParameters() {
         return Stream.of(
-                Arguments.of("Song story", RequestStatus.WAITING)
+                Arguments.of("Song story", WAITING)
         );
     }
 }
