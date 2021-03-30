@@ -16,6 +16,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestB
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
@@ -45,6 +46,7 @@ import static com.requestrealpiano.songrequest.controller.MockMvcRequest.*;
 import static com.requestrealpiano.songrequest.domain.account.Role.*;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.*;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
+import static com.requestrealpiano.songrequest.testobject.JwtFactory.createValidJwtTokenOf;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
@@ -406,6 +408,28 @@ class LetterControllerTest extends BaseControllerTest {
 
         // then
         MockMvcResponse.OK(results);
+    }
+
+    @Test
+    @WithAdmin
+    @DisplayName("BAD_REQUEST - 유효하지 않은 값으로 Letter Status 수정을 요청 했을때 예외가 발생하는 테스트")
+    void bad_request_change_status() throws Exception {
+        // given
+        ErrorCode invalidLetterStatus = ErrorCode.INVALID_LETTER_STATUS;
+        OAuthAccount adminAccount = createOAuthAccountOf(ADMIN);
+        Long letterId = 1L;
+        StatusChangeRequest request = createStatusChangeRequestOf(null);
+        String requestBody = objectMapper.writeValueAsString(request);
+
+        // when
+        when(letterService.changeStatus(eq(letterId), any())).thenThrow(new LetterStatusException());
+        ResultActions results = mockMvc.perform(put("/api/letters/{id}/status", letterId)
+                                                .withPrincipal(adminAccount)
+                                                .withBody(requestBody)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.BAD_REQUEST(results, invalidLetterStatus);
     }
 
     @Test
