@@ -1,4 +1,4 @@
-package com.requestrealpiano.songrequest.service;
+package com.requestrealpiano.songrequest.service.letter;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
@@ -16,6 +16,8 @@ import com.requestrealpiano.songrequest.global.error.exception.business.LetterNo
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
+import com.requestrealpiano.songrequest.service.LetterService;
+import com.requestrealpiano.songrequest.service.SongService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

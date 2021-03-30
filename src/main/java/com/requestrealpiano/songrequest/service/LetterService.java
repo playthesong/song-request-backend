@@ -86,4 +86,12 @@ public class LetterService {
         Letter updatedLetter = letter.update(letterRequest, song);
         return LetterDetails.from(updatedLetter);
     }
+
+    public void deleteLetter(OAuthAccount loginAccount, Long letterId) {
+        Letter letter = letterRepository.findById(letterId).orElseThrow(LetterNotFoundException::new);
+        if (letter.hasDifferentAccount(loginAccount)) {
+            throw new AccountMismatchException();
+        }
+        letterRepository.delete(letter);
+    }
 }
