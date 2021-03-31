@@ -6,11 +6,6 @@
 - 신청곡 랭킹을 바탕으로 스트리머와 관련된 유튜브 컨텐츠 정보를 제공 합니다.
 - 스트리머와 관련된 Product(악보집, 악기 등) 정보를 제공 합니다.
 
-<br />
-<br />
-<br />
-
-## Design Prototype
 ![design prototype](https://user-images.githubusercontent.com/49878687/111187879-cd236f80-85f7-11eb-869b-8585d7e502a8.png)
 
 <br />
