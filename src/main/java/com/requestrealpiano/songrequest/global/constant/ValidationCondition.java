@@ -20,13 +20,13 @@ public class ValidationCondition {
     public static final int ARTIST_MIN = 1;
 
     // Title
-    public static final String TITLE_MESSAGE = "제목은 30자 미만 입니다.";
-    public static final int TITLE_MAX = 30;
+    public static final String TITLE_MESSAGE = "제목은 50자 미만 입니다.";
+    public static final int TITLE_MAX = 50;
     public static final int TITLE_MIN = 1;
 
     // Image URL
     public static final String IMAGE_MESSAGE = "유효한 이미지 정보가 아닙니다.";
-    public static final int IMAGE_MAX = 100;
+    public static final int IMAGE_MAX = 300;
 
     // Song Story
     public static final String SONG_STORY_MESSAGE = "사연은 500자 미만이어야 합니다.";
