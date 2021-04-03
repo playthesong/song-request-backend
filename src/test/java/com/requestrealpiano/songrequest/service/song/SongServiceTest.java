@@ -13,6 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -44,7 +46,7 @@ class SongServiceTest {
 
         // when
         when(songRepository.findBySongTitleAndArtist(songRequest.getTitle(), songRequest.getArtist()))
-                .thenReturn(Optional.of(existSong));
+                .thenReturn(List.of(existSong));
         Song song = songService.updateRequestCountOrElseCreate(songRequest);
 
         // then
@@ -72,7 +74,7 @@ class SongServiceTest {
 
         // when
         when(songRepository.findBySongTitleAndArtist(songRequest.getTitle(), songRequest.getArtist()))
-                .thenReturn(Optional.empty());
+                .thenReturn(Collections.emptyList());
         when(songRepository.save(any(Song.class))).thenReturn(newSong);
 
         Song song = songService.updateRequestCountOrElseCreate(songRequest);

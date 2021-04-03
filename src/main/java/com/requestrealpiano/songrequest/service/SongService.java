@@ -21,6 +21,7 @@ public class SongService {
     @Transactional
     public Song updateRequestCountOrElseCreate(SongRequest songRequest) {
         return songRepository.findBySongTitleAndArtist(songRequest.getTitle(), songRequest.getArtist())
+                             .stream().findFirst()
                              .map(Song::increaseRequestCount)
                              .orElseGet(() -> {
                                  Song song = Song.from(songRequest);
