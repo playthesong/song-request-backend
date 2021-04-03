@@ -32,11 +32,11 @@ public class Letter extends BaseTimeEntity {
     @Column(name = "request_status")
     private RequestStatus requestStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "song_id")
     private Song song;
 

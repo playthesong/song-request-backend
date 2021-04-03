@@ -25,7 +25,7 @@ public class YoutubeContent {
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "song_id")
     private Song song;
 }
