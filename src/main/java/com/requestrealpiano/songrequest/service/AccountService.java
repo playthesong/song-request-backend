@@ -1,9 +1,11 @@
 package com.requestrealpiano.songrequest.service;
 
 import com.requestrealpiano.songrequest.domain.account.Account;
+import com.requestrealpiano.songrequest.domain.account.AccountDetail;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import com.requestrealpiano.songrequest.security.jwt.JwtTokenProvider;
+import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +24,10 @@ public class AccountService {
 
     public void validateJwtToken(String jwtToken) {
         jwtTokenProvider.validateJwtToken(jwtToken);
+    }
+
+    public AccountDetail findAccountDetail(OAuthAccount loginAccount) {
+        Account account = accountRepository.findById(loginAccount.getId()).orElseThrow(AccountNotFoundException::new);
+        return AccountDetail.from(account);
     }
 }

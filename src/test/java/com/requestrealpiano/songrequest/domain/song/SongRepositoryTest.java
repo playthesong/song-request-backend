@@ -46,7 +46,7 @@ class SongRepositoryTest extends BaseRepositoryTest {
         // when
         songRepository.save(song);
         Song foundSong = songRepository.findBySongTitleAndArtist(title, artist)
-                                       .orElseThrow(SongNotFoundException::new);
+                                       .stream().findFirst().orElseThrow(SongNotFoundException::new);
 
         // then
         assertAll(
@@ -67,7 +67,7 @@ class SongRepositoryTest extends BaseRepositoryTest {
 
         // then
         assertThatThrownBy(() -> songRepository.findBySongTitleAndArtist(title, artist)
-                                               .orElseThrow(SongNotFoundException::new))
+                                               .stream().findFirst().orElseThrow(SongNotFoundException::new))
         .isInstanceOf(SongNotFoundException.class);
     }
 
@@ -81,16 +81,10 @@ class SongRepositoryTest extends BaseRepositoryTest {
         String lowerCasedTitle = song.getSongTitle().toLowerCase();
         String lowerCasedArtist = song.getArtist().toLowerCase();
 
-        // SubString
-        int beginIndex = 5;
-        String subStringTitle = song.getSongTitle().substring(beginIndex);
-
         return Stream.of(
                 Arguments.of(song, title, artist),
                 Arguments.of(song, title, lowerCasedArtist),
-                Arguments.of(song, lowerCasedTitle, lowerCasedArtist),
-                Arguments.of(song, subStringTitle, artist),
-                Arguments.of(song, subStringTitle, lowerCasedArtist)
+                Arguments.of(song, lowerCasedTitle, lowerCasedArtist)
         );
     }
 

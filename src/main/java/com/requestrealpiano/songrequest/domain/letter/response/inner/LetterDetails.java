@@ -1,11 +1,13 @@
 package com.requestrealpiano.songrequest.domain.letter.response.inner;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +17,8 @@ public class LetterDetails {
     private final Long id;
     private final String songStory;
     private final String requestStatus;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private final LocalDateTime createdDateTime;
     private final SongSummary song;
     private final AccountSummary account;
