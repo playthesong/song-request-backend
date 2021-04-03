@@ -15,7 +15,7 @@ public class AccountDetail {
     private final String avatarUrl;
     private final String role;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy / MM / dd")
     private final LocalDateTime createdDateTime;
 
     private final Integer requestCount;
