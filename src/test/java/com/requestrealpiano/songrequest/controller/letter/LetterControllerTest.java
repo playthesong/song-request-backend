@@ -486,7 +486,7 @@ class LetterControllerTest extends BaseControllerTest {
                         "Song story", 1L),
                 Arguments.of("Title", StringUtils.repeat("Invalid length of Artist", 5), "http://imageUrl",
                         "Song story", 1L),
-                Arguments.of("Title", "Artist", StringUtils.repeat("http://Invalid_imageUrl", 10),
+                Arguments.of("Title", "Artist", StringUtils.repeat("http://Invalid_imageUrl", 15),
                         "Song story", 1L),
                 Arguments.of("Title", "Artist", "http://imageUrl",
                         StringUtils.repeat("Song Story", 100), 1L)
