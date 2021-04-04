@@ -59,6 +59,12 @@ public class Account extends BaseTimeEntity {
         return role.getValue();
     }
 
+    public Account increaseRequestCount() {
+        // Letter 등록 때마다 1 증가한다.
+        this.requestCount += 1;
+        return this;
+    }
+
     public Account updateProfile(OAuthAttributes attributes) {
         this.name = attributes.getName();
         this.email = attributes.getEmail();
