@@ -51,6 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         web.ignoring().antMatchers(HttpMethod.GET, "/api/accounts/auth")
                       .antMatchers(HttpMethod.GET, "/api/accounts/auth/validation")
+                      .antMatchers(HttpMethod.GET, "/api/auth/google")
                       .antMatchers(HttpMethod.GET, "/api/letters/**")
         ;
     }
