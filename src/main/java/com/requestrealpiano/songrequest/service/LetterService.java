@@ -66,9 +66,10 @@ public class LetterService {
         SongRequest songRequest = letterRequest.getSongRequest();
         String songStory = letterRequest.getSongStory();
         Account account = accountRepository.findById(loginAccount.getId()).orElseThrow(AccountNotFoundException::new);
+        Account updatedAccount = account.increaseRequestCount();
         Song song = songService.updateRequestCountOrElseCreate(songRequest);
 
-        Letter newLetter = letterRepository.save(Letter.of(songStory, account, song));
+        Letter newLetter = letterRepository.save(Letter.of(songStory, updatedAccount, song));
         return LetterDetails.from(newLetter);
     }
 

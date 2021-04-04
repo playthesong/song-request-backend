@@ -29,6 +29,7 @@ public class AccountFactory {
                       .googleOauthId("771713471123")
                       .name("Username")
                       .email("User email")
+                      .requestCount(0)
                       .role(Role.MEMBER)
                       .avatarUrl("http://avatarUrl")
                       .build();
