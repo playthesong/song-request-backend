@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.delete;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.*;
@@ -76,5 +77,21 @@ class AccountControllerTest extends BaseControllerTest {
 
         // then
         MockMvcResponse.OK(results);
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("NO_CONTENT - Account 삭제 API 테스트")
+    void delete_account() throws Exception {
+        // given
+        OAuthAccount loginAccount = createOAuthAccountOf(MEMBER);
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/accounts")
+                                                .withPrincipal(loginAccount)
+                                                .doRequest());
+        
+        // then
+        MockMvcResponse.NO_CONTENT(results);
     }
 }
