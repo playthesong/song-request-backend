@@ -63,7 +63,7 @@ public class AccountServiceJpaTest extends BaseIntegrationTest {
         long afterAccountCount = accountRepository.count();
         // then
         assertAll(
-                () -> assertThat(beforeLetterCount).isEqualTo(letters.size()),
+                () -> assertThat(beforeLetterCount).isEqualTo(savedLetters.size()),
                 () -> assertThat(afterLetterCount).isEqualTo(afterDeleteCount),
                 () -> assertThat(beforeAccountCount).isEqualTo(initialCount),
                 () -> assertThat(afterAccountCount).isEqualTo(afterDeleteCount)

@@ -39,4 +39,10 @@ public class AccountController {
         AccountDetail accountDetail = accountService.findAccountDetail(loginAccount);
         return ApiResponse.SUCCESS(StatusCode.OK, accountDetail);
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping
+    public void delete(@LoginAccount OAuthAccount loginAccount) {
+        accountService.deleteAccount(loginAccount);
+    }
 }
