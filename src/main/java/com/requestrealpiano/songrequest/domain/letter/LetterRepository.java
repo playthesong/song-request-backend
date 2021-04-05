@@ -1,8 +1,10 @@
 package com.requestrealpiano.songrequest.domain.letter;
 
+import com.requestrealpiano.songrequest.domain.account.Account;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,4 +22,8 @@ public interface LetterRepository extends JpaRepository<Letter, Long>  {
     Page<Letter> findAllTodayLettersByRequestStatus(Pageable pageable, @Param("requestStatus")RequestStatus requestStatus,
                                                     @Param("startDateTime")LocalDateTime startDateTime,
                                                     @Param("endDateTime")LocalDateTime endDateTime);
+
+    @Modifying
+    @Query("DELETE FROM Letter l WHERE l.account = :account")
+    void deleteByAccount(@Param("account")Account account);
 }
