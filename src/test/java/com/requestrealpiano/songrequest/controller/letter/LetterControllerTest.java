@@ -434,7 +434,7 @@ class LetterControllerTest extends BaseControllerTest {
 
     @Test
     @WithMember
-    @DisplayName("FORBIDDEN - ADMIN 권한을 가지지 않은 사용자가 요청 했을 경우 요청이 실패하는 테스트")
+    @DisplayName("FORBIDDEN - ADMIN 권한을 가지지 않은 사용자가 Status 변경 요청 했을 경우 요청이 실패하는 테스트")
     void forbidden_change_status() throws Exception {
         // given
         ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
@@ -444,6 +444,39 @@ class LetterControllerTest extends BaseControllerTest {
 
         // when
         ResultActions results = mockMvc.perform(put("/api/letters/{id}/status", letterId)
+                                                .withPrincipal(memberAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError);
+    }
+
+    @Test
+    @WithAdmin
+    @DisplayName("OK - 오늘 등록 된 Letters 데이터를 초기화하는 테스트")
+    void initialize_letters() throws Exception {
+        // given
+        OAuthAccount adminAccount = createOAuthAccountOf(ADMIN);
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/letters/yesterday")
+                                                .withPrincipal(adminAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.NO_CONTENT(results);
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("FORBIDDEN - ADMIN 권한을 가지지 않은 사용자가 Letters 데이터 초기화를 요청했을 경우 예외가 발생하는 테스트")
+    void forbidden_initialize_letters() throws Exception {
+        // given
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+        OAuthAccount memberAccount = createOAuthAccountOf(MEMBER);
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/letters/yesterday")
                                                 .withPrincipal(memberAccount)
                                                 .doRequest());
 

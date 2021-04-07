@@ -108,4 +108,11 @@ public class LetterService {
         }
         letterRepository.delete(letter);
     }
+
+    @Transactional
+    public void initializeTodayLetters() {
+        LocalDateTime endDateTime = scheduler.now();
+        LocalDateTime startDateTime = scheduler.initializationStartDateTimeFrom(endDateTime);
+        letterRepository.deleteAllTodayLetters(startDateTime, endDateTime);
+    }
 }

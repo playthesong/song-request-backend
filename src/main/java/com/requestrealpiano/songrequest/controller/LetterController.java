@@ -78,4 +78,10 @@ public class LetterController {
         LettersResponse letters = letterService.findLettersByStatus(requestStatus, paginationParameters);
         return SUCCESS(OK, letters);
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/yesterday")
+    public void initialize() {
+        letterService.initializeTodayLetters();
+    }
 }
