@@ -44,6 +44,7 @@ public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
+            .antMatchers(HttpMethod.POST, "/api/admin/**").hasRole(ADMIN.getKey())
             .antMatchers(HttpMethod.POST, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
             .antMatchers(HttpMethod.PUT, "/api/letters/{id}/status").hasRole(ADMIN.getKey())
             .antMatchers(HttpMethod.PUT, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())

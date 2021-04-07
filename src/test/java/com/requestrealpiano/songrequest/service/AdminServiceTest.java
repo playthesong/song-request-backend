@@ -32,6 +32,6 @@ class AdminServiceTest {
         Boolean isReadyToLetter = adminService.changeReadyToLetter(request);
 
         // then
-        assertThat(isReadyToLetter).isFalse();
+        assertThat(isReadyToLetter).isTrue();
     }
 }
