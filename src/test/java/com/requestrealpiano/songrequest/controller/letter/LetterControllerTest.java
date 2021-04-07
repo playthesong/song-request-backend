@@ -52,6 +52,7 @@ import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
+import static java.lang.Boolean.TRUE;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -243,7 +244,7 @@ class LetterControllerTest extends BaseControllerTest {
         // given
         PaginationParameters parameters = createPaginationParameters();
         Page<Letter> lettersPage = createLettersPage();
-        LettersResponse lettersResponse = LettersResponse.from(lettersPage);
+        LettersResponse lettersResponse = LettersResponse.from(lettersPage, TRUE);
 
         // when
         when(letterService.findLettersByStatus(eq(DONE), refEq(parameters))).thenReturn(lettersResponse);

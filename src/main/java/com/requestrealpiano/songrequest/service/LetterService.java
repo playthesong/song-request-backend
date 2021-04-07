@@ -43,7 +43,7 @@ public class LetterService {
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
         Page<Letter> letters = letterRepository.findAllTodayLetters(letterPage, startDateTime, endDateTime);
-        return LettersResponse.from(letters);
+        return LettersResponse.from(letters, admin.isReadyToLetter());
     }
 
     public LetterDetails findLetter(Long id) {
@@ -57,7 +57,7 @@ public class LetterService {
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
         Page<Letter> letters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, requestStatus, startDateTime, endDateTime);
-        return LettersResponse.from(letters);
+        return LettersResponse.from(letters, admin.isReadyToLetter());
     }
 
     @Transactional

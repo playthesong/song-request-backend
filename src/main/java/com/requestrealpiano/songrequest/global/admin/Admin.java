@@ -16,6 +16,10 @@ public class Admin {
         return this.readyToLetter;
     }
 
+    public boolean isReadyToLetter() {
+        return readyToLetter;
+    }
+
     public boolean isNotReadyToLetter() {
         return !readyToLetter;
     }
