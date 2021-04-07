@@ -13,10 +13,7 @@ import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
 import com.requestrealpiano.songrequest.global.admin.Admin;
-import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
-import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
-import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
-import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
+import com.requestrealpiano.songrequest.global.error.exception.business.*;
 import com.requestrealpiano.songrequest.global.pagination.Pagination;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
@@ -65,6 +62,10 @@ public class LetterService {
 
     @Transactional
     public LetterDetails createLetter(OAuthAccount loginAccount, LetterRequest letterRequest) {
+        if (admin.isNotReadyToLetter()) {
+            throw new LetterNotReadyException();
+        }
+
         SongRequest songRequest = letterRequest.getSongRequest();
         String songStory = letterRequest.getSongStory();
         Account account = accountRepository.findById(loginAccount.getId()).orElseThrow(AccountNotFoundException::new);

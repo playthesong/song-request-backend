@@ -16,6 +16,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestB
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotReadyException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
@@ -184,6 +185,28 @@ class LetterControllerTest extends BaseControllerTest {
                                responseFields(ResponseFields.error())
                        ))
         ;
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("BAD_REQUEST - 신청곡 요청이 중단된 상태에서 사용자가 Letter 등록을 요청하는 테스트")
+    void bad_request_not_ready_to_create_letter() throws Exception {
+        // given
+        ErrorCode letterNotReadyError = ErrorCode.LETTER_NOT_READY;
+        OAuthAccount memberAccount = createOAuthAccountOf(MEMBER);
+        LetterRequest letterRequest = createLetterRequestOf("songStory", createSongRequest());
+
+        // when
+        when(letterService.createLetter(any(OAuthAccount.class), any(LetterRequest.class)))
+                .thenThrow(new LetterNotReadyException());
+
+        ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withPrincipal(memberAccount)
+                                                .withBody(objectMapper.writeValueAsString(letterRequest))
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.BAD_REQUEST(results, letterNotReadyError);
     }
 
     @ParameterizedTest
