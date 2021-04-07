@@ -26,4 +26,8 @@ public interface LetterRepository extends JpaRepository<Letter, Long>  {
     @Modifying
     @Query("DELETE FROM Letter l WHERE l.account = :account")
     void deleteByAccount(@Param("account")Account account);
+
+    @Modifying
+    @Query("DELETE FROM Letter l WHERE l.createdDateTime BETWEEN :startDateTime AND :endDateTime")
+    void deleteAllTodayLetters(LocalDateTime startDateTime, LocalDateTime endDateTime);
 }
