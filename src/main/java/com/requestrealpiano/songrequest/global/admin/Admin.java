@@ -11,8 +11,9 @@ public class Admin {
         this.readyToLetter = true;
     }
 
-    public void changeReadyToLetter(boolean readyToLetter) {
+    public boolean changeReadyToLetter(boolean readyToLetter) {
         this.readyToLetter = readyToLetter;
+        return this.readyToLetter;
     }
 
     public boolean isReadyToLetter() {
