@@ -51,11 +51,12 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
     @ParameterizedTest
     @MethodSource("findLettersByDateTimeParameters")
     @DisplayName("ALL - 설정된 시간에 해당 되는 Letter 목록을 가져오는 테스트")
-    void datetime_find_all_letters(List<Letter> foundLetters, List<Letter> notFoundLetters, Integer page, Integer pageSize) {
+    void datetime_find_all_letters(List<Letter> foundLetters, List<Letter> notFoundLetters,
+                                   Integer page, Integer pageSize, String direction) {
         /* 하루 전 19시 부터 현재시간 까지의 Letters 를 모두 조회하는 테스트 */
 
         // given
-        PaginationParameters parameters = createPaginationParametersOf(page, pageSize);
+        PaginationParameters parameters = createPaginationParametersOf(page, pageSize, direction);
         PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(),  Sort.by(Sort.Direction.DESC, CREATED_DATE_TIME.getFieldName()));
 
         LocalDateTime foundTime = LocalDateTime.of(2021, 3, 26, 19, 0, 0);
@@ -91,11 +92,12 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
     @ParameterizedTest
     @MethodSource("findLettersByDateTimeParameters")
     @DisplayName("By RequestStatus - 설정된 시간에 해당 되는 Letter 목록을 가져오는 테스트")
-    void datetime_find_letters_by_status(List<Letter> foundLetters, List<Letter> notFoundLetters, Integer page, Integer pageSize) {
+    void datetime_find_letters_by_status(List<Letter> foundLetters, List<Letter> notFoundLetters,
+                                         Integer page, Integer pageSize, String direction) {
         /* 하루 전 19시 부터 현재시간 까지의 Letters 를 Status 기준으로 조회하는 테스트 */
 
         // given
-        PaginationParameters parameters = createPaginationParametersOf(page, pageSize);
+        PaginationParameters parameters = createPaginationParametersOf(page, pageSize, direction);
         PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(),  Sort.by(Sort.Direction.DESC, CREATED_DATE_TIME.getFieldName()));
 
         LocalDateTime foundTime = LocalDateTime.of(2021, 3, 27, 19, 0, 0);
@@ -181,6 +183,7 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
     private static Stream<Arguments> findLettersByDateTimeParameters() {
         Integer page = 1;
         Integer size = 20;
+        String direction = "ASC";
 
         List<Letter> foundLetters = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -193,7 +196,7 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
         }
 
         return Stream.of(
-                Arguments.of(foundLetters, notFoundLetters, page, size)
+                Arguments.of(foundLetters, notFoundLetters, page, size, direction)
         );
     }
 }

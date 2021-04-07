@@ -35,9 +35,9 @@ class LetterRepositoryTest extends BaseRepositoryTest {
     @ParameterizedTest
     @MethodSource("paginationFindAllLettersParameters")
     @DisplayName("Paging 처리된 Letter 목록 조회 테스트")
-    void pagination_find_all_letters(List<Letter> letters, Integer page, Integer size) {
+    void pagination_find_all_letters(List<Letter> letters, Integer page, Integer size, String direction) {
         // given
-        PaginationParameters parameters = createPaginationParametersOf(page, size);
+        PaginationParameters parameters = createPaginationParametersOf(page, size, direction);
         PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(),  Sort.by(Direction.DESC, CREATED_DATE_TIME.getFieldName()));
 
         // when
@@ -93,6 +93,7 @@ class LetterRepositoryTest extends BaseRepositoryTest {
     private static Stream<Arguments> paginationFindAllLettersParameters() {
         Integer page = 1;
         Integer size = 20;
+        String direction = "ASC";
         List<Letter> letters = new ArrayList<>();
 
         for (int i = 0; i < 10 ; i++) {
@@ -100,7 +101,7 @@ class LetterRepositoryTest extends BaseRepositoryTest {
         }
 
         return Stream.of(
-                Arguments.of(letters, page, size)
+                Arguments.of(letters, page, size, direction)
         );
     }
 }

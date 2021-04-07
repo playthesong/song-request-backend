@@ -12,6 +12,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.global.admin.Admin;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
@@ -39,9 +40,10 @@ public class LetterService {
     private final AccountRepository accountRepository;
     private final SongService songService;
     private final Scheduler scheduler;
+    private final Admin admin;
 
     public LettersResponse findAllLetters(PaginationParameters parameters) {
-        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
+        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), parameters.getDirection(), CREATED_DATE_TIME);
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
         Page<Letter> letters = letterRepository.findAllTodayLetters(letterPage, startDateTime, endDateTime);
@@ -54,7 +56,8 @@ public class LetterService {
     }
 
     public LettersResponse findLettersByStatus(RequestStatus requestStatus, PaginationParameters parameters) {
-        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
+        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(),
+                                               parameters.getDirection(), CREATED_DATE_TIME);
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
         Page<Letter> letters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, requestStatus, startDateTime, endDateTime);
