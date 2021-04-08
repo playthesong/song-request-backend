@@ -18,7 +18,7 @@ public class SearchSongParameters {
 
     public void setArtist(String artist) {
         if (StringUtils.isEmpty(artist)) {
-            this.artist = "artist";
+            this.artist = StringUtils.SPACE;
             return;
         }
         this.artist = artist;
@@ -26,7 +26,7 @@ public class SearchSongParameters {
 
     public void setTitle(String title) {
         if (StringUtils.isEmpty(title)) {
-            this.title = "title";
+            this.title = StringUtils.SPACE;
             return;
         }
         this.title = title;
