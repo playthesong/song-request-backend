@@ -1,5 +1,6 @@
 package com.requestrealpiano.songrequest.testconfig.security;
 
+import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.security.oauth.CustomAccessDeniedHandler;
 import com.requestrealpiano.songrequest.security.oauth.CustomAuthenticationEntryPoint;
 import com.requestrealpiano.songrequest.testconfig.security.filter.MockAuthenticationFilter;
@@ -23,6 +24,10 @@ public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
+    private final String ADMIN = Role.ADMIN.getKey();
+    private final String MEMBER = Role.MEMBER.getKey();
+    private final String GUEST = Role.GUEST.getKey();
+
     public SecurityTestConfig(CustomAuthenticationEntryPoint customAuthenticationEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
         this.customAccessDeniedHandler = customAccessDeniedHandler;
@@ -44,16 +49,16 @@ public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-            .antMatchers(HttpMethod.GET, "/api/admin/**").hasRole(ADMIN.getKey())
-            .antMatchers(HttpMethod.POST, "/api/admin/**").hasRole(ADMIN.getKey())
-            .antMatchers(HttpMethod.POST, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.PUT, "/api/letters/{id}/status").hasRole(ADMIN.getKey())
-            .antMatchers(HttpMethod.PUT, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.DELETE, "/api/letters/yesterday").hasRole(ADMIN.getKey())
-            .antMatchers(HttpMethod.DELETE, "/api/letters/{id}").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.GET, "/api/songs/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.GET, "/api/accounts/detail").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.DELETE, "/api/accounts").hasAnyRole(GUEST.getKey(), MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.GET, "/api/admin/**").hasRole(ADMIN)
+            .antMatchers(HttpMethod.POST, "/api/admin/**").hasRole(ADMIN)
+            .antMatchers(HttpMethod.POST, "/api/letters/**").hasAnyRole(MEMBER, ADMIN)
+            .antMatchers(HttpMethod.PUT, "/api/letters/{id}/status").hasRole(ADMIN)
+            .antMatchers(HttpMethod.PUT, "/api/letters/**").hasAnyRole(MEMBER, ADMIN)
+            .antMatchers(HttpMethod.DELETE, "/api/letters/yesterday").hasRole(ADMIN)
+            .antMatchers(HttpMethod.DELETE, "/api/letters/{id}").hasAnyRole(MEMBER, ADMIN)
+            .antMatchers(HttpMethod.GET, "/api/songs/**").hasAnyRole(MEMBER, ADMIN)
+            .antMatchers(HttpMethod.GET, "/api/accounts/detail").hasAnyRole(GUEST, MEMBER, ADMIN)
+            .antMatchers(HttpMethod.DELETE, "/api/accounts").hasAnyRole(GUEST, MEMBER, ADMIN)
             .anyRequest().authenticated();
 
         http.addFilterBefore(characterEncodingFilter(), CsrfFilter.class)
