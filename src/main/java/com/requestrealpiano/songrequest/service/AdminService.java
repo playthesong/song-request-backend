@@ -14,4 +14,8 @@ public class AdminService {
     public Boolean changeReadyToLetter(ChangeReadyRequest changeReadyRequest) {
         return admin.changeReadyToLetter(changeReadyRequest.getReadyToLetter());
     }
+
+    public Boolean findReadyToLetter() {
+        return admin.isReadyToLetter();
+    }
 }

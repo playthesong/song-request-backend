@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.domain.letter.request.ChangeReadyRequest;
+import com.requestrealpiano.songrequest.global.admin.Admin;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
@@ -14,11 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.requestrealpiano.songrequest.controller.MockMvcRequest.get;
 import static com.requestrealpiano.songrequest.controller.MockMvcRequest.post;
 import static com.requestrealpiano.songrequest.domain.account.Role.ADMIN;
 import static com.requestrealpiano.songrequest.domain.account.Role.MEMBER;
@@ -40,6 +43,42 @@ class AdminControllerTest extends BaseControllerTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @SpyBean
+    Admin admin;
+
+    @Test
+    @WithAdmin
+    @DisplayName("OK - Letter 등록 가능 여부 조회 API 테스트")
+    void ok_ready_to_letter() throws Exception {
+        // given
+        OAuthAccount adminAccount = createOAuthAccountOf(ADMIN);
+
+        // when
+        ResultActions results = mockMvc.perform(get("/api/admin/letters/ready")
+                                                .withPrincipal(adminAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.OK(results);
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("FORBIDDEN - ADMIN 권한이 없는 사용자가 Letter 등록 상태 조회를 요청할 때 예외가 발생하는 테스트")
+    void forbidden_ready_to_letter() throws Exception {
+        // given
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+        OAuthAccount memberAccount = createOAuthAccountOf(MEMBER);
+
+        // when
+        ResultActions results = mockMvc.perform(get("/api/admin/letters/ready")
+                                                .withPrincipal(memberAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError);
+    }
 
     @Test
     @WithAdmin
@@ -83,4 +122,6 @@ class AdminControllerTest extends BaseControllerTest {
         // then
         MockMvcResponse.FORBIDDEN(results, accessDeniedError);
     }
+
+
 }
