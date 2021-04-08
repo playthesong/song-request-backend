@@ -14,15 +14,17 @@ import java.util.stream.Collectors;
 public class LettersResponse {
 
     private final PageDetails pageDetails;
+    private final boolean readyToLetter;
     private final List<LetterDetails> letters;
 
     @Builder
-    private LettersResponse(PageDetails pageDetails, List<LetterDetails> letters) {
+    private LettersResponse(PageDetails pageDetails, List<LetterDetails> letters, boolean readyToLetter) {
         this.pageDetails = pageDetails;
+        this.readyToLetter = readyToLetter;
         this.letters = letters;
     }
 
-    public static LettersResponse from(Page<Letter> currentPageLetters) {
+    public static LettersResponse from(Page<Letter> currentPageLetters, boolean readyToLetter) {
         List<Letter> currentLetters = currentPageLetters.getContent();
         List<LetterDetails> letters = currentLetters.stream()
                                                     .map(LetterDetails::from)
@@ -30,6 +32,7 @@ public class LettersResponse {
 
         return LettersResponse.builder()
                               .pageDetails(PageDetails.from(currentPageLetters))
+                              .readyToLetter(readyToLetter)
                               .letters(letters)
                               .build();
     }

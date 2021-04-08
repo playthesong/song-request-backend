@@ -16,6 +16,7 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequestB
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotReadyException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.security.SecurityConfig;
@@ -51,6 +52,7 @@ import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
+import static java.lang.Boolean.TRUE;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -84,6 +86,7 @@ class LetterControllerTest extends BaseControllerTest {
         ResultActions results = mockMvc.perform(get("/api/letters")
                                                 .withParam("page", String.valueOf(parameters.getPage()))
                                                 .withParam("size", String.valueOf(parameters.getSize()))
+                                                .withParam("direction", String.valueOf(parameters.getDirection()))
                                                 .doRequest());
 
         // then
@@ -93,9 +96,9 @@ class LetterControllerTest extends BaseControllerTest {
     @ParameterizedTest
     @MethodSource("paginationFindAllLettersParameters")
     @DisplayName("OK - 전체 Letter 목록 페이징 경계 값 테스트")
-    void pagination_find_all_letters(Integer page, Integer size) throws Exception {
+    void pagination_find_all_letters(Integer page, Integer size, String direction) throws Exception {
         // given
-        PaginationParameters parameters = createPaginationParametersOf(page, size);
+        PaginationParameters parameters = createPaginationParametersOf(page, size, direction);
         LettersResponse letters = createLettersResponse();
 
         // when
@@ -104,6 +107,7 @@ class LetterControllerTest extends BaseControllerTest {
         ResultActions results = mockMvc.perform(get("/api/letters")
                                                 .withParam("page", String.valueOf(parameters.getPage()))
                                                 .withParam("size", String.valueOf(parameters.getSize()))
+                                                .withParam("direction", String.valueOf(parameters.getDirection()))
                                                 .doRequest());
 
         // then
@@ -184,6 +188,28 @@ class LetterControllerTest extends BaseControllerTest {
         ;
     }
 
+    @Test
+    @WithMember
+    @DisplayName("BAD_REQUEST - 신청곡 요청이 중단된 상태에서 사용자가 Letter 등록을 요청하는 테스트")
+    void bad_request_not_ready_to_create_letter() throws Exception {
+        // given
+        ErrorCode letterNotReadyError = ErrorCode.LETTER_NOT_READY;
+        OAuthAccount memberAccount = createOAuthAccountOf(MEMBER);
+        LetterRequest letterRequest = createLetterRequestOf("songStory", createSongRequest());
+
+        // when
+        when(letterService.createLetter(any(OAuthAccount.class), any(LetterRequest.class)))
+                .thenThrow(new LetterNotReadyException());
+
+        ResultActions results = mockMvc.perform(post("/api/letters")
+                                                .withPrincipal(memberAccount)
+                                                .withBody(objectMapper.writeValueAsString(letterRequest))
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.BAD_REQUEST(results, letterNotReadyError);
+    }
+
     @ParameterizedTest
     @MethodSource("accessDeniedUserCreateLetterParameters")
     @WithGuest
@@ -218,7 +244,7 @@ class LetterControllerTest extends BaseControllerTest {
         // given
         PaginationParameters parameters = createPaginationParameters();
         Page<Letter> lettersPage = createLettersPage();
-        LettersResponse lettersResponse = LettersResponse.from(lettersPage);
+        LettersResponse lettersResponse = LettersResponse.from(lettersPage, TRUE);
 
         // when
         when(letterService.findLettersByStatus(eq(DONE), refEq(parameters))).thenReturn(lettersResponse);
@@ -226,6 +252,7 @@ class LetterControllerTest extends BaseControllerTest {
         ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", "done")
                                                 .withParam("page", String.valueOf(parameters.getPage()))
                                                 .withParam("size", String.valueOf(parameters.getSize()))
+                                                .withParam("direction", String.valueOf(parameters.getDirection()))
                                                 .doRequest());
 
         // then
@@ -434,7 +461,7 @@ class LetterControllerTest extends BaseControllerTest {
 
     @Test
     @WithMember
-    @DisplayName("FORBIDDEN - ADMIN 권한을 가지지 않은 사용자가 요청 했을 경우 요청이 실패하는 테스트")
+    @DisplayName("FORBIDDEN - ADMIN 권한을 가지지 않은 사용자가 Status 변경 요청 했을 경우 요청이 실패하는 테스트")
     void forbidden_change_status() throws Exception {
         // given
         ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
@@ -451,16 +478,50 @@ class LetterControllerTest extends BaseControllerTest {
         MockMvcResponse.FORBIDDEN(results, accessDeniedError);
     }
 
+    @Test
+    @WithAdmin
+    @DisplayName("OK - 오늘 등록 된 Letters 데이터를 초기화하는 테스트")
+    void initialize_letters() throws Exception {
+        // given
+        OAuthAccount adminAccount = createOAuthAccountOf(ADMIN);
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/letters/yesterday")
+                                                .withPrincipal(adminAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.NO_CONTENT(results);
+    }
+
+    @Test
+    @WithMember
+    @DisplayName("FORBIDDEN - ADMIN 권한을 가지지 않은 사용자가 Letters 데이터 초기화를 요청했을 경우 예외가 발생하는 테스트")
+    void forbidden_initialize_letters() throws Exception {
+        // given
+        ErrorCode accessDeniedError = ErrorCode.ACCESS_DENIED_ERROR;
+        OAuthAccount memberAccount = createOAuthAccountOf(MEMBER);
+
+        // when
+        ResultActions results = mockMvc.perform(delete("/api/letters/yesterday")
+                                                .withPrincipal(memberAccount)
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.FORBIDDEN(results, accessDeniedError);
+    }
+
     private static Stream<Arguments> paginationFindAllLettersParameters() {
         int pageMin = 0;
         int pageSizeMin = 10;
         int pageSizeMax = 50;
+        String wrongDirection = "Wrong Direction";
         return Stream.of(
-                Arguments.of(null, null),
-                Arguments.of(null, pageSizeMax + 1),
-                Arguments.of(pageMin - 1, null),
-                Arguments.of(pageMin - 1, pageSizeMin - 1),
-                Arguments.of(pageMin - 1, pageSizeMax + 1)
+                Arguments.of(null, null, wrongDirection),
+                Arguments.of(null, pageSizeMax + 1, wrongDirection),
+                Arguments.of(pageMin - 1, null, wrongDirection),
+                Arguments.of(pageMin - 1, pageSizeMin - 1, wrongDirection),
+                Arguments.of(pageMin - 1, pageSizeMax + 1, wrongDirection)
         );
     }
 

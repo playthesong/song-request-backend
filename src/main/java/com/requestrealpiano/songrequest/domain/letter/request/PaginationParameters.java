@@ -1,11 +1,14 @@
 package com.requestrealpiano.songrequest.domain.letter.request;
 
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 import static com.requestrealpiano.songrequest.global.constant.ValidationCondition.*;
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Getter
 public class PaginationParameters {
@@ -16,6 +19,8 @@ public class PaginationParameters {
     @Min(value = PAGE_SIZE_MIN, message = PAGE_SIZE_MESSAGE)
     @Max(value = PAGE_SIZE_MAX, message = PAGE_SIZE_MESSAGE)
     private Integer size;
+
+    private String direction;
 
     public void setPage(Integer page) {
         if (page == null|| page <= PAGE_MIN) {
@@ -31,5 +36,18 @@ public class PaginationParameters {
             return;
         }
         this.size = size;
+    }
+
+    public void setDirection(String direction) {
+        if (StringUtils.isEmpty(direction)) {
+            this.direction = DESC.name();
+            return;
+        }
+
+        if (StringUtils.equalsAnyIgnoreCase(direction, ASC.name(), DESC.name())) {
+            this.direction = direction;
+            return;
+        }
+        this.direction = DESC.name();
     }
 }

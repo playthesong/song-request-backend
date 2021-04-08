@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLettersPage;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPageDetailsOf;
+import static java.lang.Boolean.TRUE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -21,11 +22,12 @@ class LettersResponseTest {
         PageDetails pageDetails = createPageDetailsOf(lettersPage);
 
         // when
-        LettersResponse lettersResponse = LettersResponse.from(lettersPage);
+        LettersResponse lettersResponse = LettersResponse.from(lettersPage, TRUE);
 
         // then
         assertAll(
                 () -> assertThat(lettersResponse.getPageDetails()).isEqualToComparingFieldByField(pageDetails),
+                () -> assertThat(lettersResponse.isReadyToLetter()).isTrue(),
                 () -> assertThat(lettersResponse.getLetters().size()).isEqualTo(lettersPage.getContent().size())
         );
     }

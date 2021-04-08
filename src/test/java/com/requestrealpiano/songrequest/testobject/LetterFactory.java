@@ -23,6 +23,7 @@ import java.util.List;
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.testobject.AccountFactory.createMember;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.createSong;
+import static java.lang.Boolean.TRUE;
 
 public class LetterFactory {
 
@@ -205,7 +206,7 @@ public class LetterFactory {
 
     // LettersResponse
     public static LettersResponse createLettersResponse() {
-        return LettersResponse.from(createLettersPage());
+        return LettersResponse.from(createLettersPage(), TRUE);
     }
 
     // LetterRequest

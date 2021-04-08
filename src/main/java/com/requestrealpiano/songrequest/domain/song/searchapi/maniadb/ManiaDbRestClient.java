@@ -43,15 +43,10 @@ public class ManiaDbRestClient {
     }
 
     private String createValidKeyword(String artist, String title) {
-        String checkedArtist = artist;
-        String checkedTitle = title;
-        if (StringUtils.isEmpty(artist)) {
-            checkedArtist = "Artist";
+        String keyword = StringUtils.trim(artist + title);
+        if (StringUtils.isEmpty(keyword)) {
+            return "artist" + "title";
         }
-
-        if (StringUtils.isEmpty(title)) {
-            checkedTitle = "Title";
-        }
-        return checkedArtist + checkedTitle;
+        return keyword;
     }
 }

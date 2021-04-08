@@ -28,20 +28,22 @@ public class PaginationFactory {
         PaginationParameters parameters = new PaginationParameters();
         parameters.setPage(1);
         parameters.setSize(20);
+        parameters.setDirection("ASC");
         return parameters;
     }
 
-    public static PaginationParameters createPaginationParametersOf(Integer page, Integer size) {
+    public static PaginationParameters createPaginationParametersOf(Integer page, Integer size, String direction) {
         PaginationParameters parameters = new PaginationParameters();
         parameters.setPage(page);
         parameters.setSize(size);
+        parameters.setDirection(direction);
         return parameters;
     }
 
     // PageRequest
     public static PageRequest createPageRequest() {
         PaginationParameters parameters = createPaginationParameters();
-        Sort sortByCreatedDateTime = Sort.by(Sort.Direction.DESC, CREATED_DATE_TIME.getFieldName());
+        Sort sortByCreatedDateTime = Sort.by(Sort.Direction.ASC, CREATED_DATE_TIME.getFieldName());
         return PageRequest.of(parameters.getPage(), parameters.getSize(), sortByCreatedDateTime);
     }
 

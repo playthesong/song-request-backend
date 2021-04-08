@@ -2,6 +2,7 @@ package com.requestrealpiano.songrequest.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.requestrealpiano.songrequest.domain.account.AccountRepository;
+import com.requestrealpiano.songrequest.domain.account.Role;
 import com.requestrealpiano.songrequest.security.filter.JwtAuthorizationFilter;
 import com.requestrealpiano.songrequest.security.jwt.JwtTokenProvider;
 import com.requestrealpiano.songrequest.security.oauth.CustomAccessDeniedHandler;
@@ -44,6 +45,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
 
+    private final String ADMIN = Role.ADMIN.getKey();
+    private final String MEMBER = Role.MEMBER.getKey();
+    private final String GUEST = Role.GUEST.getKey();
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
@@ -63,13 +68,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .httpBasic().disable();
 
         http.authorizeRequests()
-            .antMatchers(HttpMethod.POST, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.PUT, "/api/letters/{id}/status").hasRole(ADMIN.getKey())
-            .antMatchers(HttpMethod.PUT, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.DELETE, "/api/letters/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.GET, "/api/songs/**").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.GET, "/api/accounts/detail").hasAnyRole(MEMBER.getKey(), ADMIN.getKey())
-            .antMatchers(HttpMethod.DELETE, "/api/accounts").hasAnyRole(GUEST.getKey(), MEMBER.getKey(), ADMIN.getKey())
+            .antMatchers(HttpMethod.GET, "/api/admin/**").hasRole(ADMIN)
+            .antMatchers(HttpMethod.POST, "/api/admin/**").hasRole(ADMIN)
+            .antMatchers(HttpMethod.POST, "/api/letters/**").hasAnyRole(MEMBER, ADMIN)
+            .antMatchers(HttpMethod.PUT, "/api/letters/{id}/status").hasRole(ADMIN)
+            .antMatchers(HttpMethod.PUT, "/api/letters/**").hasAnyRole(MEMBER, ADMIN)
+            .antMatchers(HttpMethod.DELETE, "/api/letters/yesterday").hasRole(ADMIN)
+            .antMatchers(HttpMethod.DELETE, "/api/letters/{id}").hasAnyRole(MEMBER, ADMIN)
+            .antMatchers(HttpMethod.GET, "/api/songs/**").hasAnyRole(MEMBER, ADMIN)
+            .antMatchers(HttpMethod.GET, "/api/accounts/detail").hasAnyRole(GUEST, MEMBER, ADMIN)
+            .antMatchers(HttpMethod.DELETE, "/api/accounts").hasAnyRole(GUEST, MEMBER, ADMIN)
             .anyRequest().authenticated();
 
         http.sessionManagement()

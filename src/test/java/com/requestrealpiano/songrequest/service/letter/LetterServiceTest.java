@@ -12,9 +12,11 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
+import com.requestrealpiano.songrequest.global.admin.Admin;
 import com.requestrealpiano.songrequest.global.error.exception.BusinessException;
 import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
+import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotReadyException;
 import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
 import com.requestrealpiano.songrequest.global.error.response.ErrorCode;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
@@ -29,6 +31,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -47,6 +50,7 @@ import static com.requestrealpiano.songrequest.testobject.LetterFactory.*;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPageRequest;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParameters;
 import static com.requestrealpiano.songrequest.testobject.SongFactory.*;
+import static java.lang.Boolean.FALSE;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.*;
@@ -69,6 +73,9 @@ class LetterServiceTest {
 
     @Mock
     Scheduler scheduler;
+
+    @Spy
+    Admin admin;
 
     @Test
     @DisplayName("저장 되어 있는 모든 Letters 로부터 LetterResponses 를 생성하는 테스트")
@@ -177,6 +184,24 @@ class LetterServiceTest {
                 () -> assertThat(letterDetails.getAccount().getName()).isEqualTo(newLetter.getAccount().getName()),
                 () -> assertThat(letterDetails.getAccount().getAvatarUrl()).isEqualTo(newLetter.getAccount().getAvatarUrl())
         );
+    }
+
+    @Test
+    @DisplayName("Not Ready - Letter 등록 가능 상태가 아닐 때 등록 요청하여 예외가 발생하는 테스트")
+    void not_ready_to_create_letter() {
+        // given
+        ErrorCode letterNotReadyError = ErrorCode.LETTER_NOT_READY;
+        OAuthAccount loginAccount = createOAuthAccountOf(MEMBER);
+        LetterRequest letterRequest = createLetterRequestOf("Song Story", createSongRequest());
+
+        // when
+        admin.changeReadyToLetter(FALSE);
+
+        // then
+        assertThatThrownBy(() -> letterService.createLetter(loginAccount, letterRequest))
+                .isExactlyInstanceOf(LetterNotReadyException.class)
+                .isInstanceOf(BusinessException.class)
+                .hasMessage(letterNotReadyError.getMessage());
     }
 
     @ParameterizedTest

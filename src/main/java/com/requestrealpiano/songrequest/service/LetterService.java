@@ -12,17 +12,14 @@ import com.requestrealpiano.songrequest.domain.letter.request.inner.SongRequest;
 import com.requestrealpiano.songrequest.domain.letter.response.LettersResponse;
 import com.requestrealpiano.songrequest.domain.letter.response.inner.LetterDetails;
 import com.requestrealpiano.songrequest.domain.song.Song;
-import com.requestrealpiano.songrequest.global.error.exception.business.AccountMismatchException;
-import com.requestrealpiano.songrequest.global.error.exception.business.AccountNotFoundException;
-import com.requestrealpiano.songrequest.global.error.exception.business.LetterNotFoundException;
-import com.requestrealpiano.songrequest.global.error.exception.business.LetterStatusException;
+import com.requestrealpiano.songrequest.global.admin.Admin;
+import com.requestrealpiano.songrequest.global.error.exception.business.*;
 import com.requestrealpiano.songrequest.global.pagination.Pagination;
 import com.requestrealpiano.songrequest.global.time.Scheduler;
 import com.requestrealpiano.songrequest.security.oauth.OAuthAccount;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,13 +36,14 @@ public class LetterService {
     private final AccountRepository accountRepository;
     private final SongService songService;
     private final Scheduler scheduler;
+    private final Admin admin;
 
     public LettersResponse findAllLetters(PaginationParameters parameters) {
-        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
+        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), parameters.getDirection(), CREATED_DATE_TIME);
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
         Page<Letter> letters = letterRepository.findAllTodayLetters(letterPage, startDateTime, endDateTime);
-        return LettersResponse.from(letters);
+        return LettersResponse.from(letters, admin.isReadyToLetter());
     }
 
     public LetterDetails findLetter(Long id) {
@@ -54,15 +52,20 @@ public class LetterService {
     }
 
     public LettersResponse findLettersByStatus(RequestStatus requestStatus, PaginationParameters parameters) {
-        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(), Direction.DESC, CREATED_DATE_TIME);
+        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(),
+                                               parameters.getDirection(), CREATED_DATE_TIME);
         LocalDateTime endDateTime = scheduler.now();
         LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
         Page<Letter> letters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, requestStatus, startDateTime, endDateTime);
-        return LettersResponse.from(letters);
+        return LettersResponse.from(letters, admin.isReadyToLetter());
     }
 
     @Transactional
     public LetterDetails createLetter(OAuthAccount loginAccount, LetterRequest letterRequest) {
+        if (admin.isNotReadyToLetter()) {
+            throw new LetterNotReadyException();
+        }
+
         SongRequest songRequest = letterRequest.getSongRequest();
         String songStory = letterRequest.getSongStory();
         Account account = accountRepository.findById(loginAccount.getId()).orElseThrow(AccountNotFoundException::new);
@@ -107,5 +110,12 @@ public class LetterService {
             throw new AccountMismatchException();
         }
         letterRepository.delete(letter);
+    }
+
+    @Transactional
+    public void initializeTodayLetters() {
+        LocalDateTime endDateTime = scheduler.now();
+        LocalDateTime startDateTime = scheduler.initializationStartDateTimeFrom(endDateTime);
+        letterRepository.deleteAllTodayLetters(startDateTime, endDateTime);
     }
 }

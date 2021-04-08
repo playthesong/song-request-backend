@@ -18,12 +18,14 @@ import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.requestrealpiano.songrequest.domain.letter.RequestStatus.WAITING;
 import static com.requestrealpiano.songrequest.global.constant.SortProperties.CREATED_DATE_TIME;
+import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetter;
 import static com.requestrealpiano.songrequest.testobject.LetterFactory.createLetters;
 import static com.requestrealpiano.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,9 +51,12 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
     @ParameterizedTest
     @MethodSource("findLettersByDateTimeParameters")
     @DisplayName("ALL - 설정된 시간에 해당 되는 Letter 목록을 가져오는 테스트")
-    void datetime_find_all_letters(List<Letter> foundLetters, List<Letter> notFoundLetters, Integer page, Integer pageSize) {
+    void datetime_find_all_letters(List<Letter> foundLetters, List<Letter> notFoundLetters,
+                                   Integer page, Integer pageSize, String direction) {
+        /* 하루 전 19시 부터 현재시간 까지의 Letters 를 모두 조회하는 테스트 */
+
         // given
-        PaginationParameters parameters = createPaginationParametersOf(page, pageSize);
+        PaginationParameters parameters = createPaginationParametersOf(page, pageSize, direction);
         PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(),  Sort.by(Sort.Direction.DESC, CREATED_DATE_TIME.getFieldName()));
 
         LocalDateTime foundTime = LocalDateTime.of(2021, 3, 26, 19, 0, 0);
@@ -87,9 +92,12 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
     @ParameterizedTest
     @MethodSource("findLettersByDateTimeParameters")
     @DisplayName("By RequestStatus - 설정된 시간에 해당 되는 Letter 목록을 가져오는 테스트")
-    void datetime_find_letters_by_status(List<Letter> foundLetters, List<Letter> notFoundLetters, Integer page, Integer pageSize) {
+    void datetime_find_letters_by_status(List<Letter> foundLetters, List<Letter> notFoundLetters,
+                                         Integer page, Integer pageSize, String direction) {
+        /* 하루 전 19시 부터 현재시간 까지의 Letters 를 Status 기준으로 조회하는 테스트 */
+
         // given
-        PaginationParameters parameters = createPaginationParametersOf(page, pageSize);
+        PaginationParameters parameters = createPaginationParametersOf(page, pageSize, direction);
         PageRequest pageRequest = PageRequest.of(parameters.getPage(), parameters.getSize(),  Sort.by(Sort.Direction.DESC, CREATED_DATE_TIME.getFieldName()));
 
         LocalDateTime foundTime = LocalDateTime.of(2021, 3, 27, 19, 0, 0);
@@ -122,9 +130,60 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("initializeLettersParameters")
+    @DisplayName("Letters initialization 테스트")
+    void initialize_letters(List<Letter> deletedLetters, long deletedLettersSize,
+                            List<Letter> notDeletedLetters, long notDeletedLettersSize) {
+        /* 하루 전 18시 59분 부터 현재시간 까지의 Letters 를 삭제하는 테스트 */
+
+        // given
+        LocalDateTime deletedTime = LocalDateTime.of(2021, 4, 7, 18, 59, 0);
+        LocalDateTime notDeletedTime = LocalDateTime.of(2021, 4, 7, 18, 58, 59);
+        LocalDateTime now = LocalDateTime.of(2021, 4, 8, 15, 5, 0);
+        LocalDateTime startDateTime = scheduler.initializationStartDateTimeFrom(now);
+
+        // when
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(notDeletedTime));
+        letterRepository.saveAll(notDeletedLetters);
+
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(deletedTime));
+        letterRepository.saveAll(deletedLetters);
+
+        long todayLettersCount = letterRepository.count();
+
+        when(dateTimeProvider.getNow()).thenReturn(Optional.of(now));
+        letterRepository.deleteAllTodayLetters(startDateTime, now);
+
+        long notDeletedCount = letterRepository.count();
+        long deletedCount = todayLettersCount - notDeletedCount;
+
+        // then
+        assertAll(
+                () -> assertThat(notDeletedCount).isEqualTo(notDeletedLettersSize),
+                () -> assertThat(deletedCount).isEqualTo(deletedLettersSize)
+        );
+    }
+
+    private static Stream<Arguments> initializeLettersParameters() {
+        List<Letter> deletedLetters = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            deletedLetters.addAll(createLetters());
+        }
+
+        List<Letter> notDeletedLetters = createLetters();
+
+        return Stream.of(
+                Arguments.of(
+                    deletedLetters, (long) deletedLetters.size(), notDeletedLetters, (long) notDeletedLetters.size()
+                )
+        );
+    }
+
     private static Stream<Arguments> findLettersByDateTimeParameters() {
         Integer page = 1;
         Integer size = 20;
+        String direction = "ASC";
 
         List<Letter> foundLetters = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -137,7 +196,7 @@ public class LetterRepositoryDateTimeTest extends BaseRepositoryTest {
         }
 
         return Stream.of(
-                Arguments.of(foundLetters, notFoundLetters, page, size)
+                Arguments.of(foundLetters, notFoundLetters, page, size, direction)
         );
     }
 }

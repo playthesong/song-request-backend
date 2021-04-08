@@ -24,6 +24,7 @@ public enum ErrorCode {
 
     // Letter
     INVALID_LETTER_STATUS(400, "요청한 신청곡 상태 변경 정보가 유효하지 않습니다."),
+    LETTER_NOT_READY(400, "현재 신청곡 등록이 중단되어 있습니다. 나중에 다시 시도 해주세요."),
     LETTER_NOT_FOUND(404, "해당 신청곡 및 사연이 존재하지 않습니다."),
 
     // Song

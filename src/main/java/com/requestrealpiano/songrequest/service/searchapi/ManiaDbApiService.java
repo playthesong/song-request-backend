@@ -1,6 +1,5 @@
 package com.requestrealpiano.songrequest.service.searchapi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
 import com.requestrealpiano.songrequest.domain.song.searchapi.maniadb.response.ManiaDbClientResponse;
 import com.requestrealpiano.songrequest.domain.song.searchapi.request.SearchSongParameters;
