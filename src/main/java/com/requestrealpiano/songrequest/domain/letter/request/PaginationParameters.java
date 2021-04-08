@@ -40,14 +40,14 @@ public class PaginationParameters {
 
     public void setDirection(String direction) {
         if (StringUtils.isEmpty(direction)) {
-            this.direction = ASC.name();
+            this.direction = DESC.name();
             return;
         }
 
-        if (StringUtils.equalsAny(ASC.name(), DESC.name())) {
+        if (StringUtils.equalsAnyIgnoreCase(direction, ASC.name(), DESC.name())) {
             this.direction = direction;
             return;
         }
-        this.direction = ASC.name();
+        this.direction = DESC.name();
     }
 }
