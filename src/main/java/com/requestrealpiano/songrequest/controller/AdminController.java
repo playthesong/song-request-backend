@@ -17,7 +17,7 @@ public class AdminController {
     private final AdminService adminService;
 
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/letters")
+    @PostMapping("/letters/ready")
     public ApiResponse<Boolean> changeReady(@RequestBody ChangeReadyRequest changeReadyRequest) {
         Boolean readyToLetter = adminService.changeReadyToLetter(changeReadyRequest);
         return ApiResponse.SUCCESS(OK, readyToLetter);

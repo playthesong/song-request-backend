@@ -53,7 +53,7 @@ class AdminControllerTest extends BaseControllerTest {
         // when
         when(adminService.changeReadyToLetter(refEq(changeReadyRequest))).thenReturn(TRUE);
 
-        ResultActions results = mockMvc.perform(post("/api/admin/letters")
+        ResultActions results = mockMvc.perform(post("/api/admin/letters/ready")
                                                 .withPrincipal(adminAccount)
                                                 .withBody(objectMapper.writeValueAsString(changeReadyRequest))
                                                 .doRequest());
@@ -75,7 +75,7 @@ class AdminControllerTest extends BaseControllerTest {
         // when
         when(adminService.changeReadyToLetter(refEq(changeReadyRequest))).thenReturn(FALSE);
 
-        ResultActions results = mockMvc.perform(post("/api/admin/letters")
+        ResultActions results = mockMvc.perform(post("/api/admin/letters/ready")
                                                 .withPrincipal(memberAccount)
                                                 .withBody(objectMapper.writeValueAsString(changeReadyRequest))
                                                 .doRequest());
