@@ -74,6 +74,20 @@ class PaginationParametersTest {
         assertThat(parameters.getSize()).isEqualTo(defaultSize);
     }
 
+    @Test
+    @DisplayName("Day Ago 경계 값 테스트")
+    void boundary_value_set_day_ago() {
+        // given
+        int minimumDayAgo = 0;
+        int defaultDayAgo = 1;
+
+        // when
+        parameters.setDayAgo(minimumDayAgo);
+
+        // then
+        assertThat(parameters.getDayAgo()).isEqualTo(defaultDayAgo);
+    }
+
     @ParameterizedTest
     @MethodSource("setDirectionParameters")
     @DisplayName("Direction 테스트")

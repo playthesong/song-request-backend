@@ -20,6 +20,8 @@ public class PaginationParameters {
     @Max(value = PAGE_SIZE_MAX, message = PAGE_SIZE_MESSAGE)
     private Integer size;
 
+    private Integer dayAgo;
+
     private String direction;
 
     public void setPage(Integer page) {
@@ -36,6 +38,14 @@ public class PaginationParameters {
             return;
         }
         this.size = size;
+    }
+
+    public void setDayAgo(Integer dayAgo) {
+        if (dayAgo <= DAY_AGO_MIN) {
+            this.dayAgo = DAY_AGO_DEFAULT;
+            return;
+        }
+        this.dayAgo = dayAgo;
     }
 
     public void setDirection(String direction) {

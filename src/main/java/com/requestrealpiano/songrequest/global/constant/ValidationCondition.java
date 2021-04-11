@@ -14,6 +14,9 @@ public class ValidationCondition {
     public static final int PAGE_SIZE_MIN = 10;
     public static final int PAGE_SIZE_MAX = 50;
 
+    public static final int DAY_AGO_MIN = 0;
+    public static final int DAY_AGO_DEFAULT = 1;
+
     // Artist
     public static final String ARTIST_MESSAGE = "아티스트는 30자 미만 입니다.";
     public static final int ARTIST_MAX = 30;
