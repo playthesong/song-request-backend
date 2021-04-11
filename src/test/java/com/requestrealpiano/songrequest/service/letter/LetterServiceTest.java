@@ -5,6 +5,7 @@ import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
+import com.requestrealpiano.songrequest.domain.letter.request.DateParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
@@ -104,7 +105,10 @@ class LetterServiceTest {
     void find_all_letters_by_request_status() {
         // given
         int first = 0;
+        int dayAgo = 1;
         PaginationParameters paginationParameters = createPaginationParameters();
+        DateParameters dateParams = new DateParameters();
+        dateParams.setDayAgo(dayAgo);
         PageRequest pageRequest = createPageRequest();
         List<Letter> waitingLetters = Collections.singletonList(createLetter());
 
@@ -115,7 +119,7 @@ class LetterServiceTest {
         when(letterRepository.findAllTodayLettersByRequestStatus(refEq(pageRequest), eq(WAITING),
                                                                  any(LocalDateTime.class), any(LocalDateTime.class)))
                 .thenReturn(new PageImpl<>(waitingLetters));
-        LettersResponse waitingLettersResponse = letterService.findLettersByStatus(WAITING, paginationParameters);
+        LettersResponse waitingLettersResponse = letterService.findLettersByStatus(WAITING, paginationParameters, dateParams);
 
         Letter waitingLetter = waitingLetters.get(first);
         LetterDetails waitingLetterDetails = waitingLettersResponse.getLetters().get(first);
