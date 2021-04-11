@@ -115,7 +115,7 @@ class LetterServiceTest {
         // when
         LocalDateTime now = LocalDateTime.now();
         when(scheduler.now()).thenReturn(now);
-        when(scheduler.defaultStartDateTimeFrom((any(LocalDateTime.class)))).thenReturn(now.minusDays(1));
+        when(scheduler.customStartDateTimeFrom((any(LocalDateTime.class)), eq(dayAgo))).thenReturn(now.minusDays(1));
         when(letterRepository.findAllTodayLettersByRequestStatus(refEq(pageRequest), eq(WAITING),
                                                                  any(LocalDateTime.class), any(LocalDateTime.class)))
                 .thenReturn(new PageImpl<>(waitingLetters));
