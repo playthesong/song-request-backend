@@ -1,7 +1,7 @@
 package live.playthesong.songrequest.controller;
 
-import live.playthesong.songrequest.domain.song.searchapi.request.SearchSongParameters;
-import live.playthesong.songrequest.domain.song.searchapi.response.SearchApiResponse;
+import live.playthesong.songrequest.searchapi.request.SearchSongParameters;
+import live.playthesong.songrequest.searchapi.response.SearchApiResponse;
 import live.playthesong.songrequest.global.response.ApiResponse;
 import live.playthesong.songrequest.service.SongService;
 import lombok.RequiredArgsConstructor;

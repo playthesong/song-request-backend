@@ -3,7 +3,7 @@ package live.playthesong.songrequest.testobject;
 import live.playthesong.songrequest.domain.letter.request.inner.SongRequest;
 import live.playthesong.songrequest.domain.letter.request.inner.SongRequestBuilder;
 import live.playthesong.songrequest.domain.song.Song;
-import live.playthesong.songrequest.domain.song.searchapi.request.SearchSongParameters;
+import live.playthesong.songrequest.searchapi.request.SearchSongParameters;
 
 import java.util.List;
 

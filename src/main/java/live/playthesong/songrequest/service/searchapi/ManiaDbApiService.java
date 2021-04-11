@@ -1,10 +1,10 @@
 package live.playthesong.songrequest.service.searchapi;
 
-import live.playthesong.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
-import live.playthesong.songrequest.domain.song.searchapi.maniadb.response.ManiaDbClientResponse;
-import live.playthesong.songrequest.domain.song.searchapi.request.SearchSongParameters;
-import live.playthesong.songrequest.domain.song.searchapi.response.SearchApiResponse;
-import live.playthesong.songrequest.domain.song.searchapi.translator.XmlTranslator;
+import live.playthesong.songrequest.searchapi.maniadb.ManiaDbRestClient;
+import live.playthesong.songrequest.searchapi.maniadb.response.ManiaDbClientResponse;
+import live.playthesong.songrequest.searchapi.request.SearchSongParameters;
+import live.playthesong.songrequest.searchapi.response.SearchApiResponse;
+import live.playthesong.songrequest.searchapi.translator.XmlTranslator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

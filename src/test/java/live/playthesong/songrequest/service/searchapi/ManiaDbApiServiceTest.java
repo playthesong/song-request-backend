@@ -1,10 +1,10 @@
 package live.playthesong.songrequest.service.searchapi;
 
-import live.playthesong.songrequest.domain.song.searchapi.maniadb.ManiaDbRestClient;
-import live.playthesong.songrequest.domain.song.searchapi.request.SearchSongParameters;
-import live.playthesong.songrequest.domain.song.searchapi.response.SearchApiResponse;
-import live.playthesong.songrequest.domain.song.searchapi.response.inner.Track;
-import live.playthesong.songrequest.domain.song.searchapi.translator.XmlTranslator;
+import live.playthesong.songrequest.searchapi.maniadb.ManiaDbRestClient;
+import live.playthesong.songrequest.searchapi.request.SearchSongParameters;
+import live.playthesong.songrequest.searchapi.response.SearchApiResponse;
+import live.playthesong.songrequest.searchapi.response.inner.Track;
+import live.playthesong.songrequest.searchapi.translator.XmlTranslator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,9 +1,9 @@
 package live.playthesong.songrequest.service.searchapi;
 
-import live.playthesong.songrequest.domain.song.searchapi.lastfm.LastFmRestClient;
-import live.playthesong.songrequest.domain.song.searchapi.request.SearchSongParameters;
-import live.playthesong.songrequest.domain.song.searchapi.response.SearchApiResponse;
-import live.playthesong.songrequest.domain.song.searchapi.translator.JsonTranslator;
+import live.playthesong.songrequest.searchapi.lastfm.LastFmRestClient;
+import live.playthesong.songrequest.searchapi.request.SearchSongParameters;
+import live.playthesong.songrequest.searchapi.response.SearchApiResponse;
+import live.playthesong.songrequest.searchapi.translator.JsonTranslator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
