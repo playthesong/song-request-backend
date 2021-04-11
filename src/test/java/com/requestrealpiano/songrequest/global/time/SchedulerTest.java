@@ -68,6 +68,31 @@ class SchedulerTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("customStartDateTimeParameters")
+    @DisplayName("신청곡 임의의 조회 시간 설정 테스트")
+    void custom_start_date_time(int endYear, int endMonth, int endDayOfMonth, int endHour, int endMinute, int endSecond,
+                                int startYear, int startMonth, int startDayOfMonth,
+                                int initializationHour, int initializationMinute, int initializationSecond) {
+        // given
+        int dayAgo = 10;
+        LocalDateTime endDateTime = LocalDateTime.of(endYear, endMonth, endDayOfMonth, endHour, endMinute, endSecond);
+
+        // when
+        LocalDateTime startDateTime = scheduler.customStartDateTimeFrom(endDateTime, dayAgo);
+
+        // then
+        assertAll(
+                () -> assertThat(startDateTime.getYear()).isEqualTo(startYear),
+                () -> assertThat(startDateTime.getMonthValue()).isEqualTo(startMonth),
+                () -> assertThat(startDateTime.getDayOfMonth()).isEqualTo(startDayOfMonth),
+                () -> assertThat(startDateTime.getHour()).isEqualTo(initializationHour),
+                () -> assertThat(startDateTime.getMinute()).isEqualTo(initializationMinute),
+                () -> assertThat(startDateTime.getSecond()).isEqualTo(initializationSecond)
+
+        );
+    }
+
     private static Stream<Arguments> initializationStartDateTimeParameters() {
         return Stream.of(
                 Arguments.of(2021, 4, 1, 14, 10, 11,
@@ -79,6 +104,13 @@ class SchedulerTest {
         return Stream.of(
                 Arguments.of(2021, 4, 1, 14, 10, 11,
                              2021, 3, 31, 19, 0, 0)
+        );
+    }
+
+    private static Stream<Arguments> customStartDateTimeParameters() {
+        return Stream.of(
+                Arguments.of(2021, 4, 1, 14, 10, 11,
+                             2021, 3, 22, 19, 0, 0)
         );
     }
 }

@@ -33,4 +33,10 @@ public class Scheduler {
         LocalTime startTime = LocalTime.of(INITIALIZATION_HOUR, INITIALIZATION_MINUTE, DEFAULT_SECOND);
         return LocalDateTime.of(startDate, startTime);
     }
+
+    public LocalDateTime customStartDateTimeFrom(LocalDateTime today, int dayAgo) {
+        LocalDate startDate = today.minusDays(dayAgo).toLocalDate();
+        LocalTime startTime = LocalTime.of(DEFAULT_HOUR, DEFAULT_MINUTE, DEFAULT_SECOND);
+        return LocalDateTime.of(startDate, startTime);
+    }
 }

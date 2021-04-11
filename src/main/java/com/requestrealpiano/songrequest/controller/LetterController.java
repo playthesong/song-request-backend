@@ -1,6 +1,7 @@
 package com.requestrealpiano.songrequest.controller;
 
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
+import com.requestrealpiano.songrequest.domain.letter.request.DateParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
@@ -74,8 +75,9 @@ public class LetterController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/status/{requestStatus}")
     public ApiResponse<LettersResponse> findByStatus(@PathVariable RequestStatus requestStatus,
-                                                     @ModelAttribute @Valid PaginationParameters paginationParameters) {
-        LettersResponse letters = letterService.findLettersByStatus(requestStatus, paginationParameters);
+                                                     @ModelAttribute @Valid PaginationParameters paginationParameters,
+                                                     @ModelAttribute DateParameters dateParameters) {
+        LettersResponse letters = letterService.findLettersByStatus(requestStatus, paginationParameters, dateParameters);
         return SUCCESS(OK, letters);
     }
 

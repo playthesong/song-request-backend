@@ -5,6 +5,7 @@ import com.requestrealpiano.songrequest.domain.account.AccountRepository;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
 import com.requestrealpiano.songrequest.domain.letter.LetterRepository;
 import com.requestrealpiano.songrequest.domain.letter.RequestStatus;
+import com.requestrealpiano.songrequest.domain.letter.request.DateParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
@@ -51,11 +52,12 @@ public class LetterService {
         return LetterDetails.from(letter);
     }
 
-    public LettersResponse findLettersByStatus(RequestStatus requestStatus, PaginationParameters parameters) {
-        PageRequest letterPage = Pagination.of(parameters.getPage(), parameters.getSize(),
-                                               parameters.getDirection(), CREATED_DATE_TIME);
+    public LettersResponse findLettersByStatus(RequestStatus requestStatus, PaginationParameters paginationParams,
+                                               DateParameters dateParams) {
+        PageRequest letterPage = Pagination.of(paginationParams.getPage(), paginationParams.getSize(),
+                                               paginationParams.getDirection(), CREATED_DATE_TIME);
         LocalDateTime endDateTime = scheduler.now();
-        LocalDateTime startDateTime = scheduler.defaultStartDateTimeFrom(endDateTime);
+        LocalDateTime startDateTime = scheduler.customStartDateTimeFrom(endDateTime, dateParams.getDayAgo());
         Page<Letter> letters = letterRepository.findAllTodayLettersByRequestStatus(letterPage, requestStatus, startDateTime, endDateTime);
         return LettersResponse.from(letters, admin.isReadyToLetter());
     }

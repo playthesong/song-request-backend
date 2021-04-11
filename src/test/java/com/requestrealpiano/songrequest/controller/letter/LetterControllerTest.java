@@ -8,6 +8,7 @@ import com.requestrealpiano.songrequest.controller.restdocs.Parameters;
 import com.requestrealpiano.songrequest.controller.restdocs.ResponseFields;
 import com.requestrealpiano.songrequest.domain.account.Account;
 import com.requestrealpiano.songrequest.domain.letter.Letter;
+import com.requestrealpiano.songrequest.domain.letter.request.DateParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.LetterRequest;
 import com.requestrealpiano.songrequest.domain.letter.request.PaginationParameters;
 import com.requestrealpiano.songrequest.domain.letter.request.StatusChangeRequest;
@@ -242,17 +243,23 @@ class LetterControllerTest extends BaseControllerTest {
     @DisplayName("OK - 유효한 Letter Status 값으로 요청하는 테스트")
     void valid_letter_status() throws Exception {
         // given
-        PaginationParameters parameters = createPaginationParameters();
+        int dayAgo = 1;
+
+        PaginationParameters paginationParams = createPaginationParameters();
+        DateParameters dateParams = new DateParameters();
+        dateParams.setDayAgo(dayAgo);
+
         Page<Letter> lettersPage = createLettersPage();
         LettersResponse lettersResponse = LettersResponse.from(lettersPage, TRUE);
 
         // when
-        when(letterService.findLettersByStatus(eq(DONE), refEq(parameters))).thenReturn(lettersResponse);
+        when(letterService.findLettersByStatus(eq(DONE), refEq(paginationParams), refEq(dateParams))).thenReturn(lettersResponse);
 
         ResultActions results = mockMvc.perform(get("/api/letters/status/{requestStatus}", "done")
-                                                .withParam("page", String.valueOf(parameters.getPage()))
-                                                .withParam("size", String.valueOf(parameters.getSize()))
-                                                .withParam("direction", String.valueOf(parameters.getDirection()))
+                                                .withParam("page", String.valueOf(paginationParams.getPage()))
+                                                .withParam("size", String.valueOf(paginationParams.getSize()))
+                                                .withParam("direction", String.valueOf(paginationParams.getDirection()))
+                                                .withParam("dayAgo", String.valueOf(dateParams.getDayAgo()))
                                                 .doRequest());
 
         // then
