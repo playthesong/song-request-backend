@@ -6,12 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.data.domain.Sort;
 
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 class PaginationParametersTest {
@@ -72,20 +70,6 @@ class PaginationParametersTest {
 
         // then
         assertThat(parameters.getSize()).isEqualTo(defaultSize);
-    }
-
-    @Test
-    @DisplayName("Day Ago 경계 값 테스트")
-    void boundary_value_set_day_ago() {
-        // given
-        int minimumDayAgo = 0;
-        int defaultDayAgo = 1;
-
-        // when
-        parameters.setDayAgo(minimumDayAgo);
-
-        // then
-        assertThat(parameters.getDayAgo()).isEqualTo(defaultDayAgo);
     }
 
     @ParameterizedTest
