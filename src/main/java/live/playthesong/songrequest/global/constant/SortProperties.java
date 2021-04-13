@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum SortProperties {
-    CREATED_DATE_TIME("createdDateTime")
-
+    CREATED_DATE_TIME("createdDateTime"),
+    REQUEST_COUNT("requestCount")
     ;
 
     private final String fieldName;
