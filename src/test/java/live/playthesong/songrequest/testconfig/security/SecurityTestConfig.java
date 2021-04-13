@@ -38,6 +38,7 @@ public class SecurityTestConfig extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers(HttpMethod.GET, "/api/accounts/auth")
                       .antMatchers(HttpMethod.GET, "/api/accounts/auth/validation")
                       .antMatchers(HttpMethod.GET, "/api/letters/**")
+                      .antMatchers(HttpMethod.GET, "/api/songs/ranking")
         ;
     }
 
