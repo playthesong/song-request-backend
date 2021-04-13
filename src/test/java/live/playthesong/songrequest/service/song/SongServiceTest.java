@@ -132,7 +132,7 @@ class SongServiceTest {
         List<Song> songs = new ArrayList<>();
 
         for (int i = minRequestCount; i <= maxRequestCount; i++) {
-            songs.add(createSongOf(i));
+            songs.add(createSongOf((long) i, i));
         }
 
         return Stream.of(
