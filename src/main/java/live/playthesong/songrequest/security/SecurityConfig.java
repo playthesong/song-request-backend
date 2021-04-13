@@ -56,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                       .antMatchers(HttpMethod.GET, "/api/accounts/auth/validation")
                       .antMatchers(HttpMethod.GET, "/api/auth/google")
                       .antMatchers(HttpMethod.GET, "/api/letters/**")
+                      .antMatchers(HttpMethod.GET, "/api/songs/ranking")
         ;
     }
 

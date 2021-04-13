@@ -1,5 +1,7 @@
 package live.playthesong.songrequest.controller;
 
+import live.playthesong.songrequest.domain.letter.request.PaginationParameters;
+import live.playthesong.songrequest.domain.song.response.SongRankingResponse;
 import live.playthesong.songrequest.searchapi.request.SearchSongParameters;
 import live.playthesong.songrequest.searchapi.response.SearchApiResponse;
 import live.playthesong.songrequest.global.response.ApiResponse;
@@ -21,6 +23,13 @@ import static live.playthesong.songrequest.global.response.StatusCode.OK;
 public class SongController {
 
     private final SongService songService;
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/ranking")
+    public ApiResponse<SongRankingResponse> ranking(@ModelAttribute @Valid PaginationParameters parameters) {
+        SongRankingResponse rankingResponse = songService.findSongs(parameters);
+        return SUCCESS(OK, rankingResponse);
+    }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping

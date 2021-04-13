@@ -4,6 +4,9 @@ import live.playthesong.songrequest.controller.MockMvcResponse;
 import live.playthesong.songrequest.controller.SongController;
 import live.playthesong.songrequest.controller.restdocs.Parameters;
 import live.playthesong.songrequest.controller.restdocs.ResponseFields;
+import live.playthesong.songrequest.domain.letter.request.PaginationParameters;
+import live.playthesong.songrequest.domain.song.Song;
+import live.playthesong.songrequest.domain.song.response.SongRankingResponse;
 import live.playthesong.songrequest.searchapi.lastfm.response.inner.LastFmTrack;
 import live.playthesong.songrequest.searchapi.request.SearchSongParameters;
 import live.playthesong.songrequest.searchapi.response.SearchApiResponse;
@@ -19,6 +22,7 @@ import live.playthesong.songrequest.controller.MockMvcRequest;
 import live.playthesong.songrequest.domain.account.Role;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,6 +31,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -36,9 +42,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static live.playthesong.songrequest.controller.MockMvcRequest.get;
+import static live.playthesong.songrequest.global.constant.SortProperties.REQUEST_COUNT;
 import static live.playthesong.songrequest.testobject.AccountFactory.createOAuthAccountOf;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static live.playthesong.songrequest.testobject.PaginationFactory.createPaginationParametersOf;
+import static live.playthesong.songrequest.testobject.SongFactory.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -54,6 +62,28 @@ class SongControllerTest extends BaseControllerTest {
 
     @MockBean
     SongService songService;
+
+    @Test
+    @DisplayName("OK - Song Ranking 조회 API 테스트")
+    void song_ranking() throws Exception {
+        // given
+        int page = 0;
+        int size = 30;
+        PaginationParameters parameters = createPaginationParametersOf(page, size, REQUEST_COUNT.getFieldName());
+        Page<Song> songs = new PageImpl<>(Arrays.asList(createSongOf(1L), createSongOf(2L), createSongOf(3L)));
+        
+        // when
+        when(songService.findSongs(refEq(parameters))).thenReturn(SongRankingResponse.from(songs));
+
+        ResultActions results = mockMvc.perform(get("/api/songs/ranking")
+                                                .withParam("page", String.valueOf(parameters.getPage()))
+                                                .withParam("size", String.valueOf(parameters.getSize()))
+                                                .withParam("direction", String.valueOf(parameters.getDirection()))
+                                                .doRequest());
+
+        // then
+        MockMvcResponse.OK(results);
+    }
 
     @ParameterizedTest
     @MethodSource("searchManiaDbParameters")
